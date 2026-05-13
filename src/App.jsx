@@ -540,12 +540,8 @@ function cleanStoredMap(value) {
 }
 
 function normalizeStoredState(value, storageAvailable = true) {
-  const hasThemePreference =
-    value && typeof value === "object" && !Array.isArray(value)
-      ? typeof value.hasThemePreference === "boolean"
-        ? value.hasThemePreference
-        : Object.prototype.hasOwnProperty.call(value, "theme")
-      : false;
+  const isStoredObject = value && typeof value === "object" && !Array.isArray(value);
+  const hasThemePreference = isStoredObject ? value.hasThemePreference === true : false;
 
   return {
     revealed: cleanStoredMap(value?.revealed),
@@ -654,6 +650,7 @@ function App({
   const [category, setCategory] = useState("All");
   const [level, setLevel] = useState("All");
   const [mode, setMode] = useState("browse");
+  const [drillScope, setDrillScope] = useState("browse");
   const [activeId, setActiveId] = useState(questions[0]?.id || "");
   const [revealed, setRevealed] = useState(storedState.revealed);
   const [reviewed, setReviewed] = useState(storedState.reviewed);
@@ -789,10 +786,11 @@ function App({
     () => filteredQuestions.filter((item) => starred[item.id]),
     [filteredQuestions, starred]
   );
-  const randomDrillPool = mode === "starred" ? starredQueue : filteredQuestions;
+  const usesSavedQueue = mode === "starred" || (mode === "mock" && drillScope === "starred");
+  const randomDrillPool = usesSavedQueue ? starredQueue : filteredQuestions;
   const studyQueue = useMemo(
-    () => (mode === "starred" ? starredQueue : filteredQuestions),
-    [filteredQuestions, mode, starredQueue]
+    () => (usesSavedQueue ? starredQueue : filteredQuestions),
+    [filteredQuestions, starredQueue, usesSavedQueue]
   );
   const activeQuestion =
     studyQueue.find((item) => item.id === activeId) || studyQueue[0] || null;
@@ -811,7 +809,7 @@ function App({
     !hasProgress && mode === "browse" && !query && category === "All" && level === "All";
   const hasNoMatches = filteredQuestions.length === 0;
   const isSavedEmpty =
-    mode === "starred" && filteredQuestions.length > 0 && !visibleQuestions.length;
+    usesSavedQueue && filteredQuestions.length > 0 && !visibleQuestions.length;
 
   useEffect(() => {
     if (studyQueue.length && !studyQueue.some((item) => item.id === activeId)) {
@@ -830,7 +828,11 @@ function App({
   }, [activeQueueIndex, mode, studyQueue.length, visibleLimit]);
 
   const reviewedCount = Object.values(reviewed).filter(Boolean).length;
-  const progress = questions.length ? Math.round((reviewedCount / questions.length) * 100) : 0;
+  const progress = questions.length
+    ? reviewedCount >= questions.length
+      ? 100
+      : Math.floor((reviewedCount / questions.length) * 100)
+    : 0;
   const thinkPrompt =
     activeQuestion &&
     (categoryPrompts[activeQuestion.category] ||
@@ -944,6 +946,7 @@ function App({
   function pickRandomQuestion() {
     if (!randomDrillPool.length) return;
     const next = randomDrillPool[Math.floor(Math.random() * randomDrillPool.length)];
+    setDrillScope(mode === "mock" ? drillScope : mode === "starred" ? "starred" : "browse");
     setActiveId(next.id);
     setMode("mock");
     showSessionNote("Random drill started.", "action");
@@ -1024,11 +1027,13 @@ function App({
     setCategory("All");
     setLevel("All");
     setMode("browse");
+    setDrillScope("browse");
     showSessionNote("Filters cleared.", "action");
   }
 
   function showQuestionQueue() {
     setMode("browse");
+    setDrillScope("browse");
     showSessionNote("Question queue shown.", "action");
   }
 
@@ -1037,7 +1042,7 @@ function App({
     const currentIndex = activeQueueIndex < 0 ? 0 : activeQueueIndex;
     const nextIndex = (currentIndex + direction + studyQueue.length) % studyQueue.length;
     setActiveId(studyQueue[nextIndex].id);
-    if (mode === "mock") setMode("browse");
+    if (mode === "mock") setMode(drillScope === "starred" ? "starred" : "browse");
     showSessionNote(`Question ${nextIndex + 1} of ${studyQueue.length}.`);
   }
 
@@ -1142,7 +1147,10 @@ function App({
             type="button"
             className={mode === "browse" ? "active" : ""}
             aria-pressed={mode === "browse"}
-            onClick={() => setMode("browse")}
+            onClick={() => {
+              setMode("browse");
+              setDrillScope("browse");
+            }}
           >
             <ListFilter size={17} /> Browse
           </button>
@@ -1150,7 +1158,10 @@ function App({
             type="button"
             className={mode === "starred" ? "active" : ""}
             aria-pressed={mode === "starred"}
-            onClick={() => setMode("starred")}
+            onClick={() => {
+              setMode("starred");
+              setDrillScope("starred");
+            }}
           >
             <Sparkles size={17} /> Saved
           </button>
