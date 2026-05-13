@@ -1,6 +1,7 @@
-import { expandedQuestions } from "./questionExpansion.js";
+import { expandedQuestions } from "./questionExpansion";
+import type { Question } from "./questionTypes";
 
-const coreQuestions = [
+const coreQuestions: Question[] = [
   {
     id: "q001",
     category: "JavaScript",
@@ -1303,7 +1304,7 @@ const coreQuestions = [
   }
 ];
 
-export const questions = [...coreQuestions, ...expandedQuestions];
+export const questions: Question[] = [...coreQuestions, ...expandedQuestions];
 
 export const categories = [...new Set(questions.map((question) => question.category))];
 export const levels = [...new Set(questions.map((question) => question.level))];

@@ -1,21 +1,24 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutationGeneric as mutation, queryGeneric as query } from "convex/server";
 import { v } from "convex/values";
+import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
 
-async function requireUserId(ctx) {
+type ProgressKey = "revealed" | "reviewed" | "starred";
+
+async function requireUserId(ctx: QueryCtx | MutationCtx): Promise<Id<"users">> {
   const userId = await getAuthUserId(ctx);
   if (userId === null) throw new Error("Sign in before saving account progress.");
   return userId;
 }
 
-async function getQuestionProgress(ctx, userId, questionId) {
+async function getQuestionProgress(ctx: QueryCtx | MutationCtx, userId: Id<"users">, questionId: string) {
   return await ctx.db
     .query("questionProgress")
     .withIndex("by_user_question", (q) => q.eq("userId", userId).eq("questionId", questionId))
     .unique();
 }
 
-function idsFromRows(rows, key) {
+function idsFromRows(rows: Doc<"questionProgress">[], key: ProgressKey) {
   return rows.filter((row) => row[key]).map((row) => row.questionId);
 }
 

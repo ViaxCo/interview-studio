@@ -1,10 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
+import App from "./App";
 import "./styles.css";
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL;
-const root = createRoot(document.getElementById("root"));
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Root element was not found.");
+const root = createRoot(rootElement);
 
 function canUseLocalStorage() {
   try {
@@ -22,7 +24,7 @@ async function renderApp() {
     const [{ ConvexAuthProvider }, { ConvexReactClient }, { default: ConvexApp }] = await Promise.all([
       import("@convex-dev/auth/react"),
       import("convex/react"),
-      import("./ConvexApp.jsx")
+      import("./ConvexApp")
     ]);
     const convex = new ConvexReactClient(convexUrl);
 

@@ -1,7 +1,12 @@
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
 import { useState } from "react";
 
-export default function AccountPanel({ progressReady, syncStatus = "saved" }) {
+type AccountPanelProps = {
+  progressReady: boolean;
+  syncStatus?: "saved" | "saving" | "recovery";
+};
+
+export default function AccountPanel({ progressReady, syncStatus = "saved" }: AccountPanelProps) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signIn, signOut } = useAuthActions();
   const [error, setError] = useState("");
@@ -14,7 +19,7 @@ export default function AccountPanel({ progressReady, syncStatus = "saved" }) {
     try {
       await signIn("google");
     } catch (authError) {
-      setError(authError?.message || "Could not complete sign in.");
+      setError(authError instanceof Error ? authError.message : "Could not complete sign in.");
     } finally {
       setSubmitting(false);
     }

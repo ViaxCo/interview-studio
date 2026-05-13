@@ -15,18 +15,61 @@ import {
   X
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { answerDepth } from "./answerDepth.js";
-import { categories, levels, questions } from "./questions.js";
+import type { CSSProperties, Dispatch, ReactNode, SetStateAction } from "react";
+import { answerDepth } from "./answerDepth";
+import { categories, levels, questions } from "./questions";
+import type {
+  AnswerDepth,
+  ProgressMap,
+  ProgressUpdate,
+  Question,
+  SerializedProgress,
+  StoredState,
+  Theme
+} from "./questionTypes";
 
 const storageKey = "frontend-interview-studio-state";
 const questionIds = new Set(questions.map((item) => item.id));
 const initialVisibleLimit = 80;
 const visiblePageSize = 80;
-const categoryCounts = questions.reduce((counts, question) => {
+const progressKeys = ["revealed", "reviewed", "starred"] as const;
+type ProgressKey = (typeof progressKeys)[number];
+type QuestionProgressState = Pick<StoredState, ProgressKey>;
+type ImportableProgressState = QuestionProgressState & Pick<StoredState, "theme" | "hasThemePreference">;
+type SessionTone = "neutral" | "success" | "warning" | "action" | "milestone";
+type TopicCssProperties = CSSProperties &
+  Partial<Record<"--topic-bg" | "--topic-border" | "--topic-text", string>>;
+type ProgressRingStyle = CSSProperties & { "--progress": string };
+type AnswerGuide = {
+  trap: string;
+  frame: string;
+  depth?: AnswerDepth;
+  moves: string[];
+  codeTitle?: string;
+  code?: string;
+  visualTitle?: string;
+  visual?: string[];
+};
+type AccountProgress = SerializedProgress & {
+  userId: string;
+  updatedAt?: number;
+};
+export type AppProps = {
+  accountCanSave?: boolean;
+  accountPending?: boolean;
+  accountPanel?: ReactNode;
+  accountProgress?: AccountProgress | null;
+  importAccountProgress?: ((progress: Omit<SerializedProgress, "theme">) => Promise<unknown>) | null;
+  resetAccountProgress?: (() => Promise<unknown>) | null;
+  saveQuestionProgress?: ((questionId: string, progress: ProgressUpdate) => Promise<unknown>) | null;
+  saveThemePreference?: ((theme: Theme) => Promise<unknown>) | null;
+};
+
+const categoryCounts = questions.reduce<Record<string, number>>((counts, question) => {
   counts[question.category] = (counts[question.category] || 0) + 1;
   return counts;
 }, {});
-const milestoneMessages = {
+const milestoneMessages: Record<number, string> = {
   25: "25 reviewed. Patterns are starting to repeat.",
   50: "Halfway through. Your answers should feel sharper now.",
   75: "75 reviewed. Time to hunt for weak spots.",
@@ -35,7 +78,7 @@ const milestoneMessages = {
   500: "All 500 reviewed. You have completed the bank."
 };
 
-const categoryPrompts = {
+const categoryPrompts: Record<string, string> = {
   Accessibility: "Name the user who benefits, then name the failure mode.",
   Browser: "Start with what the browser guarantees, then where it gets expensive.",
   CSS: "Describe the layout rule first, then the tradeoff it creates.",
@@ -46,7 +89,7 @@ const categoryPrompts = {
   Testing: "Say what confidence the test buys, not just the tool you would use."
 };
 
-const topicPalettes = {
+const topicPalettes: Record<string, TopicCssProperties> = {
   craft: {
     "--topic-bg": "oklch(0.956 0.04 82)",
     "--topic-border": "oklch(0.75 0.09 78)",
@@ -69,7 +112,7 @@ const topicPalettes = {
   }
 };
 
-const darkTopicPalettes = {
+const darkTopicPalettes: Record<string, TopicCssProperties> = {
   craft: {
     "--topic-bg": "oklch(0.24 0.048 82)",
     "--topic-border": "oklch(0.57 0.095 78)",
@@ -92,7 +135,7 @@ const darkTopicPalettes = {
   }
 };
 
-const categoryTone = {
+const categoryTone: Record<string, string> = {
   Accessibility: "quality",
   Architecture: "interface",
   Browser: "craft",
@@ -110,7 +153,7 @@ const categoryTone = {
   Testing: "quality"
 };
 
-const categoryAnswerMoves = {
+const categoryAnswerMoves: Record<string, string[]> = {
   Accessibility: [
     "Name the person affected by the choice, then describe the exact interaction that breaks.",
     "Prefer native semantics first. If custom UI is necessary, explain the keyboard, focus, name, role, and state work you now own.",
@@ -198,14 +241,14 @@ const categoryAnswerMoves = {
   ]
 };
 
-const defaultAnswerGuide = {
+const defaultAnswerGuide: Pick<AnswerGuide, "trap" | "frame"> = {
   trap:
     "Stopping at the definition. A better answer explains what breaks in real product code when the concept is misunderstood.",
   frame:
     "Give the direct answer first, then add the engineering consequence, a tradeoff, and one concrete example."
 };
 
-const answerGuides = {
+const answerGuides: Record<string, Partial<AnswerGuide>> = {
   q001: {
     codeTitle: "Scope and binding example",
     code: `for (var i = 0; i < 3; i += 1) {
@@ -434,12 +477,12 @@ setPage(1);`
   }
 };
 
-function topicStyle(categoryName, theme = "light") {
+function topicStyle(categoryName: string, theme: Theme = "light"): TopicCssProperties {
   const palettes = theme === "dark" ? darkTopicPalettes : topicPalettes;
   return palettes[categoryTone[categoryName]] || {};
 }
 
-function getAnswerGuide(question) {
+function getAnswerGuide(question: Question): AnswerGuide {
   return {
     ...defaultAnswerGuide,
     depth: answerDepth[question.id],
@@ -448,7 +491,7 @@ function getAnswerGuide(question) {
   };
 }
 
-function InlineText({ text }) {
+function InlineText({ text }: { text: string }) {
   return String(text)
     .split(/(`[^`]+`)/g)
     .map((part, index) =>
@@ -460,7 +503,7 @@ function InlineText({ text }) {
     );
 }
 
-function HighlightedCode({ code }) {
+function HighlightedCode({ code }: { code: string }) {
   const pattern =
     /(\/\/.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b(?:async|await|const|let|var|function|return|if|else|for|while|new|throw|try|catch|class|extends|import|export|from|true|false|null|undefined)\b|\b\d+(?:\.\d+)?\b|[A-Z][A-Za-z0-9_]*(?=\s*[({<])|[a-zA-Z_$][\w$]*(?=\s*\())/g;
 
@@ -486,7 +529,7 @@ function HighlightedCode({ code }) {
     });
 }
 
-function guideSearchText(question) {
+function guideSearchText(question: Question) {
   const guide = getAnswerGuide(question);
 
   return [
@@ -520,7 +563,7 @@ const questionSearchIndex = questions.map((item) => ({
     .toLowerCase()
 }));
 
-function emptyStoredState(storageAvailable = true) {
+function emptyStoredState(storageAvailable = true): StoredState {
   return {
     revealed: {},
     reviewed: {},
@@ -531,7 +574,7 @@ function emptyStoredState(storageAvailable = true) {
   };
 }
 
-function cleanStoredMap(value) {
+function cleanStoredMap(value: unknown): ProgressMap {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
 
   return Object.fromEntries(
@@ -539,26 +582,29 @@ function cleanStoredMap(value) {
   );
 }
 
-function normalizeStoredState(value, storageAvailable = true) {
+function normalizeStoredState(value: unknown, storageAvailable = true): StoredState {
   const isStoredObject = value && typeof value === "object" && !Array.isArray(value);
-  const hasThemePreference = isStoredObject ? value.hasThemePreference === true : false;
+  const stored = isStoredObject ? (value as Record<string, unknown>) : {};
+  const hasThemePreference = stored.hasThemePreference === true;
 
   return {
-    revealed: cleanStoredMap(value?.revealed),
-    reviewed: cleanStoredMap(value?.reviewed),
-    starred: cleanStoredMap(value?.starred),
-    theme: value?.theme === "dark" ? "dark" : "light",
+    revealed: cleanStoredMap(stored.revealed),
+    reviewed: cleanStoredMap(stored.reviewed),
+    starred: cleanStoredMap(stored.starred),
+    theme: stored.theme === "dark" ? "dark" : "light",
     hasThemePreference,
     storageAvailable
   };
 }
 
-function mapFromIds(ids) {
+function mapFromIds(ids: unknown): ProgressMap {
   if (!Array.isArray(ids)) return {};
-  return Object.fromEntries(ids.filter((id) => questionIds.has(id)).map((id) => [id, true]));
+  return Object.fromEntries(
+    ids.filter((id): id is string => typeof id === "string" && questionIds.has(id)).map((id) => [id, true])
+  );
 }
 
-function serializeProgress(state) {
+function serializeProgress(state: unknown): SerializedProgress {
   const normalized = normalizeStoredState(state);
 
   return {
@@ -569,25 +615,28 @@ function serializeProgress(state) {
   };
 }
 
-function progressKey(state) {
+function progressKey(state: unknown) {
   return JSON.stringify(serializeProgress(state));
 }
 
-function hasProgressMissingFromAccount(deviceState, accountState) {
-  return ["revealed", "reviewed", "starred"].some((key) =>
+function hasProgressMissingFromAccount(
+  deviceState: QuestionProgressState,
+  accountState: QuestionProgressState
+) {
+  return progressKeys.some((key) =>
     Object.keys(deviceState[key]).some((id) => !accountState[key][id])
   );
 }
 
-function hasDeviceStateToImport(deviceState, accountState) {
+function hasDeviceStateToImport(deviceState: ImportableProgressState, accountState: ImportableProgressState) {
   return (
     hasProgressMissingFromAccount(deviceState, accountState) ||
     (deviceState.hasThemePreference === true && deviceState.theme !== accountState.theme)
   );
 }
 
-function applyQuestionUpdate(state, questionId, update) {
-  for (const key of ["revealed", "reviewed", "starred"]) {
+function applyQuestionUpdate(state: QuestionProgressState, questionId: string, update: ProgressUpdate) {
+  for (const key of progressKeys) {
     if (update[key] === undefined) continue;
     if (update[key]) {
       state[key][questionId] = true;
@@ -597,8 +646,8 @@ function applyQuestionUpdate(state, questionId, update) {
   }
 }
 
-function questionUpdateMatches(state, questionId, update) {
-  return ["revealed", "reviewed", "starred"].every(
+function questionUpdateMatches(state: QuestionProgressState, questionId: string, update: ProgressUpdate) {
+  return progressKeys.every(
     (key) => update[key] === undefined || Boolean(state[key][questionId]) === update[key]
   );
 }
@@ -611,18 +660,19 @@ function getStorage() {
   }
 }
 
-function loadStoredState() {
+function loadStoredState(): StoredState {
   const storage = getStorage();
   if (!storage) return emptyStoredState(false);
 
   try {
-    return normalizeStoredState(JSON.parse(storage.getItem(storageKey)) || {});
+    const storedValue = storage.getItem(storageKey);
+    return normalizeStoredState(storedValue ? JSON.parse(storedValue) : {});
   } catch {
     return emptyStoredState(false);
   }
 }
 
-function saveStoredState(state) {
+function saveStoredState(state: unknown) {
   const storage = getStorage();
   if (!storage) return false;
 
@@ -638,13 +688,13 @@ function App({
   accountCanSave = false,
   accountPending = false,
   accountPanel = null,
-  accountProgress,
+  accountProgress = undefined,
   importAccountProgress = null,
   resetAccountProgress = null,
   saveQuestionProgress = null,
   saveThemePreference = null
-}) {
-  const searchInputRef = useRef(null);
+}: AppProps) {
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [storedState] = useState(loadStoredState);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -658,16 +708,16 @@ function App({
   const [theme, setTheme] = useState(storedState.theme);
   const [storageAvailable, setStorageAvailable] = useState(storedState.storageAvailable);
   const [confirmReset, setConfirmReset] = useState(false);
-  const [resetBackup, setResetBackup] = useState(null);
-  const [pendingGuestImport, setPendingGuestImport] = useState(null);
+  const [resetBackup, setResetBackup] = useState<QuestionProgressState | null>(null);
+  const [pendingGuestImport, setPendingGuestImport] = useState<ImportableProgressState | null>(null);
   const [sessionNote, setSessionNote] = useState("");
-  const [sessionTone, setSessionTone] = useState("neutral");
+  const [sessionTone, setSessionTone] = useState<SessionTone>("neutral");
   const [sessionNoteKey, setSessionNoteKey] = useState(0);
   const [visibleLimit, setVisibleLimit] = useState(initialVisibleLimit);
   const syncedAccountKey = useRef("");
   const hadAccountSession = useRef(false);
-  const pendingQuestionEdits = useRef(new Map());
-  const pendingTheme = useRef(null);
+  const pendingQuestionEdits = useRef(new Map<string, ProgressUpdate>());
+  const pendingTheme = useRef<Theme | null>(null);
   const hasDeviceThemePreference = useRef(storedState.hasThemePreference);
 
   useEffect(() => {
@@ -698,11 +748,12 @@ function App({
     if (!accountCanSave || accountProgress === undefined) return;
 
     if (accountProgress) {
-      const accountState = {
+      const accountState: ImportableProgressState = {
         revealed: mapFromIds(accountProgress.revealed),
         reviewed: mapFromIds(accountProgress.reviewed),
         starred: mapFromIds(accountProgress.starred),
-        theme: accountProgress.theme === "dark" ? "dark" : "light"
+        theme: accountProgress.theme === "dark" ? "dark" : "light",
+        hasThemePreference: true
       };
       const accountKey = `${accountProgress.userId}:${progressKey(accountState)}`;
       for (const [questionId, update] of pendingQuestionEdits.current) {
@@ -730,7 +781,7 @@ function App({
         setPendingGuestImport(currentState);
       }
 
-      const nextState = {
+      const nextState: QuestionProgressState & Pick<StoredState, "theme"> = {
         revealed: { ...accountState.revealed },
         reviewed: { ...accountState.reviewed },
         starred: { ...accountState.starred },
@@ -839,8 +890,8 @@ function App({
       `Answer like a senior engineer: claim, reason, tradeoff, example.`);
 
   useEffect(() => {
-    function handleShortcut(event) {
-      const tagName = event.target.tagName;
+    function handleShortcut(event: KeyboardEvent) {
+      const tagName = event.target instanceof HTMLElement ? event.target.tagName : "";
       const isTyping = tagName === "INPUT" || tagName === "SELECT" || tagName === "TEXTAREA";
       const hasModifier = event.metaKey || event.ctrlKey || event.altKey;
 
@@ -884,7 +935,7 @@ function App({
     return () => window.clearTimeout(timeout);
   }, [sessionNote]);
 
-  function toggleMap(setter, id) {
+  function toggleMap(setter: Dispatch<SetStateAction<ProgressMap>>, id: string) {
     setter((current) => {
       const next = { ...current };
       if (next[id]) {
@@ -896,7 +947,7 @@ function App({
     });
   }
 
-  function showSessionNote(message, tone = "neutral") {
+  function showSessionNote(message: string, tone: SessionTone = "neutral") {
     setSessionTone(tone);
     setSessionNote(message);
     setSessionNoteKey((current) => current + 1);
@@ -908,7 +959,7 @@ function App({
     return true;
   }
 
-  function saveAccountQuestion(questionId, progressUpdate) {
+  function saveAccountQuestion(questionId: string, progressUpdate: ProgressUpdate) {
     if (!accountCanSave || !saveQuestionProgress) return;
     pendingQuestionEdits.current.set(questionId, {
       ...pendingQuestionEdits.current.get(questionId),
@@ -919,7 +970,7 @@ function App({
     });
   }
 
-  function saveAccountTheme(themeValue) {
+  function saveAccountTheme(themeValue: Theme) {
     if (!accountCanSave || !saveThemePreference) return;
     pendingTheme.current = themeValue;
     saveThemePreference(themeValue).catch(() => {
@@ -927,13 +978,13 @@ function App({
     });
   }
 
-  function serializeQuestionProgress(state) {
+  function serializeQuestionProgress(state: unknown) {
     const { revealed: revealedIds, reviewed: reviewedIds, starred: starredIds } = serializeProgress(state);
     return { revealed: revealedIds, reviewed: reviewedIds, starred: starredIds };
   }
 
-  function queueImportedProgress(state) {
-    for (const key of ["revealed", "reviewed", "starred"]) {
+  function queueImportedProgress(state: QuestionProgressState) {
+    for (const key of progressKeys) {
       for (const id of Object.keys(state[key])) {
         pendingQuestionEdits.current.set(id, {
           ...pendingQuestionEdits.current.get(id),
@@ -1037,7 +1088,7 @@ function App({
     showSessionNote("Question queue shown.", "action");
   }
 
-  function moveQuestion(direction) {
+  function moveQuestion(direction: number) {
     if (!studyQueue.length || !activeQuestion) return;
     const currentIndex = activeQueueIndex < 0 ? 0 : activeQueueIndex;
     const nextIndex = (currentIndex + direction + studyQueue.length) % studyQueue.length;
@@ -1123,7 +1174,7 @@ function App({
           <div
             key={reviewedCount}
             className="progress-ring"
-            style={{ "--progress": `${progress * 3.6}deg` }}
+            style={{ "--progress": `${progress * 3.6}deg` } as ProgressRingStyle}
           >
             <span>{progress}%</span>
           </div>
@@ -1290,8 +1341,8 @@ function App({
             {visibleQuestions.map((item, index) => (
               <button
                 type="button"
-                className={`question-row ${activeQuestion.id === item.id ? "current" : ""}`}
-                aria-current={activeQuestion.id === item.id ? "true" : undefined}
+                className={`question-row ${activeQuestion?.id === item.id ? "current" : ""}`}
+                aria-current={activeQuestion?.id === item.id ? "true" : undefined}
                 key={item.id}
                 style={topicStyle(item.category, theme)}
                 onClick={() => setActiveId(item.id)}
@@ -1332,7 +1383,7 @@ function App({
 
           </section>
 
-          {activeQuestion ? (
+          {activeQuestion && activeGuide ? (
             <article
               key={activeQuestion.id}
               className="question-detail"

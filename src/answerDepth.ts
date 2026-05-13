@@ -1,6 +1,7 @@
-import { expandedAnswerDepth } from "./questionExpansion.js";
+import { expandedAnswerDepth } from "./questionExpansion";
+import type { AnswerDepth } from "./questionTypes";
 
-export const answerDepth = {
+export const answerDepth: Record<string, AnswerDepth> = {
   q001: {
     mentalModel:
       "`var` belongs to the nearest function, while `let` and `const` belong to the nearest block. `const` protects the variable binding, not the contents of an object or array.",

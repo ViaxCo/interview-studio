@@ -1,4 +1,24 @@
-const topicSpecs = [
+import type { AnswerDepth, Question } from "./questionTypes";
+
+type TopicSpec = [string, string, string, string, string, string];
+type TopicContext = {
+  category: string;
+  level: string;
+  concept: string;
+  practice: string;
+  trap: string;
+  example: string;
+};
+type QuestionAngle = {
+  kind: "concept" | "application" | "trap" | "verification";
+  question: (context: TopicContext) => string;
+  answer: (context: TopicContext) => string;
+  reasoning: (context: TopicContext) => string;
+  tests: (context: TopicContext) => string;
+  followUps: (context: TopicContext) => string[];
+};
+
+const topicSpecs: TopicSpec[] = [
   ["JavaScript", "Foundational", "the prototype chain", "object behavior is resolved through linked prototypes before reaching built-in defaults", "assuming every property lives directly on the object", "shared model objects and component helpers"],
   ["JavaScript", "Intermediate", "`this` binding", "the call site decides the receiver unless a function is bound or lexical", "passing methods as callbacks and losing the expected receiver", "event handlers and class-style utilities"],
   ["JavaScript", "Intermediate", "iterators", "a value can expose a standard way to produce items one at a time", "building eager arrays when the UI only needs a small slice", "streaming search results and custom collections"],
@@ -101,7 +121,7 @@ const topicSpecs = [
   ["Build Tools", "Intermediate", "CI preview builds", "every change can get a temporary environment for review and testing", "treating previews as production without matching data, flags, or auth assumptions", "pull request review"]
 ];
 
-const questionAngles = [
+const questionAngles: QuestionAngle[] = [
   {
     kind: "concept",
     question: ({ concept }) => `What should a frontend engineer understand about ${concept}?`,
@@ -160,15 +180,15 @@ const questionAngles = [
   }
 ];
 
-function sentenceCase(value) {
+function sentenceCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function idFor(index) {
+function idFor(index: number) {
   return `q${String(101 + index).padStart(3, "0")}`;
 }
 
-function makeQuestion(spec, angle, index) {
+function makeQuestion(spec: TopicSpec, angle: QuestionAngle, index: number): Question {
   const [category, level, concept, practice, trap, example] = spec;
   const context = { category, level, concept, practice, trap, example };
 
@@ -184,9 +204,9 @@ function makeQuestion(spec, angle, index) {
   };
 }
 
-function makeDepth(question, spec, angle) {
+function makeDepth(question: Question, spec: TopicSpec, angle: QuestionAngle): [string, AnswerDepth] {
   const [, , concept, practice, trap, example] = spec;
-  const byKind = {
+  const byKind: Record<QuestionAngle["kind"], AnswerDepth> = {
     concept: {
       mentalModel: `${sentenceCase(concept)} is not trivia. It is a model for deciding how the interface should behave when content, state, users, or runtime conditions change.`,
       engineeringUse: `Use it in ${example} by treating this as an implementation rule: ${practice}. That rule should make the happy path clear and the failure path recoverable.`,
