@@ -31,6 +31,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { categories, levels, questions } from "./questions";
 import type {
   AnswerDepth,
@@ -562,7 +563,29 @@ function guideSearchText(question: Question) {
     .join(" ");
 }
 
-const questionSearchIndex = questions.map((item) => ({
+const questionSearchTextCache = new Map<string, string>();
+
+function getQuestionSearchText(question: Question) {
+  const cached = questionSearchTextCache.get(question.id);
+  if (cached) return cached;
+
+  const text = [
+    question.question,
+    question.answer,
+    question.reasoning,
+    question.tests,
+    question.category,
+    question.level,
+    guideSearchText(question)
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  questionSearchTextCache.set(question.id, text);
+  return text;
+}
+
+const baseQuestionSearchText = questions.map((item) => ({
   item,
   text: [
     item.question,
@@ -570,8 +593,7 @@ const questionSearchIndex = questions.map((item) => ({
     item.reasoning,
     item.tests,
     item.category,
-    item.level,
-    guideSearchText(item)
+    item.level
   ]
     .join(" ")
     .toLowerCase()
@@ -600,12 +622,13 @@ function normalizeStoredState(value: unknown, storageAvailable = true): StoredSt
   const isStoredObject = value && typeof value === "object" && !Array.isArray(value);
   const stored = isStoredObject ? (value as Record<string, unknown>) : {};
   const hasThemePreference = stored.hasThemePreference === true;
+  const storedTheme = stored.theme === "light" || stored.theme === "dark" ? stored.theme : "light";
 
   return {
     revealed: cleanStoredMap(stored.revealed),
     reviewed: cleanStoredMap(stored.reviewed),
     starred: cleanStoredMap(stored.starred),
-    theme: stored.theme === "dark" ? "dark" : "light",
+    theme: hasThemePreference ? storedTheme : "light",
     hasThemePreference,
     storageAvailable
   };
@@ -838,12 +861,14 @@ function App({
   const filteredQuestions = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return questionSearchIndex.filter(({ item, text }) => {
+    return baseQuestionSearchText.filter(({ item, text }) => {
       const matchesCategory = category === "All" || item.category === category;
       const matchesLevel = level === "All" || item.level === level;
-      const matchesQuery = !normalizedQuery || text.includes(normalizedQuery);
 
-      return matchesCategory && matchesLevel && matchesQuery;
+      if (!matchesCategory || !matchesLevel) return false;
+      if (!normalizedQuery) return true;
+
+      return text.includes(normalizedQuery) || getQuestionSearchText(item).includes(normalizedQuery);
     }).map(({ item }) => item);
   }, [category, level, query]);
 
@@ -970,6 +995,10 @@ function App({
     return true;
   }
 
+  function clearResetBackup() {
+    setResetBackup(null);
+  }
+
   function saveAccountQuestion(questionId: string, progressUpdate: ProgressUpdate) {
     if (!accountCanSave || !saveQuestionProgress) return;
     pendingQuestionEdits.current.set(questionId, {
@@ -1053,6 +1082,7 @@ function App({
 
   function importGuestProgress() {
     if (blockProgressEdit() || !pendingGuestImport) return;
+    clearResetBackup();
     const shouldImportTheme = pendingGuestImport.hasThemePreference === true;
     const nextState = {
       revealed: { ...revealed, ...pendingGuestImport.revealed },
@@ -1111,6 +1141,7 @@ function App({
   function markReviewedAndContinue() {
     if (blockProgressEdit()) return;
     if (!activeQuestion) return;
+    clearResetBackup();
     setReviewed((current) => ({ ...current, [activeQuestion.id]: true }));
     saveAccountQuestion(activeQuestion.id, { reviewed: true });
     moveQuestion(1);
@@ -1120,6 +1151,7 @@ function App({
   function toggleReviewed() {
     if (blockProgressEdit()) return;
     if (!activeQuestion) return;
+    clearResetBackup();
     const willReview = !reviewed[activeQuestion.id];
     toggleMap(setReviewed, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { reviewed: willReview });
@@ -1129,6 +1161,7 @@ function App({
   function toggleStarred() {
     if (blockProgressEdit()) return;
     if (!activeQuestion) return;
+    clearResetBackup();
     const willStar = !starred[activeQuestion.id];
     toggleMap(setStarred, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { starred: willStar });
@@ -1141,6 +1174,7 @@ function App({
   function toggleRevealed() {
     if (blockProgressEdit()) return;
     if (!activeQuestion) return;
+    clearResetBackup();
     const willReveal = !revealed[activeQuestion.id];
     toggleMap(setRevealed, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { revealed: willReveal });
@@ -1157,27 +1191,27 @@ function App({
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="study-shell min-h-screen bg-background text-foreground">
         <a
-          className="sr-only fixed left-3 top-3 z-50 rounded-none bg-card px-3 py-2 text-xs text-card-foreground ring-1 ring-border focus:not-sr-only"
+          className="sr-only fixed left-3 top-3 z-50 rounded-md bg-card px-3 py-2 text-xs text-card-foreground ring-1 ring-border focus:not-sr-only"
           href="#main-content"
         >
           Skip to questions
         </a>
 
-        <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
           <aside
-            className="border-b bg-sidebar text-sidebar-foreground lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r"
+            className="study-rail border-b border-sidebar-border bg-sidebar text-sidebar-foreground lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r"
             aria-label="Interview studio navigation"
           >
             <div className="flex h-full min-h-0 flex-col">
-              <div className="flex items-start gap-3 p-4">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-none bg-sidebar-primary text-sidebar-primary-foreground">
+              <div className="flex items-start gap-3 p-5">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
                   <BookOpenIcon />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium uppercase text-muted-foreground">Practice</p>
-                  <h1 className="font-heading text-base font-medium">Interview Studio</h1>
+                  <p className="text-xs font-medium uppercase text-sidebar-foreground/55">Study deck</p>
+                  <h1 className="font-heading text-lg font-bold">Interview Studio</h1>
                 </div>
                 <Button
                   type="button"
@@ -1191,8 +1225,8 @@ function App({
                 </Button>
               </div>
 
-              <div className="flex flex-col gap-3 px-4 pb-4">
-                <Card size="sm">
+              <div className="flex flex-col gap-3 px-5 pb-5">
+                <Card size="sm" className="border-sidebar-border bg-sidebar-accent/55">
                   <CardHeader>
                     <CardTitle>Progress</CardTitle>
                     <CardDescription>{questions.length} questions in this collection.</CardDescription>
@@ -1209,7 +1243,7 @@ function App({
                 </Card>
 
                 {accountPanel || (
-                  <Card size="sm" aria-label="Guest progress">
+                  <Card size="sm" className="border-sidebar-border bg-sidebar-accent/35" aria-label="Guest progress">
                     <CardHeader>
                       <CardTitle>Guest progress</CardTitle>
                       <CardDescription>Saved on this device. Add Convex to sync across devices.</CardDescription>
@@ -1218,7 +1252,7 @@ function App({
                 )}
               </div>
 
-              <div className="px-4 pb-3">
+              <div className="px-5 pb-3">
                 <Tabs
                   value={mode === "starred" ? "starred" : "browse"}
                   onValueChange={(value) => {
@@ -1240,7 +1274,7 @@ function App({
 
               <Separator />
 
-              <ScrollArea className="max-h-72 min-h-0 flex-1 lg:max-h-none">
+              <ScrollArea className="max-h-52 min-h-0 flex-1 lg:max-h-none">
                 <div className="flex flex-col gap-1 p-4" aria-label="Question categories">
                   {["All", ...categories].map((item) => (
                     <Button
@@ -1261,68 +1295,76 @@ function App({
                 </div>
               </ScrollArea>
 
-              <div className="flex flex-col gap-2 border-t p-4">
-                {(hasProgress || confirmReset) && (
-                  <Button
-                    type="button"
-                    variant={confirmReset ? "destructive" : "outline"}
-                    size="sm"
-                    onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
-                  >
-                    <ArrowCounterClockwiseIcon data-icon="inline-start" />
-                    {confirmReset ? "Clear progress" : "Reset progress"}
-                  </Button>
-                )}
-                {confirmReset && (
-                  <Alert role="status">
-                    <AlertTitle>Confirm reset</AlertTitle>
-                    <AlertDescription>
-                      {accountCanSave
-                        ? "This clears reviewed, saved, and revealed answers for your account."
-                        : "This clears reviewed, saved, and revealed answers on this device."}
-                    </AlertDescription>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
-                      Cancel
+              {(hasProgress || confirmReset || resetBackup || (pendingGuestImport && accountCanSave) || !storageAvailable) && (
+                <div className="flex flex-col gap-2 border-t border-sidebar-border p-5">
+                  {!resetBackup && (hasProgress || confirmReset) && (
+                    <Button
+                      type="button"
+                      variant={confirmReset ? "destructive" : "outline"}
+                      size="sm"
+                      onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
+                    >
+                      <ArrowCounterClockwiseIcon data-icon="inline-start" />
+                      {confirmReset ? "Clear progress" : "Reset progress"}
                     </Button>
-                  </Alert>
-                )}
-                {resetBackup && (
-                  <Alert role="status">
-                    <AlertTitle>{accountCanSave ? "Account progress cleared." : "Local progress cleared."}</AlertTitle>
-                    <Button type="button" variant="outline" size="sm" onClick={undoReset}>
-                      Undo
-                    </Button>
-                  </Alert>
-                )}
-                {pendingGuestImport && accountCanSave && (
-                  <Alert role="status">
-                    <AlertTitle>Device progress found</AlertTitle>
-                    <AlertDescription>Import it into this account, or dismiss it.</AlertDescription>
-                    <div className="mt-2 flex gap-2">
-                      <Button type="button" size="sm" onClick={importGuestProgress}>
-                        Import
+                  )}
+                  {confirmReset && (
+                    <Alert role="status">
+                      <AlertTitle>Confirm reset</AlertTitle>
+                      <AlertDescription>
+                        {accountCanSave
+                          ? "This clears reviewed, saved, and revealed answers for your account."
+                          : "This clears reviewed, saved, and revealed answers on this device."}
+                      </AlertDescription>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
+                        Cancel
                       </Button>
-                      <Button type="button" variant="outline" size="sm" onClick={() => setPendingGuestImport(null)}>
-                        Dismiss
+                    </Alert>
+                  )}
+                  {resetBackup && (
+                    <Alert role="status">
+                      <AlertTitle>{accountCanSave ? "Account progress cleared." : "Local progress cleared."}</AlertTitle>
+                      <Button type="button" variant="outline" size="sm" onClick={undoReset}>
+                        Undo
                       </Button>
-                    </div>
-                  </Alert>
-                )}
-                {!storageAvailable && (
-                  <Alert variant="destructive" role="status">
-                    <AlertTitle>Storage blocked</AlertTitle>
-                    <AlertDescription>
-                      Progress and theme will not be saved because this browser blocked local storage.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
+                    </Alert>
+                  )}
+                  {pendingGuestImport && accountCanSave && (
+                    <Alert role="status">
+                      <AlertTitle>Device progress found</AlertTitle>
+                      <AlertDescription>Import it into this account, or dismiss it.</AlertDescription>
+                      <div className="mt-2 flex gap-2">
+                        <Button type="button" size="sm" onClick={importGuestProgress}>
+                          Import
+                        </Button>
+                        <Button type="button" variant="outline" size="sm" onClick={() => setPendingGuestImport(null)}>
+                          Dismiss
+                        </Button>
+                      </div>
+                    </Alert>
+                  )}
+                  {!storageAvailable && (
+                    <Alert variant="destructive" role="status">
+                      <AlertTitle>Storage blocked</AlertTitle>
+                      <AlertDescription>
+                        Progress and theme will not be saved because this browser blocked local storage.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
             </div>
           </aside>
 
           <main className="min-w-0" id="main-content">
-            <header className="sticky top-0 z-20 border-b bg-background/95 p-4 backdrop-blur">
+            <header className="study-command-bar sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
               <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+                <div className="min-w-0 xl:w-52">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">Current run</p>
+                  <p className="truncate text-sm font-semibold">
+                    {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved review" : "Browse practice"}
+                  </p>
+                </div>
                 <div className="relative min-w-0 flex-1">
                   <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -1331,7 +1373,7 @@ function App({
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search questions, answers, concepts"
-                    className="pl-8 pr-8"
+                    className="h-10 bg-card pl-8 pr-8"
                   />
                   {query && (
                     <Button
@@ -1350,7 +1392,7 @@ function App({
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span id="level-filter-label">Level</span>
                   <Select value={level} onValueChange={(value) => value && setLevel(value)}>
-                    <SelectTrigger aria-labelledby="level-filter-label" className="w-36">
+                    <SelectTrigger aria-labelledby="level-filter-label" className="w-40 bg-card">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1372,31 +1414,279 @@ function App({
               </div>
             </header>
 
-            <div className="grid gap-4 p-4 xl:grid-cols-[minmax(280px,420px)_minmax(0,1fr)]">
-              <Card role="region" aria-label="Questions" className="min-h-[420px]">
+            <div className="grid gap-5 p-4 lg:p-6 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
+              {activeQuestion && activeGuide ? (
+                <article key={activeQuestion.id} className="flex min-w-0 flex-col gap-5">
+                  <Card className="study-stage overflow-hidden">
+                    <CardHeader className="gap-5 border-b">
+                      <div className="flex flex-wrap gap-1.5">
+                        <Badge variant="secondary">{activeQuestion.category}</Badge>
+                        <Badge variant="outline">{activeQuestion.level}</Badge>
+                        <Badge variant={revealed[activeQuestion.id] ? "default" : "secondary"}>
+                          {revealed[activeQuestion.id] ? "Answer shown" : "Try first"}
+                        </Badge>
+                        <Badge variant={reviewed[activeQuestion.id] ? "default" : "outline"}>
+                          {reviewed[activeQuestion.id] ? "Reviewed" : "Unreviewed"}
+                        </Badge>
+                      </div>
+                      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+                        <div className="min-w-0">
+                          <CardDescription>
+                            Question {activeQueueIndex + 1} of {studyQueue.length}
+                          </CardDescription>
+                          <h2 className="mt-3 max-w-[24ch] font-heading text-2xl font-bold leading-[1.12] sm:text-3xl lg:text-4xl">
+                            <InlineText text={activeQuestion.question} />
+                          </h2>
+                        </div>
+                        <div className="xl:justify-self-end">
+                          <Button
+                            type="button"
+                            variant={starred[activeQuestion.id] ? "default" : "outline"}
+                            size="sm"
+                            aria-pressed={!!starred[activeQuestion.id]}
+                            aria-label={
+                              starred[activeQuestion.id] ? "Remove from saved questions" : "Save for review"
+                            }
+                            onClick={toggleStarred}
+                          >
+                            <SparkleIcon data-icon="inline-start" />
+                            {starred[activeQuestion.id] ? "Saved" : "Save"}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="lg"
+                          aria-expanded={!!revealed[activeQuestion.id]}
+                          aria-controls={`answer-${activeQuestion.id}`}
+                          aria-keyshortcuts="R"
+                          onClick={toggleRevealed}
+                        >
+                          <CaretDownIcon data-icon="inline-start" />
+                          {revealed[activeQuestion.id] ? "Hide answer" : "Reveal answer"}
+                          <Kbd>R</Kbd>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}
+                          size="lg"
+                          aria-pressed={!!reviewed[activeQuestion.id]}
+                          onClick={toggleReviewed}
+                        >
+                          <CheckCircleIcon data-icon="inline-start" />
+                          {reviewed[activeQuestion.id] ? "Unmark reviewed" : "Mark reviewed"}
+                        </Button>
+                        <Button type="button" variant="outline" size="lg" onClick={markReviewedAndContinue}>
+                          <CheckCircleIcon data-icon="inline-start" />
+                          Reviewed and next
+                        </Button>
+                      </div>
+
+                      <ButtonGroup aria-label="Question navigation" className="justify-self-start lg:justify-self-end">
+                        <Button type="button" variant="outline" aria-keyshortcuts="P" onClick={() => moveQuestion(-1)}>
+                          <CaretLeftIcon data-icon="inline-start" /> Previous <Kbd>P</Kbd>
+                        </Button>
+                        <div className="flex items-center border border-input bg-card px-3 text-xs text-muted-foreground" aria-live="polite">
+                          {activeQueueIndex + 1} of {studyQueue.length}
+                        </div>
+                        <Button type="button" variant="outline" aria-keyshortcuts="N" onClick={() => moveQuestion(1)}>
+                          Next <CaretRightIcon data-icon="inline-end" /> <Kbd>N</Kbd>
+                        </Button>
+                      </ButtonGroup>
+                    </CardContent>
+                  </Card>
+
+                  <section id={`answer-${activeQuestion.id}`} hidden={!revealed[activeQuestion.id]}>
+                    {revealed[activeQuestion.id] && (
+                      <div className="flex flex-col gap-4">
+                        <Card className="answer-panel">
+                          <CardHeader>
+                            <CardTitle>Model Answer</CardTitle>
+                          </CardHeader>
+                          <CardContent className="reading-copy">
+                            <p><InlineText text={activeQuestion.answer} /></p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="answer-panel">
+                          <CardHeader>
+                            <CardTitle>Engineering Reasoning</CardTitle>
+                          </CardHeader>
+                          <CardContent className="reading-copy">
+                            <p><InlineText text={activeQuestion.reasoning} /></p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="answer-panel">
+                          <CardHeader>
+                            <CardTitle>Study the Reasoning</CardTitle>
+                            <CardDescription>Use this to shape a senior-level answer.</CardDescription>
+                          </CardHeader>
+                          <CardContent className="reading-copy flex flex-col gap-4">
+                            {activeGuide.depth && (
+                              <div className="grid gap-3 lg:grid-cols-3">
+                                <div className="rounded-md border bg-muted/35 p-3">
+                                  <strong className="text-xs uppercase text-muted-foreground">Mental model</strong>
+                                  <p className="mt-2"><InlineText text={activeGuide.depth.mentalModel} /></p>
+                                </div>
+                                <div className="rounded-md border bg-muted/35 p-3">
+                                  <strong className="text-xs uppercase text-muted-foreground">Engineering use</strong>
+                                  <p className="mt-2"><InlineText text={activeGuide.depth.engineeringUse} /></p>
+                                </div>
+                                <div className="rounded-md border bg-muted/35 p-3">
+                                  <strong className="text-xs uppercase text-muted-foreground">Interview signal</strong>
+                                  <p className="mt-2"><InlineText text={activeGuide.depth.interviewSignal} /></p>
+                                </div>
+                              </div>
+                            )}
+                            <Separator />
+                            <div className="max-w-[75ch]">
+                              <strong className="text-xs uppercase text-muted-foreground">Senior answer moves</strong>
+                              <p className="mt-2"><InlineText text={activeGuide.frame} /></p>
+                              <ul className="mt-3 list-disc pl-5">
+                                {activeGuide.moves.map((item) => (
+                                  <li key={item}><InlineText text={item} /></li>
+                                ))}
+                              </ul>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {activeGuide.code && (
+                          <Card className="answer-panel">
+                            <CardHeader>
+                              <CardTitle>{activeGuide.codeTitle || "Code Example"}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <pre className="overflow-x-auto rounded-md bg-muted p-4 text-xs leading-6">
+                                <code><HighlightedCode code={activeGuide.code} /></code>
+                              </pre>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {activeGuide.visual && (
+                          <Card className="answer-panel">
+                            <CardHeader>
+                              <CardTitle>{activeGuide.visualTitle || "Illustration"}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <ol className="grid gap-2 sm:grid-cols-3">
+                                {activeGuide.visual.map((item, index) => (
+                                  <li key={item} className="rounded-md border bg-muted/35 p-3 text-sm/6">
+                                    <Badge variant="outline">{index + 1}</Badge>
+                                    <span className="mt-3 block">{item}</span>
+                                  </li>
+                                ))}
+                              </ol>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        <Alert>
+                          <AlertTitle>Common Trap</AlertTitle>
+                          <AlertDescription><InlineText text={activeGuide.trap} /></AlertDescription>
+                        </Alert>
+
+                        <Card className="answer-panel">
+                          <CardHeader>
+                            <CardTitle>What This Tests</CardTitle>
+                          </CardHeader>
+                          <CardContent className="reading-copy grid gap-4 lg:grid-cols-2">
+                            <p><InlineText text={activeQuestion.tests} /></p>
+                            <div>
+                              <strong className="text-xs uppercase text-muted-foreground">Follow-up prompts</strong>
+                              <ul className="mt-2 list-disc pl-5">
+                                {activeQuestion.followUps.map((item) => (
+                                  <li key={item}><InlineText text={item} /></li>
+                                ))}
+                              </ul>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </section>
+
+                  {!revealed[activeQuestion.id] && (
+                    <Alert className="answer-panel">
+                      <AlertTitle>{isFirstRun ? "Start here" : "Think first"}</AlertTitle>
+                      <AlertDescription>
+                        {isFirstRun
+                          ? "Answer this in your own words, reveal the model answer, then mark it reviewed when the reasoning clicks."
+                          : thinkPrompt}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </article>
+              ) : isSavedEmpty ? (
+                <Card key="saved-empty" className="answer-panel">
+                  <CardContent>
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon"><SparkleIcon /></EmptyMedia>
+                        <EmptyTitle>No saved questions yet</EmptyTitle>
+                        <EmptyDescription>Save questions you want to revisit before an interview.</EmptyDescription>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <Button type="button" onClick={showQuestionQueue}>Browse questions</Button>
+                      </EmptyContent>
+                    </Empty>
+                  </CardContent>
+                </Card>
+              ) : hasNoMatches ? null : (
+                <Card key="empty" className="answer-panel">
+                  <CardContent>
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon"><MagnifyingGlassIcon /></EmptyMedia>
+                        <EmptyTitle>No question selected</EmptyTitle>
+                        <EmptyDescription>Your current search and filters do not match any questions.</EmptyDescription>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <Button type="button" variant="outline" onClick={resetFilters}>Reset filters</Button>
+                      </EmptyContent>
+                    </Empty>
+                  </CardContent>
+                </Card>
+              )}
+
+              <Card
+                role="region"
+                aria-label="Questions"
+                className="question-rail min-h-[360px] xl:sticky xl:top-[88px] xl:h-[calc(100vh-112px)]"
+              >
                 <CardHeader>
                   <CardTitle>
-                    {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved queue" : "Question queue"}
+                    {mode === "mock" ? "Drill card" : mode === "starred" ? "Saved queue" : "Question queue"}
                   </CardTitle>
                   <CardDescription>
                     {visibleQuestions.length}
                     {queueRows.length > visibleQuestions.length ? ` of ${queueRows.length}` : ""} shown
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[min(680px,calc(100vh-210px))] pr-2">
+                <CardContent className="min-h-0 flex-1">
+                  <ScrollArea className="h-[520px] pr-2 xl:h-full">
                     <div className="flex flex-col gap-2">
                       {visibleQuestions.map((item, index) => (
                         <Button
                           type="button"
                           variant={activeQuestion?.id === item.id ? "secondary" : "ghost"}
-                          className="h-auto w-full justify-start px-2 py-2.5 text-left"
+                          className={cn(
+                            "h-auto w-full justify-start px-2 py-2.5 text-left",
+                            activeQuestion?.id === item.id && "shadow-xs"
+                          )}
                           aria-current={activeQuestion?.id === item.id ? "true" : undefined}
                           key={item.id}
                           onClick={() => setActiveId(item.id)}
                         >
                           <span className="flex min-w-0 flex-1 items-start gap-2">
-                            <Badge variant="outline">{String(index + 1).padStart(2, "0")}</Badge>
+                            <Badge variant="outline" className="font-mono tabular-nums">
+                              {String(index + 1).padStart(2, "0")}
+                            </Badge>
                             <span className="min-w-0 flex-1">
                               <span className="line-clamp-2 block text-xs font-medium">
                                 {item.question}
@@ -1441,244 +1731,20 @@ function App({
                           </EmptyContent>
                         </Empty>
                       )}
+
+                      {!visibleQuestions.length && isSavedEmpty && (
+                        <Empty>
+                          <EmptyHeader>
+                            <EmptyMedia variant="icon"><SparkleIcon /></EmptyMedia>
+                            <EmptyTitle>No saved questions yet</EmptyTitle>
+                            <EmptyDescription>Save questions you want to revisit before an interview.</EmptyDescription>
+                          </EmptyHeader>
+                        </Empty>
+                      )}
                     </div>
                   </ScrollArea>
                 </CardContent>
               </Card>
-
-              {activeQuestion && activeGuide ? (
-                <article key={activeQuestion.id} className="flex min-w-0 flex-col gap-4">
-                  <Card>
-                    <CardHeader>
-                      <h2 className="font-heading text-base font-medium leading-snug">
-                        <InlineText text={activeQuestion.question} />
-                      </h2>
-                      <CardDescription>
-                        Question {activeQueueIndex + 1} of {studyQueue.length}
-                      </CardDescription>
-                      <CardAction>
-                        <Button
-                          type="button"
-                          variant={starred[activeQuestion.id] ? "default" : "outline"}
-                          size="sm"
-                          aria-pressed={!!starred[activeQuestion.id]}
-                          aria-label={
-                            starred[activeQuestion.id] ? "Remove from saved questions" : "Save for review"
-                          }
-                          onClick={toggleStarred}
-                        >
-                          <SparkleIcon data-icon="inline-start" />
-                          {starred[activeQuestion.id] ? "Saved" : "Save"}
-                        </Button>
-                      </CardAction>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-4">
-                      <div className="flex flex-wrap gap-1">
-                        <Badge variant="secondary">{activeQuestion.category}</Badge>
-                        <Badge variant="outline">{activeQuestion.level}</Badge>
-                        <Badge variant={revealed[activeQuestion.id] ? "default" : "secondary"}>
-                          {revealed[activeQuestion.id] ? "Answer shown" : "Try first"}
-                        </Badge>
-                        <Badge variant={reviewed[activeQuestion.id] ? "default" : "outline"}>
-                          {reviewed[activeQuestion.id] ? "Reviewed" : "Unreviewed"}
-                        </Badge>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          type="button"
-                          aria-expanded={!!revealed[activeQuestion.id]}
-                          aria-controls={`answer-${activeQuestion.id}`}
-                          aria-keyshortcuts="R"
-                          onClick={toggleRevealed}
-                        >
-                          <CaretDownIcon data-icon="inline-start" />
-                          {revealed[activeQuestion.id] ? "Hide answer" : "Reveal answer"}
-                          <Kbd>R</Kbd>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}
-                          aria-pressed={!!reviewed[activeQuestion.id]}
-                          onClick={toggleReviewed}
-                        >
-                          <CheckCircleIcon data-icon="inline-start" />
-                          {reviewed[activeQuestion.id] ? "Unmark reviewed" : "Mark reviewed"}
-                        </Button>
-                        <Button type="button" variant="outline" onClick={markReviewedAndContinue}>
-                          <CheckCircleIcon data-icon="inline-start" />
-                          Mark reviewed and next
-                        </Button>
-                      </div>
-
-                      <ButtonGroup aria-label="Question navigation">
-                        <Button type="button" variant="outline" aria-keyshortcuts="P" onClick={() => moveQuestion(-1)}>
-                          <CaretLeftIcon data-icon="inline-start" /> Previous <Kbd>P</Kbd>
-                        </Button>
-                        <div className="flex items-center border border-input px-3 text-xs text-muted-foreground" aria-live="polite">
-                          {activeQueueIndex + 1} of {studyQueue.length}
-                        </div>
-                        <Button type="button" variant="outline" aria-keyshortcuts="N" onClick={() => moveQuestion(1)}>
-                          Next <CaretRightIcon data-icon="inline-end" /> <Kbd>N</Kbd>
-                        </Button>
-                      </ButtonGroup>
-                    </CardContent>
-                  </Card>
-
-                  <section id={`answer-${activeQuestion.id}`} hidden={!revealed[activeQuestion.id]}>
-                    {revealed[activeQuestion.id] && (
-                      <div className="flex flex-col gap-4">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>Model Answer</CardTitle>
-                          </CardHeader>
-                          <CardContent className="max-w-[75ch] text-sm/7">
-                            <p><InlineText text={activeQuestion.answer} /></p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>Engineering Reasoning</CardTitle>
-                          </CardHeader>
-                          <CardContent className="max-w-[75ch] text-sm/7">
-                            <p><InlineText text={activeQuestion.reasoning} /></p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>Study the Reasoning</CardTitle>
-                            <CardDescription>Use this to shape a senior-level answer.</CardDescription>
-                          </CardHeader>
-                          <CardContent className="flex flex-col gap-4 text-sm/7">
-                            {activeGuide.depth && (
-                              <div className="grid gap-3 lg:grid-cols-3">
-                                <div className="border p-3">
-                                  <strong className="text-xs uppercase text-muted-foreground">Mental model</strong>
-                                  <p className="mt-2"><InlineText text={activeGuide.depth.mentalModel} /></p>
-                                </div>
-                                <div className="border p-3">
-                                  <strong className="text-xs uppercase text-muted-foreground">Engineering use</strong>
-                                  <p className="mt-2"><InlineText text={activeGuide.depth.engineeringUse} /></p>
-                                </div>
-                                <div className="border p-3">
-                                  <strong className="text-xs uppercase text-muted-foreground">Interview signal</strong>
-                                  <p className="mt-2"><InlineText text={activeGuide.depth.interviewSignal} /></p>
-                                </div>
-                              </div>
-                            )}
-                            <Separator />
-                            <div className="max-w-[75ch]">
-                              <strong className="text-xs uppercase text-muted-foreground">Senior answer moves</strong>
-                              <p className="mt-2"><InlineText text={activeGuide.frame} /></p>
-                              <ul className="mt-3 list-disc pl-5">
-                                {activeGuide.moves.map((item) => (
-                                  <li key={item}><InlineText text={item} /></li>
-                                ))}
-                              </ul>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        {activeGuide.code && (
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>{activeGuide.codeTitle || "Code Example"}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <pre className="overflow-x-auto bg-muted p-4 text-xs leading-6">
-                                <code><HighlightedCode code={activeGuide.code} /></code>
-                              </pre>
-                            </CardContent>
-                          </Card>
-                        )}
-
-                        {activeGuide.visual && (
-                          <Card>
-                            <CardHeader>
-                              <CardTitle>{activeGuide.visualTitle || "Illustration"}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <ol className="grid gap-2 sm:grid-cols-3">
-                                {activeGuide.visual.map((item, index) => (
-                                  <li key={item} className="border p-3 text-sm/6">
-                                    <Badge variant="outline">{index + 1}</Badge>
-                                    <span className="mt-3 block">{item}</span>
-                                  </li>
-                                ))}
-                              </ol>
-                            </CardContent>
-                          </Card>
-                        )}
-
-                        <Alert>
-                          <AlertTitle>Common Trap</AlertTitle>
-                          <AlertDescription><InlineText text={activeGuide.trap} /></AlertDescription>
-                        </Alert>
-
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>What This Tests</CardTitle>
-                          </CardHeader>
-                          <CardContent className="grid gap-4 text-sm/7 lg:grid-cols-2">
-                            <p><InlineText text={activeQuestion.tests} /></p>
-                            <div>
-                              <strong className="text-xs uppercase text-muted-foreground">Follow-up prompts</strong>
-                              <ul className="mt-2 list-disc pl-5">
-                                {activeQuestion.followUps.map((item) => (
-                                  <li key={item}><InlineText text={item} /></li>
-                                ))}
-                              </ul>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    )}
-                  </section>
-
-                  {!revealed[activeQuestion.id] && (
-                    <Alert>
-                      <AlertTitle>{isFirstRun ? "Start here" : "Think first"}</AlertTitle>
-                      <AlertDescription>
-                        {isFirstRun
-                          ? "Answer this in your own words, reveal the model answer, then mark it reviewed when the reasoning clicks."
-                          : thinkPrompt}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </article>
-              ) : isSavedEmpty ? (
-                <Card key="saved-empty">
-                  <CardContent>
-                    <Empty>
-                      <EmptyHeader>
-                        <EmptyMedia variant="icon"><SparkleIcon /></EmptyMedia>
-                        <EmptyTitle>No saved questions yet</EmptyTitle>
-                        <EmptyDescription>Save questions you want to revisit before an interview.</EmptyDescription>
-                      </EmptyHeader>
-                      <EmptyContent>
-                        <Button type="button" onClick={showQuestionQueue}>Browse questions</Button>
-                      </EmptyContent>
-                    </Empty>
-                  </CardContent>
-                </Card>
-              ) : hasNoMatches ? null : (
-                <Card key="empty">
-                  <CardContent>
-                    <Empty>
-                      <EmptyHeader>
-                        <EmptyMedia variant="icon"><MagnifyingGlassIcon /></EmptyMedia>
-                        <EmptyTitle>No question selected</EmptyTitle>
-                        <EmptyDescription>Your current search and filters do not match any questions.</EmptyDescription>
-                      </EmptyHeader>
-                      <EmptyContent>
-                        <Button type="button" variant="outline" onClick={resetFilters}>Reset filters</Button>
-                      </EmptyContent>
-                    </Empty>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </main>
         </div>
