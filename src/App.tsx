@@ -15,7 +15,7 @@ import {
   XIcon
 } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, Dispatch, ReactNode, SetStateAction } from "react";
+import type { CSSProperties, Dispatch, KeyboardEvent as ReactKeyboardEvent, ReactNode, SetStateAction } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { categories, levels, questions } from "./questions";
+import { categories, levels, questionTrack, questions, tracks } from "./questions";
 import type {
   AnswerDepth,
   ProgressMap,
@@ -42,6 +42,7 @@ import type {
 
 const storageKey = "frontend-interview-studio-state";
 const questionIds = new Set(questions.map((item) => item.id));
+const allTracks = "All";
 const initialVisibleLimit = 32;
 const visiblePageSize = 32;
 const progressKeys = ["revealed", "reviewed", "starred"] as const;
@@ -79,18 +80,40 @@ export type AppProps = {
   saveThemePreference?: ((theme: Theme) => Promise<unknown>) | null;
 };
 
-const categoryCounts = questions.reduce<Record<string, number>>((counts, question) => {
-  counts[question.category] = (counts[question.category] || 0) + 1;
+const trackCounts = questions.reduce<Record<string, number>>((counts, question) => {
+  const trackName = questionTrack(question);
+  counts[trackName] = (counts[trackName] || 0) + 1;
   return counts;
 }, {});
-const milestoneMessages: Record<number, string> = {
-  25: "25 reviewed. Patterns are starting to repeat.",
-  50: "Halfway through. Your answers should feel sharper now.",
-  75: "75 reviewed. Time to hunt for weak spots.",
-  100: "100 reviewed. Strong foundation built.",
-  250: "250 reviewed. You have crossed the midpoint.",
-  500: "All 500 reviewed. You have completed the bank."
-};
+
+function milestoneMessage(reviewedCount: number, total: number) {
+  if (reviewedCount === total && total > 0) return `All ${total} reviewed. You have completed this collection.`;
+  if (reviewedCount === 25) return "25 reviewed. Patterns are starting to repeat.";
+  if (reviewedCount === 50) return "50 reviewed. Your answers should feel sharper now.";
+  if (reviewedCount === 75) return "75 reviewed. Time to hunt for weak spots.";
+  if (reviewedCount === 100) return "100 reviewed. Strong foundation built.";
+  if (reviewedCount === 250) return "250 reviewed. You have crossed a serious midpoint.";
+  return "";
+}
+
+function trackLabel(trackName: string) {
+  return trackName === allTracks ? "All roles" : trackName;
+}
+
+function sentenceEnd(value: string) {
+  const text = value.trim();
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+function queueRowLabel(question: Question, index: number, isReviewed: boolean) {
+  return [
+    `${isReviewed ? "Reviewed" : "Open"} question ${index + 1}.`,
+    sentenceEnd(question.question),
+    sentenceEnd(questionTrack(question)),
+    sentenceEnd(question.category),
+    sentenceEnd(question.level)
+  ].join(" ");
+}
 
 const categoryPrompts: Record<string, string> = {
   Accessibility: "Name the user who benefits, then name the failure mode.",
@@ -100,7 +123,20 @@ const categoryPrompts: Record<string, string> = {
   Performance: "Start with what users feel, then trace it to the browser work.",
   React: "Separate render behavior from state ownership before answering.",
   Security: "Name the trust boundary, then explain how the bug gets in.",
-  Testing: "Say what confidence the test buys, not just the tool you would use."
+  Testing: "Say what confidence the test buys, not just the tool you would use.",
+  "Payments & Remittance": "Start with the money movement, then explain settlement, risk, and customer impact.",
+  "API & Partner Integration": "Name the contract, failure mode, and how both sides prove it works.",
+  "Data & Schema Design": "Start with the domain facts, then the queries and audit trail the business needs.",
+  "Cloud & Infrastructure": "Tie the technical choice to reliability, cost, security, and operating model.",
+  "Security & Compliance": "Name the regulated risk, the control, and the customer experience tradeoff.",
+  "Fraud & Risk": "Explain the signal, the false-positive cost, and the escalation path.",
+  "Agile Delivery": "Break the work into milestones that can be tested, governed, and released.",
+  "Stakeholder Communication": "Translate the technical detail into a decision, risk, or next step.",
+  "Architecture & Systems": "Draw the boundary first, then name ownership, scale, and failure behavior.",
+  "Observability & Operations": "Say which operational question the metric or log will answer.",
+  "Product Strategy": "Connect the idea to customer value, business case, risk, and measurable outcome.",
+  "Mobile & Channels": "Compare the channel constraints before proposing the same workflow everywhere.",
+  "Vendor & Partner Management": "Ask what happens after the demo: SLA, cost, support, risk, and exit path."
 };
 
 const topicPalettes: Record<string, TopicCssProperties> = {
@@ -157,17 +193,35 @@ const categoryTone: Record<string, string> = {
   CSS: "interface",
   Data: "judgment",
   Debugging: "quality",
+  "Agile Delivery": "quality",
+  "API & Partner Integration": "interface",
+  "Architecture & Systems": "interface",
+  "Cloud & Infrastructure": "craft",
+  "Data & Schema Design": "judgment",
+  "Fraud & Risk": "judgment",
   JavaScript: "craft",
   Leadership: "judgment",
+  "Mobile & Channels": "interface",
+  "Observability & Operations": "quality",
+  "Payments & Remittance": "craft",
   Performance: "quality",
   "Product Engineering": "judgment",
+  "Product Strategy": "judgment",
   React: "interface",
   Security: "judgment",
+  "Security & Compliance": "judgment",
   "System Design": "interface",
-  Testing: "quality"
+  "Stakeholder Communication": "quality",
+  Testing: "quality",
+  "Vendor & Partner Management": "craft"
 };
 
 const categoryAnswerMoves: Record<string, string[]> = {
+  TPM: [
+    "Start with the business process and the customer promise, then name the technical system that supports it.",
+    "Make the tradeoff explicit: speed, cost, reliability, compliance, customer friction, partner limits, or operating effort.",
+    "Close with how you would prove readiness: API evidence, data checks, risk controls, rollout plan, dashboards, and owner."
+  ],
   Accessibility: [
     "Name the person affected by the choice, then describe the exact interaction that breaks.",
     "Prefer native semantics first. If custom UI is necessary, explain the keyboard, focus, name, role, and state work you now own.",
@@ -500,7 +554,9 @@ function getAnswerGuide(question: Question, depthMap: AnswerDepthMap | null = nu
   return {
     ...defaultAnswerGuide,
     depth: depthMap?.[question.id],
-    moves: categoryAnswerMoves[question.category] || categoryAnswerMoves.JavaScript,
+    moves:
+      categoryAnswerMoves[question.category] ||
+      (questionTrack(question) === "TPM" ? categoryAnswerMoves.TPM : categoryAnswerMoves.JavaScript),
     ...answerGuides[question.id]
   };
 }
@@ -574,6 +630,7 @@ function getQuestionSearchText(question: Question, depthMap: AnswerDepthMap | nu
     question.answer,
     question.reasoning,
     question.tests,
+    questionTrack(question),
     question.category,
     question.level,
     guideSearchText(question, depthMap)
@@ -592,6 +649,7 @@ const baseQuestionSearchText = questions.map((item) => ({
     item.answer,
     item.reasoning,
     item.tests,
+    questionTrack(item),
     item.category,
     item.level
   ]
@@ -734,6 +792,7 @@ function App({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [storedState] = useState(loadStoredState);
   const [query, setQuery] = useState("");
+  const [track, setTrack] = useState(allTracks);
   const [category, setCategory] = useState("All");
   const [level, setLevel] = useState("All");
   const [mode, setMode] = useState("browse");
@@ -863,19 +922,36 @@ function App({
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  const trackQuestions = useMemo(
+    () => questions.filter((item) => track === allTracks || questionTrack(item) === track),
+    [track]
+  );
+  const categoryCounts = useMemo(
+    () =>
+      trackQuestions.reduce<Record<string, number>>((counts, question) => {
+        counts[question.category] = (counts[question.category] || 0) + 1;
+        return counts;
+      }, {}),
+    [trackQuestions]
+  );
+  const visibleCategories = useMemo(
+    () => categories.filter((item) => categoryCounts[item]),
+    [categoryCounts]
+  );
   const filteredQuestions = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return baseQuestionSearchText.filter(({ item, text }) => {
+      const matchesTrack = track === allTracks || questionTrack(item) === track;
       const matchesCategory = category === "All" || item.category === category;
       const matchesLevel = level === "All" || item.level === level;
 
-      if (!matchesCategory || !matchesLevel) return false;
+      if (!matchesTrack || !matchesCategory || !matchesLevel) return false;
       if (!normalizedQuery) return true;
 
       return text.includes(normalizedQuery) || getQuestionSearchText(item, answerDepthMap).includes(normalizedQuery);
     }).map(({ item }) => item);
-  }, [answerDepthMap, category, level, query]);
+  }, [answerDepthMap, category, level, query, track]);
 
   const starredQueue = useMemo(
     () => filteredQuestions.filter((item) => starred[item.id]),
@@ -898,10 +974,14 @@ function App({
     : -1;
   const hasProgress = [revealed, reviewed, starred].some((map) => Object.values(map).some(Boolean));
   const isFirstRun =
-    !hasProgress && mode === "browse" && !query && category === "All" && level === "All";
+    !hasProgress && mode === "browse" && !query && track === allTracks && category === "All" && level === "All";
   const hasNoMatches = filteredQuestions.length === 0;
   const isSavedEmpty =
     usesSavedQueue && filteredQuestions.length > 0 && !visibleQuestions.length;
+  const emptyStateTitle = hasNoMatches ? "No matching questions" : "No question selected";
+  const emptyStateDescription = hasNoMatches
+    ? "Clear search or reset filters to return to the full question bank."
+    : "Your current search and filters do not match any questions.";
   const isAnswerDepthLoading =
     Boolean(activeQuestion && revealed[activeQuestion.id]) && answerDepthState === "loading" && !answerDepthMap;
 
@@ -913,7 +993,7 @@ function App({
 
   useEffect(() => {
     setVisibleLimit(initialVisibleLimit);
-  }, [category, level, mode, query]);
+  }, [category, level, mode, query, track]);
 
   useEffect(() => {
     if (mode !== "mock" && activeQueueIndex >= visibleLimit) {
@@ -940,15 +1020,22 @@ function App({
     });
   }, [activeQuestion, answerDepthMap, answerDepthState, query, revealed]);
 
-  const reviewedCount = Object.values(reviewed).filter(Boolean).length;
-  const progress = questions.length
-    ? reviewedCount >= questions.length
+  const reviewedCount = trackQuestions.filter((item) => reviewed[item.id]).length;
+  const totalQuestions = trackQuestions.length;
+  const collectionDescription =
+    track === allTracks
+      ? `${totalQuestions} questions across both roles.`
+      : `${track}: ${totalQuestions} questions.`;
+  const progress = totalQuestions
+    ? reviewedCount >= totalQuestions
       ? 100
-      : Math.floor((reviewedCount / questions.length) * 100)
+      : Math.floor((reviewedCount / totalQuestions) * 100)
     : 0;
   const progressNudge =
     reviewedCount === 0
-      ? "Start with one answer you can defend."
+      ? track === "TPM"
+        ? "Start with one answer that connects tech to business impact."
+        : "Start with one answer you can defend."
       : reviewedCount < 5
         ? `${5 - reviewedCount} more to finish a five-question run.`
         : reviewedCount < 25
@@ -960,6 +1047,7 @@ function App({
     activeQuestion &&
     (categoryPrompts[activeQuestion.category] ||
       `Answer like a senior engineer: claim, reason, tradeoff, example.`);
+  const showTrackBadges = track === allTracks;
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -1003,9 +1091,9 @@ function App({
     }
     previousReviewedCount.current = reviewedCount;
 
-    const milestone = milestoneMessages[reviewedCount];
+    const milestone = milestoneMessage(reviewedCount, totalQuestions);
     if (milestone) showSessionNote(milestone, "milestone");
-  }, [reviewedCount]);
+  }, [reviewedCount, totalQuestions]);
 
   useEffect(() => {
     if (!sessionNote) return undefined;
@@ -1158,6 +1246,7 @@ function App({
 
   function resetFilters() {
     setQuery("");
+    setTrack(allTracks);
     setCategory("All");
     setLevel("All");
     setMode("browse");
@@ -1178,6 +1267,40 @@ function App({
     setActiveId(studyQueue[nextIndex].id);
     if (mode === "mock") setMode(drillScope === "starred" ? "starred" : "browse");
     showSessionNote(`Question ${nextIndex + 1} is up.`);
+  }
+
+  function focusQueueRow(questionId: string) {
+    requestAnimationFrame(() => {
+      const row = document.querySelector<HTMLButtonElement>(
+        `[data-queue-question-id="${CSS.escape(questionId)}"]`
+      );
+      row?.focus({ preventScroll: true });
+      row?.scrollIntoView({ block: "nearest" });
+    });
+  }
+
+  function moveQueueFocus(nextIndex: number) {
+    const boundedIndex = Math.min(Math.max(nextIndex, 0), visibleQuestions.length - 1);
+    const nextQuestion = visibleQuestions[boundedIndex];
+    if (!nextQuestion) return;
+    setActiveId(nextQuestion.id);
+    focusQueueRow(nextQuestion.id);
+  }
+
+  function handleQueueRowKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>, index: number) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      moveQueueFocus(index + 1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      moveQueueFocus(index - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      moveQueueFocus(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      moveQueueFocus(visibleQuestions.length - 1);
+    }
   }
 
   function markReviewedAndContinue() {
@@ -1231,6 +1354,100 @@ function App({
     showSessionNote(nextTheme === "dark" ? "Dark mode on." : "Light mode on.", "action");
   }
 
+  const activeFilterCount = [track !== allTracks, category !== "All", level !== "All"].filter(Boolean).length;
+  const mobileFilterSummary = activeFilterCount ? `${activeFilterCount} active` : "All";
+
+  function renderFilterControls(idSuffix: string, compact = false) {
+    const trackLabelId = `track-filter-label-${idSuffix}`;
+    const topicLabelId = `topic-filter-label-${idSuffix}`;
+    const levelLabelId = `level-filter-label-${idSuffix}`;
+    const triggerClassName = compact ? "min-w-0 flex-1 bg-card" : "min-w-0 flex-1 bg-card sm:flex-none";
+
+    return (
+      <>
+        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+          <span id={trackLabelId} className={compact ? "w-12 shrink-0" : undefined}>Role</span>
+          <Select
+            value={track}
+            onValueChange={(value) => {
+              if (!value) return;
+              setTrack(value);
+              setCategory("All");
+            }}
+          >
+            <SelectTrigger
+              aria-labelledby={trackLabelId}
+              className={cn(triggerClassName, !compact && "sm:w-36")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                {[allTracks, ...tracks].map((item) => (
+                  <SelectItem key={item} value={item}>
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-4">
+                      <span className="truncate">{trackLabel(item)}</span>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {item === allTracks ? questions.length : trackCounts[item] || 0}
+                      </span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+          <span id={topicLabelId} className={compact ? "w-12 shrink-0" : undefined}>Topic</span>
+          <Select value={category} onValueChange={(value) => value && setCategory(value)}>
+            <SelectTrigger
+              aria-labelledby={topicLabelId}
+              className={cn(triggerClassName, !compact && "sm:w-52")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                {["All", ...visibleCategories].map((item) => (
+                  <SelectItem key={item} value={item}>
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-4">
+                      <span className="truncate">{item}</span>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {item === "All" ? trackQuestions.length : categoryCounts[item] || 0}
+                      </span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+          <span id={levelLabelId} className={compact ? "w-12 shrink-0" : undefined}>Level</span>
+          <Select value={level} onValueChange={(value) => value && setLevel(value)}>
+            <SelectTrigger
+              aria-labelledby={levelLabelId}
+              className={cn(triggerClassName, !compact && "sm:w-40")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {["All", ...levels].map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </>
+    );
+  }
+
   return (
     <TooltipProvider>
       <div className="study-shell min-h-screen bg-background text-foreground">
@@ -1244,103 +1461,86 @@ function App({
         <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
           <main className="min-w-0 lg:order-2" id="main-content">
             <header className="study-command-bar sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
-              <div className="flex flex-col gap-3 xl:flex-row xl:flex-wrap xl:items-center">
-                <div className="min-w-0 xl:w-44">
+              <div className="grid gap-3 xl:grid-cols-[minmax(10rem,12rem)_minmax(0,1fr)] xl:items-center">
+                <div className="min-w-0">
                   <h1 className="text-xs font-medium uppercase text-muted-foreground">Interview Studio</h1>
                   <p className="truncate text-[0.9375rem] font-semibold">
                     {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved review" : "Browse practice"}
                   </p>
                 </div>
 
-                <Tabs
-                  value={mode === "starred" ? "starred" : "browse"}
-                  onValueChange={(value) => {
-                    const nextMode = value === "starred" ? "starred" : "browse";
-                    setMode(nextMode);
-                    setDrillScope(nextMode);
-                  }}
-                >
-                  <TabsList className="w-full sm:w-fit">
-                    <TabsTrigger value="browse" className="flex-1 sm:flex-none">
-                      <FunnelIcon data-icon="inline-start" /> Browse
-                    </TabsTrigger>
-                    <TabsTrigger value="starred" className="flex-1 sm:flex-none">
-                      <SparkleIcon data-icon="inline-start" /> Saved
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:flex-wrap xl:items-center 2xl:flex-nowrap">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <Tabs
+                      value={mode === "starred" ? "starred" : "browse"}
+                      onValueChange={(value) => {
+                        const nextMode = value === "starred" ? "starred" : "browse";
+                        setMode(nextMode);
+                        setDrillScope(nextMode);
+                      }}
+                    >
+                      <TabsList className="w-fit">
+                        <TabsTrigger value="browse" className="flex-none">
+                          <FunnelIcon data-icon="inline-start" /> Browse
+                        </TabsTrigger>
+                        <TabsTrigger value="starred" className="flex-none">
+                          <SparkleIcon data-icon="inline-start" /> Saved
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
 
-                <div className="relative min-w-0 flex-1 xl:min-w-64">
-                  <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    ref={searchInputRef}
-                    aria-label="Search questions"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search questions, answers, concepts"
-                    className="h-11 bg-card pl-9 pr-11"
-                  />
-                  {query && (
                     <Button
                       type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      className="absolute right-0 top-0"
-                      aria-label="Clear search"
-                      onClick={() => setQuery("")}
+                      variant="outline"
+                      disabled={!randomDrillPool.length}
+                      onClick={pickRandomQuestion}
                     >
-                      <XIcon />
+                      <ShuffleIcon data-icon="inline-start" />
+                      Random drill
                     </Button>
-                  )}
-                </div>
-
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-                    <span id="topic-filter-label">Topic</span>
-                    <Select value={category} onValueChange={(value) => value && setCategory(value)}>
-                      <SelectTrigger aria-labelledby="topic-filter-label" className="min-w-0 flex-1 bg-card sm:w-52 sm:flex-none">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent align="end">
-                        <SelectGroup>
-                          {["All", ...categories].map((item) => (
-                            <SelectItem key={item} value={item}>
-                              <span className="flex min-w-0 flex-1 items-center justify-between gap-4">
-                                <span className="truncate">{item}</span>
-                                <span className="text-xs tabular-nums text-muted-foreground">
-                                  {item === "All" ? questions.length : categoryCounts[item] || 0}
-                                </span>
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
                   </div>
 
-                  <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-                    <span id="level-filter-label">Level</span>
-                    <Select value={level} onValueChange={(value) => value && setLevel(value)}>
-                      <SelectTrigger aria-labelledby="level-filter-label" className="min-w-0 flex-1 bg-card sm:w-40 sm:flex-none">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {["All", ...levels].map((item) => (
-                            <SelectItem key={item} value={item}>
-                              {item}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                  <div className="relative min-w-0 flex-1 xl:min-w-72 2xl:max-w-[28rem]">
+                    <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      ref={searchInputRef}
+                      aria-label="Search questions"
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      placeholder="Search questions and answers"
+                      className="h-11 bg-card pl-9 pr-11"
+                    />
+                    {query && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="absolute right-0 top-0"
+                        aria-label="Clear search"
+                        onClick={() => setQuery("")}
+                      >
+                        <XIcon />
+                      </Button>
+                    )}
+                  </div>
+
+                  <details className="mobile-filter-panel sm:hidden">
+                    <summary className="flex h-11 items-center justify-between gap-3 rounded-4xl border border-input bg-card px-4 text-[0.9375rem] font-medium">
+                      <span className="inline-flex items-center gap-1.5">
+                        <FunnelIcon data-icon="inline-start" />
+                        Filters
+                      </span>
+                      <span className="text-sm text-muted-foreground">{mobileFilterSummary}</span>
+                    </summary>
+                    <div className="mt-3 grid gap-2">
+                      {renderFilterControls("mobile", true)}
+                    </div>
+                  </details>
+
+                  <div className="hidden w-full gap-2 sm:grid sm:w-auto sm:grid-cols-[auto_auto_auto]">
+                    {renderFilterControls("desktop")}
                   </div>
                 </div>
-
-                <Button type="button" variant="outline" disabled={!randomDrillPool.length} onClick={pickRandomQuestion}>
-                  <ShuffleIcon data-icon="inline-start" />
-                  Random drill
-                </Button>
               </div>
             </header>
 
@@ -1354,14 +1554,13 @@ function App({
                   >
                     <CardHeader className="gap-5 border-b">
                       <div className="flex flex-wrap gap-1.5">
+                        {showTrackBadges && <Badge variant="outline">{questionTrack(activeQuestion)}</Badge>}
                         <Badge variant="secondary">{activeQuestion.category}</Badge>
                         <Badge variant="outline">{activeQuestion.level}</Badge>
                         <Badge variant={revealed[activeQuestion.id] ? "secondary" : "outline"}>
                           {revealed[activeQuestion.id] ? "Answer shown" : "Try first"}
                         </Badge>
-                        <Badge variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}>
-                          {reviewed[activeQuestion.id] ? "Reviewed" : "Unreviewed"}
-                        </Badge>
+                        {reviewed[activeQuestion.id] && <Badge variant="secondary">Reviewed</Badge>}
                       </div>
                       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
                         <div className="min-w-0">
@@ -1595,14 +1794,14 @@ function App({
                     </Empty>
                   </CardContent>
                 </Card>
-              ) : hasNoMatches ? null : (
+              ) : (
                 <Card key="empty" className="answer-panel">
                   <CardContent>
                     <Empty>
                       <EmptyHeader>
                         <EmptyMedia variant="icon"><MagnifyingGlassIcon /></EmptyMedia>
-                        <EmptyTitle>No question selected</EmptyTitle>
-                        <EmptyDescription>Your current search and filters do not match any questions.</EmptyDescription>
+                        <EmptyTitle>{emptyStateTitle}</EmptyTitle>
+                        <EmptyDescription>{emptyStateDescription}</EmptyDescription>
                       </EmptyHeader>
                       <EmptyContent>
                         <Button type="button" variant="outline" onClick={resetFilters}>Reset filters</Button>
@@ -1614,8 +1813,8 @@ function App({
 
               <Card
                 role="region"
-                aria-label="Questions"
-                className="question-rail min-h-[360px] xl:sticky xl:top-[88px] xl:h-[calc(100vh-112px)]"
+                aria-label="Questions. Use arrow keys to move through the queue."
+                className="question-rail min-h-[360px] xl:sticky xl:top-[88px] xl:h-[calc(100dvh-178px)]"
               >
                 <CardHeader>
                   <CardTitle>
@@ -1629,48 +1828,57 @@ function App({
                 <CardContent className="min-h-0 flex-1">
                   {visibleQuestions.length ? (
                     <ScrollArea className="h-[520px] pr-2 xl:h-full">
-                      <div className="flex flex-col gap-2">
-                        {visibleQuestions.map((item, index) => (
-                          <Button
-                            type="button"
-                            variant={activeQuestion?.id === item.id ? "secondary" : "ghost"}
-                            className={cn(
-                              "queue-row min-h-16 w-full justify-start px-3 py-3 text-left"
-                            )}
-                            aria-current={activeQuestion?.id === item.id ? "true" : undefined}
-                            data-reviewed={reviewed[item.id] ? "true" : undefined}
-                            key={item.id}
-                            title={item.question}
-                            onClick={() => setActiveId(item.id)}
-                          >
-                            <span className="flex min-w-0 flex-1 items-start gap-3">
-                              <Badge variant="outline" className="font-mono tabular-nums">
+                      <div className="flex flex-col gap-2 pb-2">
+                        {visibleQuestions.map((item, index) => {
+                          const isActiveRow = activeQuestion?.id === item.id;
+                          const isTabStop = isActiveRow || (!activeQuestion && index === 0);
+
+                          return (
+                            <Button
+                              type="button"
+                              variant={isActiveRow ? "secondary" : "ghost"}
+                              className={cn(
+                                "queue-row grid h-auto min-h-24 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 whitespace-normal px-3 py-3 text-left"
+                              )}
+                              aria-current={isActiveRow ? "true" : undefined}
+                              aria-keyshortcuts="ArrowUp ArrowDown Home End"
+                              data-queue-question-id={item.id}
+                              data-reviewed={reviewed[item.id] ? "true" : undefined}
+                              key={item.id}
+                              tabIndex={isTabStop ? 0 : -1}
+                              title={item.question}
+                              aria-label={queueRowLabel(item, index, !!reviewed[item.id])}
+                              onClick={() => setActiveId(item.id)}
+                              onKeyDown={(event) => handleQueueRowKeyDown(event, index)}
+                            >
+                              <Badge variant="outline" className="mt-0.5 font-mono tabular-nums">
                                 {String(index + 1).padStart(2, "0")}
                               </Badge>
-                              <span className="min-w-0 flex-1">
-                                <span className="line-clamp-3 block text-[0.9375rem] font-medium leading-6">
+                              <span className="min-w-0">
+                                <span className="queue-question-title text-[0.9375rem] font-medium leading-6">
                                   {item.question}
                                 </span>
-                                <span className="mt-1 flex flex-wrap gap-1">
-                                  <Badge variant="secondary">{item.category}</Badge>
+                                <span className="mt-2 flex min-w-0 flex-wrap gap-1.5">
+                                  {showTrackBadges && <Badge variant="outline">{questionTrack(item)}</Badge>}
+                                  <Badge variant="secondary" className="max-w-full truncate">{item.category}</Badge>
                                   <Badge variant="outline">{item.level}</Badge>
                                 </span>
                               </span>
-                            </span>
-                            <span
-                              className="queue-state ml-auto"
-                              aria-label={reviewed[item.id] ? "Reviewed" : "Open"}
-                              title={reviewed[item.id] ? "Reviewed" : "Open"}
-                            >
-                              {reviewed[item.id] ? (
-                                <CheckCircleIcon aria-hidden="true" />
-                              ) : (
-                                <CircleIcon aria-hidden="true" />
-                              )}
-                              <span className="sr-only">{reviewed[item.id] ? "Reviewed" : "Open"}</span>
-                            </span>
-                          </Button>
-                        ))}
+                              <span
+                                className="queue-state mt-1"
+                                aria-label={reviewed[item.id] ? "Reviewed" : "Open"}
+                                title={reviewed[item.id] ? "Reviewed" : "Open"}
+                              >
+                                {reviewed[item.id] ? (
+                                  <CheckCircleIcon aria-hidden="true" />
+                                ) : (
+                                  <CircleIcon aria-hidden="true" />
+                                )}
+                                <span className="sr-only">{reviewed[item.id] ? "Reviewed" : "Open"}</span>
+                              </span>
+                            </Button>
+                          );
+                        })}
 
                         {hasMoreQuestions && (
                           <Button
@@ -1686,23 +1894,18 @@ function App({
                       </div>
                     </ScrollArea>
                   ) : (
-                    <div className="flex min-h-[320px] items-center justify-center pr-2 xl:min-h-[calc(100vh-284px)]">
+                    <div className="flex min-h-[320px] items-center justify-center pr-2 xl:h-full xl:min-h-0">
                       {filteredQuestions.length === 0 ? (
                         <Empty>
                           <EmptyHeader>
                             <EmptyMedia variant="icon">
                               <MagnifyingGlassIcon />
                             </EmptyMedia>
-                            <EmptyTitle>No matching questions</EmptyTitle>
+                            <EmptyTitle>Queue is empty</EmptyTitle>
                             <EmptyDescription>
-                              Clear search or reset filters to return to the full question bank.
+                              The current search and filters have no queue results.
                             </EmptyDescription>
                           </EmptyHeader>
-                          <EmptyContent>
-                            <Button type="button" variant="outline" onClick={resetFilters}>
-                              Reset filters
-                            </Button>
-                          </EmptyContent>
                         </Empty>
                       ) : isSavedEmpty ? (
                         <Empty>
@@ -1749,7 +1952,7 @@ function App({
                 <Card size="sm" className="border-sidebar-border bg-sidebar-accent/55">
                   <CardHeader>
                     <CardTitle>Progress</CardTitle>
-                    <CardDescription>{questions.length} questions in this collection.</CardDescription>
+                    <CardDescription>{collectionDescription}</CardDescription>
                     <CardAction>
                       <Badge variant="secondary">{progress}%</Badge>
                     </CardAction>
@@ -1773,7 +1976,7 @@ function App({
                           onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
                         >
                           <ArrowCounterClockwiseIcon data-icon="inline-start" />
-                          {confirmReset ? "Clear progress" : "Reset progress"}
+                          {confirmReset ? "Clear all progress" : "Reset all progress"}
                         </Button>
                       )}
                       {confirmReset && (
@@ -1781,8 +1984,8 @@ function App({
                           <AlertTitle>Confirm reset</AlertTitle>
                           <AlertDescription>
                             {accountCanSave
-                              ? "This clears reviewed, saved, and revealed answers for your account."
-                              : "This clears reviewed, saved, and revealed answers on this device."}
+                              ? "This clears reviewed, saved, and revealed answers for every role in your account."
+                              : "This clears reviewed, saved, and revealed answers for every role on this device."}
                           </AlertDescription>
                           <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
                             Cancel
