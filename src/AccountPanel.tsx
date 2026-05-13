@@ -1,5 +1,9 @@
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
+import { GoogleLogoIcon, SignOutIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type AccountPanelProps = {
   progressReady: boolean;
@@ -27,10 +31,12 @@ export default function AccountPanel({ progressReady, syncStatus = "saved" }: Ac
 
   if (isLoading) {
     return (
-      <section className="account-panel" aria-label="Account">
-        <strong>Checking account</strong>
-        <p>Preparing account sync.</p>
-      </section>
+      <Card size="sm" aria-label="Account">
+        <CardHeader>
+          <CardTitle>Checking account</CardTitle>
+          <CardDescription>Preparing account sync.</CardDescription>
+        </CardHeader>
+      </Card>
     );
   }
 
@@ -44,29 +50,39 @@ export default function AccountPanel({ progressReady, syncStatus = "saved" }: Ac
           : "Saved to your account.";
 
     return (
-      <section className="account-panel" aria-label="Account">
-        <div>
-          <strong>Account progress</strong>
-          <p>{syncCopy}</p>
-        </div>
-        <button type="button" onClick={() => void signOut()}>
-          Sign out
-        </button>
-      </section>
+      <Card size="sm" aria-label="Account">
+        <CardHeader>
+          <CardTitle>Account progress</CardTitle>
+          <CardDescription>{syncCopy}</CardDescription>
+          <CardAction>
+            <Button type="button" variant="outline" size="sm" onClick={() => void signOut()}>
+              <SignOutIcon data-icon="inline-start" />
+              Sign out
+            </Button>
+          </CardAction>
+        </CardHeader>
+      </Card>
     );
   }
 
   return (
-    <section className="account-panel" aria-label="Account sign in">
-      <div>
-        <strong>Account sync</strong>
-        <p>Use Google to save progress across devices.</p>
+    <Card size="sm" aria-label="Account sign in">
+      <CardHeader>
+        <CardTitle>Account sync</CardTitle>
+        <CardDescription>Use Google to save progress across devices.</CardDescription>
+      </CardHeader>
+      <div className="flex flex-col gap-3 px-3">
+        {error && (
+          <Alert variant="destructive">
+            <AlertTitle>Sign in failed</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        <Button type="button" onClick={handleGoogleSignIn} disabled={submitting}>
+          <GoogleLogoIcon data-icon="inline-start" />
+          {submitting ? "Opening Google..." : "Continue with Google"}
+        </Button>
       </div>
-      {error && <p className="account-error">{error}</p>}
-      <button type="button" onClick={handleGoogleSignIn} disabled={submitting}>
-        <span aria-hidden="true">G</span>
-        {submitting ? "Opening Google..." : "Continue with Google"}
-      </button>
-    </section>
+    </Card>
   );
 }
