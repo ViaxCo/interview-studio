@@ -521,7 +521,14 @@ const questionSearchIndex = questions.map((item) => ({
 }));
 
 function emptyStoredState(storageAvailable = true) {
-  return { revealed: {}, reviewed: {}, starred: {}, theme: "light", storageAvailable };
+  return {
+    revealed: {},
+    reviewed: {},
+    starred: {},
+    theme: "light",
+    hasThemePreference: false,
+    storageAvailable
+  };
 }
 
 function cleanStoredMap(value) {
@@ -533,11 +540,19 @@ function cleanStoredMap(value) {
 }
 
 function normalizeStoredState(value, storageAvailable = true) {
+  const hasThemePreference =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? typeof value.hasThemePreference === "boolean"
+        ? value.hasThemePreference
+        : Object.prototype.hasOwnProperty.call(value, "theme")
+      : false;
+
   return {
     revealed: cleanStoredMap(value?.revealed),
     reviewed: cleanStoredMap(value?.reviewed),
     starred: cleanStoredMap(value?.starred),
     theme: value?.theme === "dark" ? "dark" : "light",
+    hasThemePreference,
     storageAvailable
   };
 }
@@ -569,7 +584,10 @@ function hasProgressMissingFromAccount(deviceState, accountState) {
 }
 
 function hasDeviceStateToImport(deviceState, accountState) {
-  return hasProgressMissingFromAccount(deviceState, accountState) || deviceState.theme !== accountState.theme;
+  return (
+    hasProgressMissingFromAccount(deviceState, accountState) ||
+    (deviceState.hasThemePreference === true && deviceState.theme !== accountState.theme)
+  );
 }
 
 function applyQuestionUpdate(state, questionId, update) {
@@ -653,6 +671,7 @@ function App({
   const hadAccountSession = useRef(false);
   const pendingQuestionEdits = useRef(new Map());
   const pendingTheme = useRef(null);
+  const hasDeviceThemePreference = useRef(storedState.hasThemePreference);
 
   useEffect(() => {
     if (accountCanSave) {
@@ -673,6 +692,7 @@ function App({
       setStarred(guestState.starred);
       setTheme(guestState.theme);
       setStorageAvailable(guestState.storageAvailable);
+      hasDeviceThemePreference.current = guestState.hasThemePreference;
       hadAccountSession.current = false;
     }
   }, [accountCanSave]);
@@ -698,7 +718,13 @@ function App({
       }
       if (syncedAccountKey.current === accountKey) return;
 
-      const currentState = { revealed, reviewed, starred, theme };
+      const currentState = {
+        revealed,
+        reviewed,
+        starred,
+        theme,
+        hasThemePreference: hasDeviceThemePreference.current
+      };
 
       if (
         !syncedAccountKey.current &&
@@ -731,7 +757,15 @@ function App({
 
   useEffect(() => {
     if (!accountCanSave) {
-      setStorageAvailable(saveStoredState({ revealed, reviewed, starred, theme }));
+      setStorageAvailable(
+        saveStoredState({
+          revealed,
+          reviewed,
+          starred,
+          theme,
+          hasThemePreference: hasDeviceThemePreference.current
+        })
+      );
     }
   }, [accountCanSave, revealed, reviewed, starred, theme]);
 
@@ -954,11 +988,12 @@ function App({
 
   function importGuestProgress() {
     if (blockProgressEdit() || !pendingGuestImport) return;
+    const shouldImportTheme = pendingGuestImport.hasThemePreference === true;
     const nextState = {
       revealed: { ...revealed, ...pendingGuestImport.revealed },
       reviewed: { ...reviewed, ...pendingGuestImport.reviewed },
       starred: { ...starred, ...pendingGuestImport.starred },
-      theme: pendingGuestImport.theme
+      theme: shouldImportTheme ? pendingGuestImport.theme : theme
     };
     setRevealed(nextState.revealed);
     setReviewed(nextState.reviewed);
@@ -967,7 +1002,7 @@ function App({
     if (accountCanSave && importAccountProgress) {
       queueImportedProgress(pendingGuestImport);
       const themeImport =
-        saveThemePreference && pendingGuestImport.theme !== theme
+        shouldImportTheme && saveThemePreference && pendingGuestImport.theme !== theme
           ? saveThemePreference(pendingGuestImport.theme)
           : Promise.resolve();
       Promise.all([importAccountProgress(serializeQuestionProgress(nextState)), themeImport])
@@ -1047,6 +1082,7 @@ function App({
   function toggleTheme() {
     if (blockProgressEdit()) return;
     const nextTheme = theme === "dark" ? "light" : "dark";
+    hasDeviceThemePreference.current = true;
     setTheme(nextTheme);
     saveAccountTheme(nextTheme);
     showSessionNote(nextTheme === "dark" ? "Dark mode on." : "Light mode on.", "action");
