@@ -1,6 +1,6 @@
-import type { AnswerDepth, Question } from "./questionTypes";
+import type { Question } from "./questionTypes";
 
-type TopicSpec = [string, string, string, string, string, string];
+export type TopicSpec = [string, string, string, string, string, string];
 type TopicContext = {
   category: string;
   level: string;
@@ -18,7 +18,7 @@ type QuestionAngle = {
   followUps: (context: TopicContext) => string[];
 };
 
-const topicSpecs: TopicSpec[] = [
+export const topicSpecs: TopicSpec[] = [
   ["JavaScript", "Foundational", "the prototype chain", "object behavior is resolved through linked prototypes before reaching built-in defaults", "assuming every property lives directly on the object", "shared model objects and component helpers"],
   ["JavaScript", "Intermediate", "`this` binding", "the call site decides the receiver unless a function is bound or lexical", "passing methods as callbacks and losing the expected receiver", "event handlers and class-style utilities"],
   ["JavaScript", "Intermediate", "iterators", "a value can expose a standard way to produce items one at a time", "building eager arrays when the UI only needs a small slice", "streaming search results and custom collections"],
@@ -121,7 +121,7 @@ const topicSpecs: TopicSpec[] = [
   ["Build Tools", "Intermediate", "CI preview builds", "every change can get a temporary environment for review and testing", "treating previews as production without matching data, flags, or auth assumptions", "pull request review"]
 ];
 
-const questionAngles: QuestionAngle[] = [
+export const questionAngles: QuestionAngle[] = [
   {
     kind: "concept",
     question: ({ concept }) => `What should a frontend engineer understand about ${concept}?`,
@@ -180,7 +180,7 @@ const questionAngles: QuestionAngle[] = [
   }
 ];
 
-function sentenceCase(value: string) {
+export function sentenceCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
@@ -204,45 +204,8 @@ function makeQuestion(spec: TopicSpec, angle: QuestionAngle, index: number): Que
   };
 }
 
-function makeDepth(question: Question, spec: TopicSpec, angle: QuestionAngle): [string, AnswerDepth] {
-  const [, , concept, practice, trap, example] = spec;
-  const byKind: Record<QuestionAngle["kind"], AnswerDepth> = {
-    concept: {
-      mentalModel: `${sentenceCase(concept)} is not trivia. It is a model for deciding how the interface should behave when content, state, users, or runtime conditions change.`,
-      engineeringUse: `Use it in ${example} by treating this as an implementation rule: ${practice}. That rule should make the happy path clear and the failure path recoverable.`,
-      interviewSignal: `A strong answer connects ${concept} to a concrete product bug, then explains how the team would avoid ${trap}.`
-    },
-    application: {
-      mentalModel: `Application questions test whether the candidate can move from definition to product behavior. ${sentenceCase(concept)} should change a decision, not decorate an answer.`,
-      engineeringUse: `In ${example}, start with the user workflow, then design the state, accessibility, performance, and error behavior needed to support ${practice}.`,
-      interviewSignal: `A strong answer names what to build first, what to defer, and how to keep this failure mode from becoming a hidden release risk: ${trap}.`
-    },
-    trap: {
-      mentalModel: `Most frontend failures come from a mistaken assumption that works in one demo. With ${concept}, the trap is usually ${trap}.`,
-      engineeringUse: `Prevent the mistake by writing the safer rule into component contracts, tests, review checklists, or design-system guidance for ${example}.`,
-      interviewSignal: `A strong answer does not just name the trap. It explains why the trap is tempting and how to make the correct path easier for the next engineer.`
-    },
-    verification: {
-      mentalModel: `Testing ${concept} means proving the browser-visible behavior and the important boundary conditions, not simply exercising implementation details.`,
-      engineeringUse: `Use user-level tests for the main workflow in ${example}, then add focused checks for timing, data, permissions, or performance around this rule: ${practice}.`,
-      interviewSignal: `A strong answer chooses evidence deliberately: a test for repeatability, browser tooling for diagnosis, and production signals for confidence after release.`
-    }
-  };
-
-  return [question.id, byKind[angle.kind]];
-}
-
 export const expandedQuestions = topicSpecs.flatMap((spec, specIndex) =>
   questionAngles.map((angle, angleIndex) =>
     makeQuestion(spec, angle, specIndex * questionAngles.length + angleIndex)
-  )
-);
-
-export const expandedAnswerDepth = Object.fromEntries(
-  topicSpecs.flatMap((spec, specIndex) =>
-    questionAngles.map((angle, angleIndex) => {
-      const question = expandedQuestions[specIndex * questionAngles.length + angleIndex];
-      return makeDepth(question, spec, angle);
-    })
   )
 );

@@ -9,9 +9,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes("/src/questions.ts") || id.includes("/src/answerDepth.ts") || id.includes("/src/questionExpansion.ts")) {
-            return "interview-content";
-          }
           if (id.includes("/node_modules/@base-ui/") || id.includes("/node_modules/@floating-ui/")) {
             return "ui-primitives";
           }

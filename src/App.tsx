@@ -16,19 +16,16 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, Dispatch, ReactNode, SetStateAction } from "react";
-import { answerDepth } from "./answerDepth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -45,13 +42,15 @@ import type {
 
 const storageKey = "frontend-interview-studio-state";
 const questionIds = new Set(questions.map((item) => item.id));
-const initialVisibleLimit = 80;
-const visiblePageSize = 80;
+const initialVisibleLimit = 32;
+const visiblePageSize = 32;
 const progressKeys = ["revealed", "reviewed", "starred"] as const;
 type ProgressKey = (typeof progressKeys)[number];
 type QuestionProgressState = Pick<StoredState, ProgressKey>;
 type ImportableProgressState = QuestionProgressState & Pick<StoredState, "theme" | "hasThemePreference">;
 type SessionTone = "neutral" | "success" | "warning" | "action" | "milestone";
+type AnswerDepthState = "idle" | "loading" | "ready" | "error";
+type AnswerDepthMap = Record<string, AnswerDepth>;
 type TopicCssProperties = CSSProperties &
   Partial<Record<"--topic-bg" | "--topic-border" | "--topic-text", string>>;
 type ProgressRingStyle = CSSProperties & { "--progress": string };
@@ -497,10 +496,10 @@ function topicStyle(categoryName: string, theme: Theme = "light"): TopicCssPrope
   return palettes[categoryTone[categoryName]] || {};
 }
 
-function getAnswerGuide(question: Question): AnswerGuide {
+function getAnswerGuide(question: Question, depthMap: AnswerDepthMap | null = null): AnswerGuide {
   return {
     ...defaultAnswerGuide,
-    depth: answerDepth[question.id],
+    depth: depthMap?.[question.id],
     moves: categoryAnswerMoves[question.category] || categoryAnswerMoves.JavaScript,
     ...answerGuides[question.id]
   };
@@ -544,8 +543,8 @@ function HighlightedCode({ code }: { code: string }) {
     });
 }
 
-function guideSearchText(question: Question) {
-  const guide = getAnswerGuide(question);
+function guideSearchText(question: Question, depthMap: AnswerDepthMap | null) {
+  const guide = getAnswerGuide(question, depthMap);
 
   return [
     guide.frame,
@@ -565,8 +564,9 @@ function guideSearchText(question: Question) {
 
 const questionSearchTextCache = new Map<string, string>();
 
-function getQuestionSearchText(question: Question) {
-  const cached = questionSearchTextCache.get(question.id);
+function getQuestionSearchText(question: Question, depthMap: AnswerDepthMap | null) {
+  const cacheKey = `${question.id}:${depthMap ? "depth" : "base"}`;
+  const cached = questionSearchTextCache.get(cacheKey);
   if (cached) return cached;
 
   const text = [
@@ -576,12 +576,12 @@ function getQuestionSearchText(question: Question) {
     question.tests,
     question.category,
     question.level,
-    guideSearchText(question)
+    guideSearchText(question, depthMap)
   ]
     .join(" ")
     .toLowerCase();
 
-  questionSearchTextCache.set(question.id, text);
+  questionSearchTextCache.set(cacheKey, text);
   return text;
 }
 
@@ -746,6 +746,8 @@ function App({
   const [storageAvailable, setStorageAvailable] = useState(storedState.storageAvailable);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetBackup, setResetBackup] = useState<QuestionProgressState | null>(null);
+  const [answerDepthMap, setAnswerDepthMap] = useState<AnswerDepthMap | null>(null);
+  const [answerDepthState, setAnswerDepthState] = useState<AnswerDepthState>("idle");
   const [pendingGuestImport, setPendingGuestImport] = useState<ImportableProgressState | null>(null);
   const [sessionNote, setSessionNote] = useState("");
   const [sessionTone, setSessionTone] = useState<SessionTone>("neutral");
@@ -756,6 +758,9 @@ function App({
   const pendingQuestionEdits = useRef(new Map<string, ProgressUpdate>());
   const pendingTheme = useRef<Theme | null>(null);
   const hasDeviceThemePreference = useRef(storedState.hasThemePreference);
+  const answerDepthRequest = useRef<Promise<AnswerDepthMap> | null>(null);
+  const previousReviewedCount = useRef(Object.values(storedState.reviewed).filter(Boolean).length);
+  const [progressPulseKey, setProgressPulseKey] = useState(0);
 
   useEffect(() => {
     if (accountCanSave) {
@@ -868,9 +873,9 @@ function App({
       if (!matchesCategory || !matchesLevel) return false;
       if (!normalizedQuery) return true;
 
-      return text.includes(normalizedQuery) || getQuestionSearchText(item).includes(normalizedQuery);
+      return text.includes(normalizedQuery) || getQuestionSearchText(item, answerDepthMap).includes(normalizedQuery);
     }).map(({ item }) => item);
-  }, [category, level, query]);
+  }, [answerDepthMap, category, level, query]);
 
   const starredQueue = useMemo(
     () => filteredQuestions.filter((item) => starred[item.id]),
@@ -884,7 +889,7 @@ function App({
   );
   const activeQuestion =
     studyQueue.find((item) => item.id === activeId) || studyQueue[0] || null;
-  const activeGuide = activeQuestion ? getAnswerGuide(activeQuestion) : null;
+  const activeGuide = activeQuestion ? getAnswerGuide(activeQuestion, answerDepthMap) : null;
   const queueRows = mode === "mock" && activeQuestion ? [activeQuestion] : studyQueue;
   const visibleQuestions = queueRows.slice(0, mode === "mock" ? 1 : visibleLimit);
   const hasMoreQuestions = queueRows.length > visibleQuestions.length;
@@ -897,6 +902,8 @@ function App({
   const hasNoMatches = filteredQuestions.length === 0;
   const isSavedEmpty =
     usesSavedQueue && filteredQuestions.length > 0 && !visibleQuestions.length;
+  const isAnswerDepthLoading =
+    Boolean(activeQuestion && revealed[activeQuestion.id]) && answerDepthState === "loading" && !answerDepthMap;
 
   useEffect(() => {
     if (studyQueue.length && !studyQueue.some((item) => item.id === activeId)) {
@@ -914,12 +921,41 @@ function App({
     }
   }, [activeQueueIndex, mode, studyQueue.length, visibleLimit]);
 
+  useEffect(() => {
+    if (answerDepthMap || answerDepthState === "loading" || answerDepthState === "error") return;
+    if (!query.trim() && (!activeQuestion || !revealed[activeQuestion.id])) return;
+
+    setAnswerDepthState("loading");
+    if (!answerDepthRequest.current) {
+      answerDepthRequest.current = import("./answerDepth").then(({ answerDepth }) => answerDepth);
+    }
+
+    answerDepthRequest.current.then((answerDepth) => {
+      setAnswerDepthMap(answerDepth);
+      setAnswerDepthState("ready");
+    }).catch(() => {
+      answerDepthRequest.current = null;
+      setAnswerDepthState("error");
+      showSessionNote("Deeper guide could not load. The core answer is still available.", "warning");
+    });
+  }, [activeQuestion, answerDepthMap, answerDepthState, query, revealed]);
+
   const reviewedCount = Object.values(reviewed).filter(Boolean).length;
   const progress = questions.length
     ? reviewedCount >= questions.length
       ? 100
       : Math.floor((reviewedCount / questions.length) * 100)
     : 0;
+  const progressNudge =
+    reviewedCount === 0
+      ? "Start with one answer you can defend."
+      : reviewedCount < 5
+        ? `${5 - reviewedCount} more to finish a five-question run.`
+        : reviewedCount < 25
+          ? "A real review rhythm is forming."
+          : reviewedCount < 100
+            ? "Patterns are starting to repeat."
+            : "You are building interview recall now.";
   const thinkPrompt =
     activeQuestion &&
     (categoryPrompts[activeQuestion.category] ||
@@ -961,6 +997,12 @@ function App({
   }, [accountPending, activeQuestion, activeQueueIndex, mode, revealed, studyQueue]);
 
   useEffect(() => {
+    const previous = previousReviewedCount.current;
+    if (reviewedCount > previous) {
+      setProgressPulseKey((current) => current + 1);
+    }
+    previousReviewedCount.current = reviewedCount;
+
     const milestone = milestoneMessages[reviewedCount];
     if (milestone) showSessionNote(milestone, "milestone");
   }, [reviewedCount]);
@@ -1040,7 +1082,7 @@ function App({
     setDrillScope(mode === "mock" ? drillScope : mode === "starred" ? "starred" : "browse");
     setActiveId(next.id);
     setMode("mock");
-    showSessionNote("Random drill started.", "action");
+    showSessionNote("Drill loaded. Try it cold.", "action");
   }
 
   function resetProgress() {
@@ -1135,7 +1177,7 @@ function App({
     const nextIndex = (currentIndex + direction + studyQueue.length) % studyQueue.length;
     setActiveId(studyQueue[nextIndex].id);
     if (mode === "mock") setMode(drillScope === "starred" ? "starred" : "browse");
-    showSessionNote(`Question ${nextIndex + 1} of ${studyQueue.length}.`);
+    showSessionNote(`Question ${nextIndex + 1} is up.`);
   }
 
   function markReviewedAndContinue() {
@@ -1145,7 +1187,7 @@ function App({
     setReviewed((current) => ({ ...current, [activeQuestion.id]: true }));
     saveAccountQuestion(activeQuestion.id, { reviewed: true });
     moveQuestion(1);
-    showSessionNote("Marked reviewed. Moving to the next question.", "success");
+    showSessionNote("Banked. Next question is ready.", "success");
   }
 
   function toggleReviewed() {
@@ -1155,7 +1197,7 @@ function App({
     const willReview = !reviewed[activeQuestion.id];
     toggleMap(setReviewed, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { reviewed: willReview });
-    showSessionNote(willReview ? "Marked reviewed." : "Marked unreviewed.", willReview ? "success" : "neutral");
+    showSessionNote(willReview ? "Banked for review." : "Back in the queue.", willReview ? "success" : "neutral");
   }
 
   function toggleStarred() {
@@ -1166,7 +1208,7 @@ function App({
     toggleMap(setStarred, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { starred: willStar });
     showSessionNote(
-      willStar ? "Saved for review." : "Removed from saved questions.",
+      willStar ? "Saved to your review stack." : "Removed from review stack.",
       willStar ? "success" : "neutral"
     );
   }
@@ -1200,59 +1242,16 @@ function App({
         </a>
 
         <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
-          <aside
-            className="study-rail border-b border-sidebar-border bg-sidebar text-sidebar-foreground lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r"
-            aria-label="Interview studio navigation"
-          >
-            <div className="flex h-full min-h-0 flex-col">
-              <div className="flex items-start gap-3 p-5">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                  <BookOpenIcon />
+          <main className="min-w-0 lg:order-2" id="main-content">
+            <header className="study-command-bar sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
+              <div className="flex flex-col gap-3 xl:flex-row xl:flex-wrap xl:items-center">
+                <div className="min-w-0 xl:w-44">
+                  <h1 className="text-xs font-medium uppercase text-muted-foreground">Interview Studio</h1>
+                  <p className="truncate text-[0.9375rem] font-semibold">
+                    {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved review" : "Browse practice"}
+                  </p>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium uppercase text-sidebar-foreground/55">Study deck</p>
-                  <h1 className="font-heading text-lg font-bold">Interview Studio</h1>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                  aria-pressed={theme === "dark"}
-                  onClick={toggleTheme}
-                >
-                  {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-                </Button>
-              </div>
 
-              <div className="flex flex-col gap-3 px-5 pb-5">
-                <Card size="sm" className="border-sidebar-border bg-sidebar-accent/55">
-                  <CardHeader>
-                    <CardTitle>Progress</CardTitle>
-                    <CardDescription>{questions.length} questions in this collection.</CardDescription>
-                    <CardAction>
-                      <Badge variant="secondary">{progress}%</Badge>
-                    </CardAction>
-                  </CardHeader>
-                  <CardContent>
-                    <Progress value={progress}>
-                      <ProgressLabel>{reviewedCount} reviewed</ProgressLabel>
-                      <span className="ml-auto text-xs tabular-nums text-muted-foreground">{progress}%</span>
-                    </Progress>
-                  </CardContent>
-                </Card>
-
-                {accountPanel || (
-                  <Card size="sm" className="border-sidebar-border bg-sidebar-accent/35" aria-label="Guest progress">
-                    <CardHeader>
-                      <CardTitle>Guest progress</CardTitle>
-                      <CardDescription>Saved on this device. Add Convex to sync across devices.</CardDescription>
-                    </CardHeader>
-                  </Card>
-                )}
-              </div>
-
-              <div className="px-5 pb-3">
                 <Tabs
                   value={mode === "starred" ? "starred" : "browse"}
                   onValueChange={(value) => {
@@ -1261,111 +1260,17 @@ function App({
                     setDrillScope(nextMode);
                   }}
                 >
-                  <TabsList className="w-full">
-                    <TabsTrigger value="browse" className="flex-1">
+                  <TabsList className="w-full sm:w-fit">
+                    <TabsTrigger value="browse" className="flex-1 sm:flex-none">
                       <FunnelIcon data-icon="inline-start" /> Browse
                     </TabsTrigger>
-                    <TabsTrigger value="starred" className="flex-1">
+                    <TabsTrigger value="starred" className="flex-1 sm:flex-none">
                       <SparkleIcon data-icon="inline-start" /> Saved
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
-              </div>
 
-              <Separator />
-
-              <ScrollArea className="max-h-52 min-h-0 flex-1 lg:max-h-none">
-                <div className="flex flex-col gap-1 p-4" aria-label="Question categories">
-                  {["All", ...categories].map((item) => (
-                    <Button
-                      type="button"
-                      variant={category === item ? "secondary" : "ghost"}
-                      size="sm"
-                      className="h-auto w-full justify-between py-2 text-left"
-                      aria-pressed={category === item}
-                      key={item}
-                      onClick={() => setCategory(item)}
-                    >
-                      <span className="truncate">{item}</span>
-                      <Badge variant={category === item ? "default" : "outline"}>
-                        {item === "All" ? questions.length : categoryCounts[item] || 0}
-                      </Badge>
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
-
-              {(hasProgress || confirmReset || resetBackup || (pendingGuestImport && accountCanSave) || !storageAvailable) && (
-                <div className="flex flex-col gap-2 border-t border-sidebar-border p-5">
-                  {!resetBackup && (hasProgress || confirmReset) && (
-                    <Button
-                      type="button"
-                      variant={confirmReset ? "destructive" : "outline"}
-                      size="sm"
-                      onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
-                    >
-                      <ArrowCounterClockwiseIcon data-icon="inline-start" />
-                      {confirmReset ? "Clear progress" : "Reset progress"}
-                    </Button>
-                  )}
-                  {confirmReset && (
-                    <Alert role="status">
-                      <AlertTitle>Confirm reset</AlertTitle>
-                      <AlertDescription>
-                        {accountCanSave
-                          ? "This clears reviewed, saved, and revealed answers for your account."
-                          : "This clears reviewed, saved, and revealed answers on this device."}
-                      </AlertDescription>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
-                        Cancel
-                      </Button>
-                    </Alert>
-                  )}
-                  {resetBackup && (
-                    <Alert role="status">
-                      <AlertTitle>{accountCanSave ? "Account progress cleared." : "Local progress cleared."}</AlertTitle>
-                      <Button type="button" variant="outline" size="sm" onClick={undoReset}>
-                        Undo
-                      </Button>
-                    </Alert>
-                  )}
-                  {pendingGuestImport && accountCanSave && (
-                    <Alert role="status">
-                      <AlertTitle>Device progress found</AlertTitle>
-                      <AlertDescription>Import it into this account, or dismiss it.</AlertDescription>
-                      <div className="mt-2 flex gap-2">
-                        <Button type="button" size="sm" onClick={importGuestProgress}>
-                          Import
-                        </Button>
-                        <Button type="button" variant="outline" size="sm" onClick={() => setPendingGuestImport(null)}>
-                          Dismiss
-                        </Button>
-                      </div>
-                    </Alert>
-                  )}
-                  {!storageAvailable && (
-                    <Alert variant="destructive" role="status">
-                      <AlertTitle>Storage blocked</AlertTitle>
-                      <AlertDescription>
-                        Progress and theme will not be saved because this browser blocked local storage.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              )}
-            </div>
-          </aside>
-
-          <main className="min-w-0" id="main-content">
-            <header className="study-command-bar sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
-              <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
-                <div className="min-w-0 xl:w-52">
-                  <p className="text-xs font-medium uppercase text-muted-foreground">Current run</p>
-                  <p className="truncate text-sm font-semibold">
-                    {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved review" : "Browse practice"}
-                  </p>
-                </div>
-                <div className="relative min-w-0 flex-1">
+                <div className="relative min-w-0 flex-1 xl:min-w-64">
                   <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     ref={searchInputRef}
@@ -1373,14 +1278,14 @@ function App({
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search questions, answers, concepts"
-                    className="h-10 bg-card pl-8 pr-8"
+                    className="h-11 bg-card pl-9 pr-11"
                   />
                   {query && (
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-xs"
-                      className="absolute right-1 top-1"
+                      size="icon-sm"
+                      className="absolute right-0 top-0"
                       aria-label="Clear search"
                       onClick={() => setQuery("")}
                     >
@@ -1389,43 +1294,72 @@ function App({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span id="level-filter-label">Level</span>
-                  <Select value={level} onValueChange={(value) => value && setLevel(value)}>
-                    <SelectTrigger aria-labelledby="level-filter-label" className="w-40 bg-card">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {["All", ...levels].map((item) => (
-                          <SelectItem key={item} value={item}>
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+                    <span id="topic-filter-label">Topic</span>
+                    <Select value={category} onValueChange={(value) => value && setCategory(value)}>
+                      <SelectTrigger aria-labelledby="topic-filter-label" className="min-w-0 flex-1 bg-card sm:w-52 sm:flex-none">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent align="end">
+                        <SelectGroup>
+                          {["All", ...categories].map((item) => (
+                            <SelectItem key={item} value={item}>
+                              <span className="flex min-w-0 flex-1 items-center justify-between gap-4">
+                                <span className="truncate">{item}</span>
+                                <span className="text-xs tabular-nums text-muted-foreground">
+                                  {item === "All" ? questions.length : categoryCounts[item] || 0}
+                                </span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+                    <span id="level-filter-label">Level</span>
+                    <Select value={level} onValueChange={(value) => value && setLevel(value)}>
+                      <SelectTrigger aria-labelledby="level-filter-label" className="min-w-0 flex-1 bg-card sm:w-40 sm:flex-none">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {["All", ...levels].map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <Button type="button" disabled={!randomDrillPool.length} onClick={pickRandomQuestion}>
+                <Button type="button" variant="outline" disabled={!randomDrillPool.length} onClick={pickRandomQuestion}>
                   <ShuffleIcon data-icon="inline-start" />
-                  Start random drill
+                  Random drill
                 </Button>
               </div>
             </header>
 
-            <div className="grid gap-5 p-4 lg:p-6 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
+            <div className="study-workspace grid gap-5 p-4 lg:p-6 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
               {activeQuestion && activeGuide ? (
                 <article key={activeQuestion.id} className="flex min-w-0 flex-col gap-5">
-                  <Card className="study-stage overflow-hidden">
+                  <Card
+                    className="study-stage overflow-hidden"
+                    data-revealed={revealed[activeQuestion.id] ? "true" : undefined}
+                    data-reviewed={reviewed[activeQuestion.id] ? "true" : undefined}
+                  >
                     <CardHeader className="gap-5 border-b">
                       <div className="flex flex-wrap gap-1.5">
                         <Badge variant="secondary">{activeQuestion.category}</Badge>
                         <Badge variant="outline">{activeQuestion.level}</Badge>
-                        <Badge variant={revealed[activeQuestion.id] ? "default" : "secondary"}>
+                        <Badge variant={revealed[activeQuestion.id] ? "secondary" : "outline"}>
                           {revealed[activeQuestion.id] ? "Answer shown" : "Try first"}
                         </Badge>
-                        <Badge variant={reviewed[activeQuestion.id] ? "default" : "outline"}>
+                        <Badge variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}>
                           {reviewed[activeQuestion.id] ? "Reviewed" : "Unreviewed"}
                         </Badge>
                       </div>
@@ -1434,15 +1368,14 @@ function App({
                           <CardDescription>
                             Question {activeQueueIndex + 1} of {studyQueue.length}
                           </CardDescription>
-                          <h2 className="mt-3 max-w-[24ch] font-heading text-2xl font-bold leading-[1.12] sm:text-3xl lg:text-4xl">
+                          <h2 className="mt-3 max-w-[24ch] font-heading text-[1.75rem] font-bold leading-[1.12] sm:text-[2.125rem] lg:text-[2.75rem]">
                             <InlineText text={activeQuestion.question} />
                           </h2>
                         </div>
                         <div className="xl:justify-self-end">
                           <Button
                             type="button"
-                            variant={starred[activeQuestion.id] ? "default" : "outline"}
-                            size="sm"
+                            variant={starred[activeQuestion.id] ? "secondary" : "ghost"}
                             aria-pressed={!!starred[activeQuestion.id]}
                             aria-label={
                               starred[activeQuestion.id] ? "Remove from saved questions" : "Save for review"
@@ -1455,96 +1388,129 @@ function App({
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          type="button"
-                          size="lg"
-                          aria-expanded={!!revealed[activeQuestion.id]}
-                          aria-controls={`answer-${activeQuestion.id}`}
-                          aria-keyshortcuts="R"
-                          onClick={toggleRevealed}
-                        >
-                          <CaretDownIcon data-icon="inline-start" />
-                          {revealed[activeQuestion.id] ? "Hide answer" : "Reveal answer"}
-                          <Kbd>R</Kbd>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}
-                          size="lg"
-                          aria-pressed={!!reviewed[activeQuestion.id]}
-                          onClick={toggleReviewed}
-                        >
-                          <CheckCircleIcon data-icon="inline-start" />
-                          {reviewed[activeQuestion.id] ? "Unmark reviewed" : "Mark reviewed"}
-                        </Button>
-                        <Button type="button" variant="outline" size="lg" onClick={markReviewedAndContinue}>
-                          <CheckCircleIcon data-icon="inline-start" />
-                          Reviewed and next
-                        </Button>
-                      </div>
-
-                      <ButtonGroup aria-label="Question navigation" className="justify-self-start lg:justify-self-end">
-                        <Button type="button" variant="outline" aria-keyshortcuts="P" onClick={() => moveQuestion(-1)}>
-                          <CaretLeftIcon data-icon="inline-start" /> Previous <Kbd>P</Kbd>
-                        </Button>
-                        <div className="flex items-center border border-input bg-card px-3 text-xs text-muted-foreground" aria-live="polite">
-                          {activeQueueIndex + 1} of {studyQueue.length}
+                    <CardContent className="grid gap-5 p-5 sm:p-6">
+                      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                        <div className="flex flex-wrap gap-2">
+                          {revealed[activeQuestion.id] ? (
+                            <Button className="study-primary-action" type="button" size="lg" onClick={markReviewedAndContinue}>
+                              <CheckCircleIcon data-icon="inline-start" />
+                              Reviewed and next
+                            </Button>
+                          ) : (
+                            <Button
+                              className="study-primary-action"
+                              type="button"
+                              size="lg"
+                              aria-expanded={false}
+                              aria-controls={`answer-${activeQuestion.id}`}
+                              aria-keyshortcuts="R"
+                              onClick={toggleRevealed}
+                            >
+                              <CaretDownIcon data-icon="inline-start" />
+                              Reveal answer
+                              <Kbd>R</Kbd>
+                            </Button>
+                          )}
+                          <Button
+                            type="button"
+                            variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}
+                            size="lg"
+                            aria-pressed={!!reviewed[activeQuestion.id]}
+                            onClick={toggleReviewed}
+                          >
+                            <CheckCircleIcon data-icon="inline-start" />
+                            {reviewed[activeQuestion.id] ? "Unmark reviewed" : "Mark reviewed"}
+                          </Button>
+                          {revealed[activeQuestion.id] && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="lg"
+                              aria-expanded
+                              aria-controls={`answer-${activeQuestion.id}`}
+                              aria-keyshortcuts="R"
+                              onClick={toggleRevealed}
+                            >
+                              <CaretDownIcon data-icon="inline-start" />
+                              Hide answer
+                              <Kbd>R</Kbd>
+                            </Button>
+                          )}
                         </div>
-                        <Button type="button" variant="outline" aria-keyshortcuts="N" onClick={() => moveQuestion(1)}>
-                          Next <CaretRightIcon data-icon="inline-end" /> <Kbd>N</Kbd>
-                        </Button>
-                      </ButtonGroup>
+
+                        <div
+                          role="group"
+                          aria-label="Question navigation"
+                          className="grid w-full grid-cols-2 gap-2 sm:w-fit sm:grid-cols-[minmax(7.5rem,auto)_auto_auto] xl:justify-self-end"
+                        >
+                          <div className="order-first col-span-2 flex min-h-11 min-w-30 items-center justify-center whitespace-nowrap rounded-4xl border border-input bg-card px-4 text-[0.9375rem] text-muted-foreground sm:order-none sm:col-span-1" aria-live="polite">
+                            {activeQueueIndex + 1} of {studyQueue.length}
+                          </div>
+                          <Button type="button" variant="outline" aria-keyshortcuts="P" onClick={() => moveQuestion(-1)}>
+                            <CaretLeftIcon data-icon="inline-start" /> Previous <Kbd>P</Kbd>
+                          </Button>
+                          <Button type="button" variant="outline" aria-keyshortcuts="N" onClick={() => moveQuestion(1)}>
+                            Next <CaretRightIcon data-icon="inline-end" /> <Kbd>N</Kbd>
+                          </Button>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
 
                   <section id={`answer-${activeQuestion.id}`} hidden={!revealed[activeQuestion.id]}>
                     {revealed[activeQuestion.id] && (
-                      <div className="flex flex-col gap-4">
-                        <Card className="answer-panel">
-                          <CardHeader>
-                            <CardTitle>Model Answer</CardTitle>
-                          </CardHeader>
-                          <CardContent className="reading-copy">
+                      <Card className="answer-panel">
+                        <CardHeader>
+                          <CardTitle>Answer canvas</CardTitle>
+                          <CardDescription>Work from the direct answer into reasoning, traps, and follow-ups.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="reading-copy">
+                          <div className="study-canvas-section pt-0">
+                            <h3 className="study-canvas-label">Model answer</h3>
                             <p><InlineText text={activeQuestion.answer} /></p>
-                          </CardContent>
-                        </Card>
+                          </div>
 
-                        <Card className="answer-panel">
-                          <CardHeader>
-                            <CardTitle>Engineering Reasoning</CardTitle>
-                          </CardHeader>
-                          <CardContent className="reading-copy">
+                          <div className="study-canvas-section">
+                            <h3 className="study-canvas-label">Engineering reasoning</h3>
                             <p><InlineText text={activeQuestion.reasoning} /></p>
-                          </CardContent>
-                        </Card>
+                          </div>
 
-                        <Card className="answer-panel">
-                          <CardHeader>
-                            <CardTitle>Study the Reasoning</CardTitle>
-                            <CardDescription>Use this to shape a senior-level answer.</CardDescription>
-                          </CardHeader>
-                          <CardContent className="reading-copy flex flex-col gap-4">
-                            {activeGuide.depth && (
-                              <div className="grid gap-3 lg:grid-cols-3">
-                                <div className="rounded-md border bg-muted/35 p-3">
-                                  <strong className="text-xs uppercase text-muted-foreground">Mental model</strong>
-                                  <p className="mt-2"><InlineText text={activeGuide.depth.mentalModel} /></p>
-                                </div>
-                                <div className="rounded-md border bg-muted/35 p-3">
-                                  <strong className="text-xs uppercase text-muted-foreground">Engineering use</strong>
-                                  <p className="mt-2"><InlineText text={activeGuide.depth.engineeringUse} /></p>
-                                </div>
-                                <div className="rounded-md border bg-muted/35 p-3">
-                                  <strong className="text-xs uppercase text-muted-foreground">Interview signal</strong>
-                                  <p className="mt-2"><InlineText text={activeGuide.depth.interviewSignal} /></p>
-                                </div>
-                              </div>
+                          <div className="study-canvas-section">
+                            <h3 className="study-canvas-label">Study the reasoning</h3>
+                            {isAnswerDepthLoading && (
+                              <Alert role="status">
+                                <AlertTitle>Loading deeper guide</AlertTitle>
+                                <AlertDescription>
+                                  The direct answer is ready. The richer study notes are still loading.
+                                </AlertDescription>
+                              </Alert>
                             )}
-                            <Separator />
+                            {answerDepthState === "error" && (
+                              <Alert role="status">
+                                <AlertTitle>Deeper guide unavailable</AlertTitle>
+                                <AlertDescription>
+                                  The model answer is still usable. Try refreshing if you want the extra study notes.
+                                </AlertDescription>
+                              </Alert>
+                            )}
+                            {activeGuide.depth && (
+                              <dl className="study-depth-grid">
+                                <div className="study-depth-item">
+                                  <dt className="study-canvas-label">Mental model</dt>
+                                  <dd><InlineText text={activeGuide.depth.mentalModel} /></dd>
+                                </div>
+                                <div className="study-depth-item">
+                                  <dt className="study-canvas-label">Engineering use</dt>
+                                  <dd><InlineText text={activeGuide.depth.engineeringUse} /></dd>
+                                </div>
+                                <div className="study-depth-item">
+                                  <dt className="study-canvas-label">Interview signal</dt>
+                                  <dd><InlineText text={activeGuide.depth.interviewSignal} /></dd>
+                                </div>
+                              </dl>
+                            )}
                             <div className="max-w-[75ch]">
-                              <strong className="text-xs uppercase text-muted-foreground">Senior answer moves</strong>
+                              <h3 className="study-canvas-label">Senior answer moves</h3>
                               <p className="mt-2"><InlineText text={activeGuide.frame} /></p>
                               <ul className="mt-3 list-disc pl-5">
                                 {activeGuide.moves.map((item) => (
@@ -1552,62 +1518,54 @@ function App({
                                 ))}
                               </ul>
                             </div>
-                          </CardContent>
-                        </Card>
+                          </div>
 
-                        {activeGuide.code && (
-                          <Card className="answer-panel">
-                            <CardHeader>
-                              <CardTitle>{activeGuide.codeTitle || "Code Example"}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <pre className="overflow-x-auto rounded-md bg-muted p-4 text-xs leading-6">
+                          {activeGuide.code && (
+                            <div className="study-canvas-section">
+                              <h3 className="study-canvas-label">{activeGuide.codeTitle || "Code example"}</h3>
+                              <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-[0.9375rem] leading-7">
                                 <code><HighlightedCode code={activeGuide.code} /></code>
                               </pre>
-                            </CardContent>
-                          </Card>
-                        )}
+                            </div>
+                          )}
 
-                        {activeGuide.visual && (
-                          <Card className="answer-panel">
-                            <CardHeader>
-                              <CardTitle>{activeGuide.visualTitle || "Illustration"}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
+                          {activeGuide.visual && (
+                            <div className="study-canvas-section">
+                              <h3 className="study-canvas-label">{activeGuide.visualTitle || "Illustration"}</h3>
                               <ol className="grid gap-2 sm:grid-cols-3">
                                 {activeGuide.visual.map((item, index) => (
-                                  <li key={item} className="rounded-md border bg-muted/35 p-3 text-sm/6">
+                                  <li key={item} className="rounded-lg border bg-muted/35 p-4 text-[0.95rem]/7">
                                     <Badge variant="outline">{index + 1}</Badge>
                                     <span className="mt-3 block">{item}</span>
                                   </li>
                                 ))}
                               </ol>
-                            </CardContent>
-                          </Card>
-                        )}
-
-                        <Alert>
-                          <AlertTitle>Common Trap</AlertTitle>
-                          <AlertDescription><InlineText text={activeGuide.trap} /></AlertDescription>
-                        </Alert>
-
-                        <Card className="answer-panel">
-                          <CardHeader>
-                            <CardTitle>What This Tests</CardTitle>
-                          </CardHeader>
-                          <CardContent className="reading-copy grid gap-4 lg:grid-cols-2">
-                            <p><InlineText text={activeQuestion.tests} /></p>
-                            <div>
-                              <strong className="text-xs uppercase text-muted-foreground">Follow-up prompts</strong>
-                              <ul className="mt-2 list-disc pl-5">
-                                {activeQuestion.followUps.map((item) => (
-                                  <li key={item}><InlineText text={item} /></li>
-                                ))}
-                              </ul>
                             </div>
-                          </CardContent>
-                        </Card>
-                      </div>
+                          )}
+
+                          <div className="study-canvas-section">
+                            <Alert role="note">
+                              <AlertTitle>Common trap</AlertTitle>
+                              <AlertDescription><InlineText text={activeGuide.trap} /></AlertDescription>
+                            </Alert>
+                          </div>
+
+                          <div className="study-canvas-section pb-0">
+                            <h3 className="study-canvas-label">What this tests</h3>
+                            <div className="grid gap-4 lg:grid-cols-2">
+                              <p><InlineText text={activeQuestion.tests} /></p>
+                              <div>
+                                <strong className="study-canvas-label">Follow-up prompts</strong>
+                                <ul className="mt-2 list-disc pl-5">
+                                  {activeQuestion.followUps.map((item) => (
+                                    <li key={item}><InlineText text={item} /></li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                     )}
                   </section>
 
@@ -1669,51 +1627,67 @@ function App({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="min-h-0 flex-1">
-                  <ScrollArea className="h-[520px] pr-2 xl:h-full">
-                    <div className="flex flex-col gap-2">
-                      {visibleQuestions.map((item, index) => (
-                        <Button
-                          type="button"
-                          variant={activeQuestion?.id === item.id ? "secondary" : "ghost"}
-                          className={cn(
-                            "h-auto w-full justify-start px-2 py-2.5 text-left",
-                            activeQuestion?.id === item.id && "shadow-xs"
-                          )}
-                          aria-current={activeQuestion?.id === item.id ? "true" : undefined}
-                          key={item.id}
-                          onClick={() => setActiveId(item.id)}
-                        >
-                          <span className="flex min-w-0 flex-1 items-start gap-2">
-                            <Badge variant="outline" className="font-mono tabular-nums">
-                              {String(index + 1).padStart(2, "0")}
-                            </Badge>
-                            <span className="min-w-0 flex-1">
-                              <span className="line-clamp-2 block text-xs font-medium">
-                                {item.question}
-                              </span>
-                              <span className="mt-1 flex flex-wrap gap-1">
-                                <Badge variant="secondary">{item.category}</Badge>
-                                <Badge variant="outline">{item.level}</Badge>
+                  {visibleQuestions.length ? (
+                    <ScrollArea className="h-[520px] pr-2 xl:h-full">
+                      <div className="flex flex-col gap-2">
+                        {visibleQuestions.map((item, index) => (
+                          <Button
+                            type="button"
+                            variant={activeQuestion?.id === item.id ? "secondary" : "ghost"}
+                            className={cn(
+                              "queue-row min-h-16 w-full justify-start px-3 py-3 text-left"
+                            )}
+                            aria-current={activeQuestion?.id === item.id ? "true" : undefined}
+                            data-reviewed={reviewed[item.id] ? "true" : undefined}
+                            key={item.id}
+                            title={item.question}
+                            onClick={() => setActiveId(item.id)}
+                          >
+                            <span className="flex min-w-0 flex-1 items-start gap-3">
+                              <Badge variant="outline" className="font-mono tabular-nums">
+                                {String(index + 1).padStart(2, "0")}
+                              </Badge>
+                              <span className="min-w-0 flex-1">
+                                <span className="line-clamp-3 block text-[0.9375rem] font-medium leading-6">
+                                  {item.question}
+                                </span>
+                                <span className="mt-1 flex flex-wrap gap-1">
+                                  <Badge variant="secondary">{item.category}</Badge>
+                                  <Badge variant="outline">{item.level}</Badge>
+                                </span>
                               </span>
                             </span>
-                          </span>
-                          {reviewed[item.id] ? <CheckCircleIcon /> : <CircleIcon />}
-                        </Button>
-                      ))}
+                            <span
+                              className="queue-state ml-auto"
+                              aria-label={reviewed[item.id] ? "Reviewed" : "Open"}
+                              title={reviewed[item.id] ? "Reviewed" : "Open"}
+                            >
+                              {reviewed[item.id] ? (
+                                <CheckCircleIcon aria-hidden="true" />
+                              ) : (
+                                <CircleIcon aria-hidden="true" />
+                              )}
+                              <span className="sr-only">{reviewed[item.id] ? "Reviewed" : "Open"}</span>
+                            </span>
+                          </Button>
+                        ))}
 
-                      {hasMoreQuestions && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() =>
-                            setVisibleLimit((current) => Math.min(queueRows.length, current + visiblePageSize))
-                          }
-                        >
-                          Show {Math.min(visiblePageSize, queueRows.length - visibleQuestions.length)} more
-                        </Button>
-                      )}
-
-                      {!visibleQuestions.length && filteredQuestions.length === 0 && (
+                        {hasMoreQuestions && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() =>
+                              setVisibleLimit((current) => Math.min(queueRows.length, current + visiblePageSize))
+                            }
+                          >
+                            Show {Math.min(visiblePageSize, queueRows.length - visibleQuestions.length)} more
+                          </Button>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <div className="flex min-h-[320px] items-center justify-center pr-2 xl:min-h-[calc(100vh-284px)]">
+                      {filteredQuestions.length === 0 ? (
                         <Empty>
                           <EmptyHeader>
                             <EmptyMedia variant="icon">
@@ -1730,9 +1704,7 @@ function App({
                             </Button>
                           </EmptyContent>
                         </Empty>
-                      )}
-
-                      {!visibleQuestions.length && isSavedEmpty && (
+                      ) : isSavedEmpty ? (
                         <Empty>
                           <EmptyHeader>
                             <EmptyMedia variant="icon"><SparkleIcon /></EmptyMedia>
@@ -1740,23 +1712,141 @@ function App({
                             <EmptyDescription>Save questions you want to revisit before an interview.</EmptyDescription>
                           </EmptyHeader>
                         </Empty>
-                      )}
+                      ) : null}
                     </div>
-                  </ScrollArea>
+                  )}
                 </CardContent>
               </Card>
             </div>
           </main>
+
+          <aside
+            className="study-rail border-t border-sidebar-border bg-sidebar text-sidebar-foreground lg:order-1 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-t-0"
+            aria-label="Study deck"
+          >
+            <div className="flex h-full min-h-0 flex-col">
+              <div className="flex items-start gap-3 p-5">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-accent text-sidebar-foreground">
+                  <BookOpenIcon />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium uppercase text-sidebar-foreground/55">Study deck</p>
+                  <p className="font-heading text-lg font-bold">Interview Studio</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                  aria-pressed={theme === "dark"}
+                  onClick={toggleTheme}
+                >
+                  {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                </Button>
+              </div>
+
+              <div className="flex flex-col gap-3 px-5 pb-5">
+                <Card size="sm" className="border-sidebar-border bg-sidebar-accent/55">
+                  <CardHeader>
+                    <CardTitle>Progress</CardTitle>
+                    <CardDescription>{questions.length} questions in this collection.</CardDescription>
+                    <CardAction>
+                      <Badge variant="secondary">{progress}%</Badge>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent>
+                    <Progress key={progressPulseKey} value={progress} className="study-progress">
+                      <ProgressLabel>{reviewedCount} reviewed</ProgressLabel>
+                      <span className="ml-auto text-xs tabular-nums text-muted-foreground">{progress}%</span>
+                    </Progress>
+                    <p className="study-progress-nudge">
+                      {progressNudge}
+                    </p>
+                  </CardContent>
+                  {(hasProgress || confirmReset || resetBackup) && (
+                    <CardFooter className="flex-col items-stretch gap-2 border-t">
+                      {!resetBackup && (hasProgress || confirmReset) && (
+                        <Button
+                          type="button"
+                          variant={confirmReset ? "destructive" : "outline"}
+                          size="sm"
+                          onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
+                        >
+                          <ArrowCounterClockwiseIcon data-icon="inline-start" />
+                          {confirmReset ? "Clear progress" : "Reset progress"}
+                        </Button>
+                      )}
+                      {confirmReset && (
+                        <Alert role="status">
+                          <AlertTitle>Confirm reset</AlertTitle>
+                          <AlertDescription>
+                            {accountCanSave
+                              ? "This clears reviewed, saved, and revealed answers for your account."
+                              : "This clears reviewed, saved, and revealed answers on this device."}
+                          </AlertDescription>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
+                            Cancel
+                          </Button>
+                        </Alert>
+                      )}
+                      {resetBackup && (
+                        <Alert role="status">
+                          <AlertTitle>{accountCanSave ? "Account progress cleared." : "Local progress cleared."}</AlertTitle>
+                          <Button type="button" variant="outline" size="sm" onClick={undoReset}>
+                            Undo
+                          </Button>
+                        </Alert>
+                      )}
+                    </CardFooter>
+                  )}
+                </Card>
+
+                {accountPanel || (
+                  <Card size="sm" className="border-sidebar-border bg-sidebar-accent/35" aria-label="Guest progress">
+                    <CardHeader>
+                      <CardTitle>Guest progress</CardTitle>
+                      <CardDescription>Saved on this device. Add Convex to sync across devices.</CardDescription>
+                    </CardHeader>
+                  </Card>
+                )}
+
+                {pendingGuestImport && accountCanSave && (
+                  <Alert role="status">
+                    <AlertTitle>Device progress found</AlertTitle>
+                    <AlertDescription>Import it into this account, or dismiss it.</AlertDescription>
+                    <div className="mt-2 flex gap-2">
+                      <Button type="button" size="sm" onClick={importGuestProgress}>
+                        Import
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => setPendingGuestImport(null)}>
+                        Dismiss
+                      </Button>
+                    </div>
+                  </Alert>
+                )}
+
+                {!storageAvailable && (
+                  <Alert variant="destructive" role="status">
+                    <AlertTitle>Storage blocked</AlertTitle>
+                    <AlertDescription>
+                      Progress and theme will not be saved because this browser blocked local storage.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </div>
+          </aside>
         </div>
 
         {sessionNote && (
           <div
             key={sessionNoteKey}
-            className="fixed bottom-4 left-1/2 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 border bg-card px-4 py-2 text-xs text-card-foreground shadow-md data-[tone=success]:border-primary data-[tone=warning]:border-destructive data-[tone=action]:border-ring data-[tone=milestone]:border-primary"
+            className="study-session-note fixed bottom-4 left-1/2 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-4xl border border-border bg-popover px-4 py-2.5 text-sm font-medium text-popover-foreground shadow-lg data-[tone=success]:border-primary data-[tone=warning]:border-destructive data-[tone=action]:border-ring data-[tone=milestone]:border-primary"
             data-tone={sessionTone}
             role="status"
             aria-live="polite"
           >
+            <span aria-hidden="true" className="study-session-note-dot" />
             {sessionNote}
           </div>
         )}

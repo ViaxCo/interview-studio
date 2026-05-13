@@ -78,7 +78,7 @@ export default function AccountPanel({ progressReady, syncStatus = "saved" }: Ac
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        <Button type="button" onClick={handleGoogleSignIn} disabled={submitting}>
+        <Button type="button" variant="outline" onClick={handleGoogleSignIn} disabled={submitting}>
           <GoogleLogoIcon data-icon="inline-start" />
           {submitting ? "Opening Google..." : "Continue with Google"}
         </Button>

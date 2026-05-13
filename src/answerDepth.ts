@@ -1,4 +1,4 @@
-import { expandedAnswerDepth } from "./questionExpansion";
+import { expandedAnswerDepth } from "./questionExpansionDepth";
 import type { AnswerDepth } from "./questionTypes";
 
 export const answerDepth: Record<string, AnswerDepth> = {
