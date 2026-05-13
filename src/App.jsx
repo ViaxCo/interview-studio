@@ -789,6 +789,7 @@ function App({
     () => filteredQuestions.filter((item) => starred[item.id]),
     [filteredQuestions, starred]
   );
+  const randomDrillPool = mode === "starred" ? starredQueue : filteredQuestions;
   const studyQueue = useMemo(
     () => (mode === "starred" ? starredQueue : filteredQuestions),
     [filteredQuestions, mode, starredQueue]
@@ -941,9 +942,8 @@ function App({
   }
 
   function pickRandomQuestion() {
-    const pool = mode === "starred" && starredQueue.length ? starredQueue : filteredQuestions;
-    if (!pool.length) return;
-    const next = pool[Math.floor(Math.random() * pool.length)];
+    if (!randomDrillPool.length) return;
+    const next = randomDrillPool[Math.floor(Math.random() * randomDrillPool.length)];
     setActiveId(next.id);
     setMode("mock");
     showSessionNote("Random drill started.", "action");
@@ -1253,7 +1253,7 @@ function App({
           <button
             type="button"
             className="primary-action"
-            disabled={!filteredQuestions.length}
+            disabled={!randomDrillPool.length}
             onClick={pickRandomQuestion}
           >
             <Shuffle size={17} /> Start random drill
