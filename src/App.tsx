@@ -14,7 +14,7 @@ import {
   SunIcon,
   XIcon
 } from "@phosphor-icons/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, Dispatch, KeyboardEvent as ReactKeyboardEvent, ReactNode, SetStateAction } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +52,7 @@ type ImportableProgressState = QuestionProgressState & Pick<StoredState, "theme"
 type SessionTone = "neutral" | "success" | "warning" | "action" | "milestone";
 type AnswerDepthState = "idle" | "loading" | "ready" | "error";
 type AnswerDepthMap = Record<string, AnswerDepth>;
+type MobilePane = "study" | "queue";
 type TopicCssProperties = CSSProperties &
   Partial<Record<"--topic-bg" | "--topic-border" | "--topic-text", string>>;
 type ProgressRingStyle = CSSProperties & { "--progress": string };
@@ -113,6 +114,22 @@ function queueRowLabel(question: Question, index: number, isReviewed: boolean) {
     sentenceEnd(question.category),
     sentenceEnd(question.level)
   ].join(" ");
+}
+
+function scrollMobileElement(elementId: string) {
+  if (typeof window === "undefined" || window.innerWidth >= 640) return;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      const header = document.querySelector<HTMLElement>(".study-command-bar");
+      const headerOffset = header?.getBoundingClientRect().height || 0;
+      const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+      const top = Math.max(0, element.getBoundingClientRect().top + window.scrollY - headerOffset - 16);
+      window.scrollTo({ top, behavior });
+    });
+  });
 }
 
 const categoryPrompts: Record<string, string> = {
@@ -790,12 +807,16 @@ function App({
   saveThemePreference = null
 }: AppProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const filterPanelRef = useRef<HTMLDetailsElement>(null);
+  const accountPanelRef = useRef<HTMLDetailsElement>(null);
   const [storedState] = useState(loadStoredState);
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [track, setTrack] = useState(allTracks);
   const [category, setCategory] = useState("All");
   const [level, setLevel] = useState("All");
   const [mode, setMode] = useState("browse");
+  const [mobilePane, setMobilePane] = useState<MobilePane>("study");
   const [drillScope, setDrillScope] = useState("browse");
   const [activeId, setActiveId] = useState(questions[0]?.id || "");
   const [revealed, setRevealed] = useState(storedState.revealed);
@@ -820,6 +841,38 @@ function App({
   const answerDepthRequest = useRef<Promise<AnswerDepthMap> | null>(null);
   const previousReviewedCount = useRef(Object.values(storedState.reviewed).filter(Boolean).length);
   const [progressPulseKey, setProgressPulseKey] = useState(0);
+
+  useEffect(() => {
+    function closePanel(panel: HTMLDetailsElement | null) {
+      if (panel?.open) panel.open = false;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!(event.target instanceof Element)) return;
+      if (event.target.closest('[data-slot="select-content"]')) return;
+
+      if (filterPanelRef.current?.open && !filterPanelRef.current.contains(event.target)) {
+        closePanel(filterPanelRef.current);
+      }
+      if (accountPanelRef.current?.open && !accountPanelRef.current.contains(event.target)) {
+        closePanel(accountPanelRef.current);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      closePanel(filterPanelRef.current);
+      closePanel(accountPanelRef.current);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   useEffect(() => {
     if (accountCanSave) {
@@ -939,19 +992,22 @@ function App({
     [categoryCounts]
   );
   const filteredQuestions = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = deferredQuery.trim().toLowerCase();
+    const matches: Question[] = [];
 
-    return baseQuestionSearchText.filter(({ item, text }) => {
+    for (const { item, text } of baseQuestionSearchText) {
       const matchesTrack = track === allTracks || questionTrack(item) === track;
       const matchesCategory = category === "All" || item.category === category;
       const matchesLevel = level === "All" || item.level === level;
 
-      if (!matchesTrack || !matchesCategory || !matchesLevel) return false;
-      if (!normalizedQuery) return true;
+      if (!matchesTrack || !matchesCategory || !matchesLevel) continue;
+      if (!normalizedQuery || text.includes(normalizedQuery) || getQuestionSearchText(item, answerDepthMap).includes(normalizedQuery)) {
+        matches.push(item);
+      }
+    }
 
-      return text.includes(normalizedQuery) || getQuestionSearchText(item, answerDepthMap).includes(normalizedQuery);
-    }).map(({ item }) => item);
-  }, [answerDepthMap, category, level, query, track]);
+    return matches;
+  }, [answerDepthMap, category, deferredQuery, level, track]);
 
   const starredQueue = useMemo(
     () => filteredQuestions.filter((item) => starred[item.id]),
@@ -963,18 +1019,33 @@ function App({
     () => (usesSavedQueue ? starredQueue : filteredQuestions),
     [filteredQuestions, starredQueue, usesSavedQueue]
   );
-  const activeQuestion =
-    studyQueue.find((item) => item.id === activeId) || studyQueue[0] || null;
-  const activeGuide = activeQuestion ? getAnswerGuide(activeQuestion, answerDepthMap) : null;
-  const queueRows = mode === "mock" && activeQuestion ? [activeQuestion] : studyQueue;
-  const visibleQuestions = queueRows.slice(0, mode === "mock" ? 1 : visibleLimit);
+  const activeQueueEntry = useMemo(() => {
+    if (!studyQueue.length) return { question: null, index: -1 };
+    const index = studyQueue.findIndex((item) => item.id === activeId);
+    const safeIndex = index >= 0 ? index : 0;
+    return { question: studyQueue[safeIndex], index: safeIndex };
+  }, [activeId, studyQueue]);
+  const activeQuestion = activeQueueEntry.question;
+  const activeQueueIndex = activeQueueEntry.index;
+  const activeGuide = useMemo(
+    () => (activeQuestion ? getAnswerGuide(activeQuestion, answerDepthMap) : null),
+    [activeQuestion, answerDepthMap]
+  );
+  const queueRows = useMemo(
+    () => (mode === "mock" && activeQuestion ? [activeQuestion] : studyQueue),
+    [activeQuestion, mode, studyQueue]
+  );
+  const visibleQuestions = useMemo(
+    () => queueRows.slice(0, mode === "mock" ? 1 : visibleLimit),
+    [mode, queueRows, visibleLimit]
+  );
   const hasMoreQuestions = queueRows.length > visibleQuestions.length;
-  const activeQueueIndex = activeQuestion
-    ? studyQueue.findIndex((item) => item.id === activeQuestion.id)
-    : -1;
-  const hasProgress = [revealed, reviewed, starred].some((map) => Object.values(map).some(Boolean));
+  const hasProgress = useMemo(
+    () => [revealed, reviewed, starred].some((map) => Object.values(map).some(Boolean)),
+    [revealed, reviewed, starred]
+  );
   const isFirstRun =
-    !hasProgress && mode === "browse" && !query && track === allTracks && category === "All" && level === "All";
+    !hasProgress && mode === "browse" && !deferredQuery && track === allTracks && category === "All" && level === "All";
   const hasNoMatches = filteredQuestions.length === 0;
   const isSavedEmpty =
     usesSavedQueue && filteredQuestions.length > 0 && !visibleQuestions.length;
@@ -993,7 +1064,7 @@ function App({
 
   useEffect(() => {
     setVisibleLimit(initialVisibleLimit);
-  }, [category, level, mode, query, track]);
+  }, [category, deferredQuery, level, mode, track]);
 
   useEffect(() => {
     if (mode !== "mock" && activeQueueIndex >= visibleLimit) {
@@ -1003,7 +1074,7 @@ function App({
 
   useEffect(() => {
     if (answerDepthMap || answerDepthState === "loading" || answerDepthState === "error") return;
-    if (!query.trim() && (!activeQuestion || !revealed[activeQuestion.id])) return;
+    if (!deferredQuery.trim() && (!activeQuestion || !revealed[activeQuestion.id])) return;
 
     setAnswerDepthState("loading");
     if (!answerDepthRequest.current) {
@@ -1016,11 +1087,14 @@ function App({
     }).catch(() => {
       answerDepthRequest.current = null;
       setAnswerDepthState("error");
-      showSessionNote("Deeper guide could not load. The core answer is still available.", "warning");
+      showSessionNote("Guide failed. Core answer still works.", "warning");
     });
-  }, [activeQuestion, answerDepthMap, answerDepthState, query, revealed]);
+  }, [activeQuestion, answerDepthMap, answerDepthState, deferredQuery, revealed]);
 
-  const reviewedCount = trackQuestions.filter((item) => reviewed[item.id]).length;
+  const reviewedCount = useMemo(
+    () => trackQuestions.filter((item) => reviewed[item.id]).length,
+    [reviewed, trackQuestions]
+  );
   const totalQuestions = trackQuestions.length;
   const collectionDescription =
     track === allTracks
@@ -1136,7 +1210,7 @@ function App({
       ...progressUpdate
     });
     saveQuestionProgress(questionId, progressUpdate).catch(() => {
-      showSessionNote("Account sync failed. Your change is still visible here.", "warning");
+      showSessionNote("Sync failed. Change kept here.", "warning");
     });
   }
 
@@ -1144,7 +1218,7 @@ function App({
     if (!accountCanSave || !saveThemePreference) return;
     pendingTheme.current = themeValue;
     saveThemePreference(themeValue).catch(() => {
-      showSessionNote("Theme sync failed. Your change is still visible here.", "warning");
+      showSessionNote("Theme sync failed. Change kept here.", "warning");
     });
   }
 
@@ -1169,7 +1243,9 @@ function App({
     const next = randomDrillPool[Math.floor(Math.random() * randomDrillPool.length)];
     setDrillScope(mode === "mock" ? drillScope : mode === "starred" ? "starred" : "browse");
     setActiveId(next.id);
+    setMobilePane("study");
     setMode("mock");
+    scrollMobileElement("study-surface");
     showSessionNote("Drill loaded. Try it cold.", "action");
   }
 
@@ -1184,7 +1260,7 @@ function App({
     if (accountCanSave && resetAccountProgress) {
       pendingQuestionEdits.current.clear();
       resetAccountProgress().catch(() => {
-        showSessionNote("Account reset failed. Try again before leaving.", "warning");
+        showSessionNote("Reset failed. Try again.", "warning");
       });
     }
     showSessionNote(accountCanSave ? "Account progress cleared." : "Local progress cleared.", "warning");
@@ -1201,7 +1277,7 @@ function App({
       importAccountProgress(serializeQuestionProgress({ ...resetBackup, theme }))
         .then(() => setResetBackup(null))
         .catch(() => {
-          showSessionNote("Account restore failed. Try again before leaving.", "warning");
+          showSessionNote("Restore failed. Try again.", "warning");
           setResetBackup(resetBackup);
         });
     } else {
@@ -1236,7 +1312,7 @@ function App({
           showSessionNote("Device progress imported.", "success");
         })
         .catch(() => {
-          showSessionNote("Import failed. Try again before leaving.", "warning");
+          showSessionNote("Import failed. Try again.", "warning");
         });
     } else {
       setPendingGuestImport(null);
@@ -1257,6 +1333,7 @@ function App({
   function showQuestionQueue() {
     setMode("browse");
     setDrillScope("browse");
+    setMobilePane("queue");
     showSessionNote("Question queue shown.", "action");
   }
 
@@ -1265,6 +1342,8 @@ function App({
     const currentIndex = activeQueueIndex < 0 ? 0 : activeQueueIndex;
     const nextIndex = (currentIndex + direction + studyQueue.length) % studyQueue.length;
     setActiveId(studyQueue[nextIndex].id);
+    setMobilePane("study");
+    scrollMobileElement("study-surface");
     if (mode === "mock") setMode(drillScope === "starred" ? "starred" : "browse");
     showSessionNote(`Question ${nextIndex + 1} is up.`);
   }
@@ -1320,7 +1399,7 @@ function App({
     const willReview = !reviewed[activeQuestion.id];
     toggleMap(setReviewed, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { reviewed: willReview });
-    showSessionNote(willReview ? "Banked for review." : "Back in the queue.", willReview ? "success" : "neutral");
+    showSessionNote(willReview ? "Banked for review." : "Back in queue.", willReview ? "success" : "neutral");
   }
 
   function toggleStarred() {
@@ -1331,7 +1410,7 @@ function App({
     toggleMap(setStarred, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { starred: willStar });
     showSessionNote(
-      willStar ? "Saved to your review stack." : "Removed from review stack.",
+      willStar ? "Saved for review." : "Removed from review.",
       willStar ? "success" : "neutral"
     );
   }
@@ -1343,6 +1422,7 @@ function App({
     const willReveal = !revealed[activeQuestion.id];
     toggleMap(setRevealed, activeQuestion.id);
     saveAccountQuestion(activeQuestion.id, { revealed: willReveal });
+    scrollMobileElement(willReveal ? `answer-${activeQuestion.id}` : "study-surface");
   }
 
   function toggleTheme() {
@@ -1356,6 +1436,16 @@ function App({
 
   const activeFilterCount = [track !== allTracks, category !== "All", level !== "All"].filter(Boolean).length;
   const mobileFilterSummary = activeFilterCount ? `${activeFilterCount} active` : "All";
+  const mobileStudySummary =
+    activeQuestion && studyQueue.length
+      ? `${activeQueueIndex + 1} of ${studyQueue.length}`
+      : mode === "starred"
+        ? "Saved"
+        : "No card";
+  const mobileQueueSummary =
+    queueRows.length > visibleQuestions.length
+      ? `${visibleQuestions.length} of ${queueRows.length}`
+      : `${visibleQuestions.length}`;
 
   function renderFilterControls(idSuffix: string, compact = false) {
     const trackLabelId = `track-filter-label-${idSuffix}`;
@@ -1381,7 +1471,7 @@ function App({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent align="end">
+            <SelectContent align="start" alignItemWithTrigger={false} className="max-h-80">
               <SelectGroup>
                 {[allTracks, ...tracks].map((item) => (
                   <SelectItem key={item} value={item}>
@@ -1407,7 +1497,7 @@ function App({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent align="end">
+            <SelectContent align="start" alignItemWithTrigger={false} className="topic-filter-menu max-h-80">
               <SelectGroup>
                 {["All", ...visibleCategories].map((item) => (
                   <SelectItem key={item} value={item}>
@@ -1433,7 +1523,7 @@ function App({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent align="start" alignItemWithTrigger={false} className="max-h-80">
               <SelectGroup>
                 {["All", ...levels].map((item) => (
                   <SelectItem key={item} value={item}>
@@ -1461,16 +1551,107 @@ function App({
         <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
           <main className="min-w-0 lg:order-2" id="main-content">
             <header className="study-command-bar sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur lg:px-6">
-              <div className="grid gap-3 xl:grid-cols-[minmax(10rem,12rem)_minmax(0,1fr)] xl:items-center">
-                <div className="min-w-0">
-                  <h1 className="text-xs font-medium uppercase text-muted-foreground">Interview Studio</h1>
-                  <p className="truncate text-[0.9375rem] font-semibold">
-                    {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved review" : "Browse practice"}
-                  </p>
+              <div className="study-toolbar grid gap-3">
+                <div className="study-toolbar-title flex min-w-0 items-start justify-between gap-3">
+                  <span className="min-w-0">
+                    <h1 className="text-xs font-medium uppercase text-muted-foreground">Interview Studio</h1>
+                    <p className="truncate text-[0.9375rem] font-semibold">
+                      {mode === "mock" ? "Random drill" : mode === "starred" ? "Saved review" : "Browse practice"}
+                    </p>
+                  </span>
+                  <span className="mobile-title-actions lg:hidden">
+                    <details
+                      ref={accountPanelRef}
+                      className="mobile-account-panel"
+                      onToggle={(event) => {
+                        if (event.currentTarget.open) filterPanelRef.current?.removeAttribute("open");
+                      }}
+                    >
+                      <summary aria-label="Open account sync panel">Sync</summary>
+                      <div className="grid gap-3">
+                        {accountPanel || (
+                          <Card size="sm" aria-label="Guest progress">
+                            <CardHeader>
+                              <CardTitle>Guest progress</CardTitle>
+                              <CardDescription>Saved on this device. Add Convex to sync across devices.</CardDescription>
+                            </CardHeader>
+                          </Card>
+                        )}
+
+                        {pendingGuestImport && accountCanSave && (
+                          <Alert role="status">
+                            <AlertTitle>Device progress found</AlertTitle>
+                            <AlertDescription>Import it into this account, or dismiss it.</AlertDescription>
+                            <div className="mt-2 flex gap-2">
+                              <Button type="button" size="sm" onClick={importGuestProgress}>
+                                Import
+                              </Button>
+                              <Button type="button" variant="outline" size="sm" onClick={() => setPendingGuestImport(null)}>
+                                Dismiss
+                              </Button>
+                            </div>
+                          </Alert>
+                        )}
+
+                        {!storageAvailable && (
+                          <Alert variant="destructive" role="status">
+                            <AlertTitle>Storage blocked</AlertTitle>
+                            <AlertDescription>
+                              Progress and theme will not be saved because this browser blocked local storage.
+                            </AlertDescription>
+                          </Alert>
+                        )}
+                      </div>
+                    </details>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                      aria-pressed={theme === "dark"}
+                      onClick={toggleTheme}
+                    >
+                      {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                    </Button>
+                  </span>
                 </div>
 
-                <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:flex-wrap xl:items-center 2xl:flex-nowrap">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <div className="compact-progress lg:hidden" aria-label={`Progress: ${reviewedCount} reviewed, ${progress}% complete`}>
+                    <span className="compact-progress-copy">
+                      <span className="compact-progress-title font-semibold">Progress</span>
+                      <span className="text-muted-foreground">{reviewedCount} reviewed</span>
+                    </span>
+                  <Progress key={progressPulseKey} value={progress} className="compact-progress-track" />
+                  <Badge variant="secondary">{progress}%</Badge>
+                  {(hasProgress || confirmReset || resetBackup) && (
+                    <span className="compact-progress-actions">
+                      {resetBackup ? (
+                        <Button type="button" variant="outline" size="sm" onClick={undoReset}>
+                          Undo reset
+                        </Button>
+                      ) : (
+                        <>
+                          <Button
+                            type="button"
+                            variant={confirmReset ? "destructive" : "outline"}
+                            size="sm"
+                            onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
+                          >
+                            {confirmReset ? "Clear progress" : "Reset"}
+                          </Button>
+                          {confirmReset && (
+                            <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmReset(false)}>
+                              Cancel
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </span>
+                  )}
+                </div>
+
+                <div className="study-toolbar-controls grid min-w-0 gap-3">
+                  <div className="study-mode-controls flex min-w-0 items-center gap-2">
                     <Tabs
                       value={mode === "starred" ? "starred" : "browse"}
                       onValueChange={(value) => {
@@ -1493,21 +1674,22 @@ function App({
                       type="button"
                       variant="outline"
                       disabled={!randomDrillPool.length}
+                      className="mobile-random-drill"
                       onClick={pickRandomQuestion}
                     >
                       <ShuffleIcon data-icon="inline-start" />
-                      Random drill
+                      <span className="mobile-random-drill-label">Random drill</span>
                     </Button>
                   </div>
 
-                  <div className="relative min-w-0 flex-1 xl:min-w-72 2xl:max-w-[28rem]">
+                  <div className="study-search-control relative min-w-0">
                     <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       ref={searchInputRef}
                       aria-label="Search questions"
                       value={query}
                       onChange={(event) => setQuery(event.target.value)}
-                      placeholder="Search questions and answers"
+                      placeholder="Search questions"
                       className="h-11 bg-card pl-9 pr-11"
                     />
                     {query && (
@@ -1524,40 +1706,81 @@ function App({
                     )}
                   </div>
 
-                  <details className="mobile-filter-panel sm:hidden">
-                    <summary className="flex h-11 items-center justify-between gap-3 rounded-4xl border border-input bg-card px-4 text-[0.9375rem] font-medium">
+                  <details
+                    ref={filterPanelRef}
+                    className="filter-panel"
+                    onToggle={(event) => {
+                      if (event.currentTarget.open) accountPanelRef.current?.removeAttribute("open");
+                    }}
+                  >
+                    <summary
+                      aria-label={`Filters, ${mobileFilterSummary}`}
+                      className="flex h-11 items-center justify-between gap-3 rounded-4xl border border-input bg-card px-4 text-[0.9375rem] font-medium sm:w-44"
+                      data-active={activeFilterCount ? "true" : undefined}
+                    >
                       <span className="inline-flex items-center gap-1.5">
                         <FunnelIcon data-icon="inline-start" />
-                        Filters
+                        <span className="filter-panel-label">Filters</span>
                       </span>
-                      <span className="text-sm text-muted-foreground">{mobileFilterSummary}</span>
+                      <span className="filter-panel-count text-sm text-muted-foreground">{mobileFilterSummary}</span>
+                      {activeFilterCount > 0 && <span className="filter-panel-mobile-count">{activeFilterCount}</span>}
                     </summary>
                     <div className="mt-3 grid gap-2">
-                      {renderFilterControls("mobile", true)}
+                      {renderFilterControls("panel", true)}
                     </div>
                   </details>
 
-                  <div className="hidden w-full gap-2 sm:grid sm:w-auto sm:grid-cols-[auto_auto_auto]">
-                    {renderFilterControls("desktop")}
+                  <div className="mobile-pane-switch grid grid-cols-2 gap-1 xl:hidden" aria-label="Study view">
+                    <Button
+                      type="button"
+                      variant={mobilePane === "study" ? "secondary" : "ghost"}
+                      aria-label={`Show study card, ${mobileStudySummary}`}
+                      aria-pressed={mobilePane === "study"}
+                      disabled={!activeQuestion}
+                      className="h-auto min-h-12 flex-col items-start gap-0.5 rounded-3xl px-3 py-2"
+                      onClick={() => {
+                        setMobilePane("study");
+                        scrollMobileElement("study-surface");
+                      }}
+                    >
+                      <span>Study</span>
+                      <span className="text-xs font-medium text-muted-foreground">{mobileStudySummary}</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={mobilePane === "queue" ? "secondary" : "ghost"}
+                      aria-label={`Show question queue, ${mobileQueueSummary} shown`}
+                      aria-pressed={mobilePane === "queue"}
+                      className="h-auto min-h-12 flex-col items-start gap-0.5 rounded-3xl px-3 py-2"
+                      onClick={() => setMobilePane("queue")}
+                    >
+                      <span>Queue</span>
+                      <span className="text-xs font-medium text-muted-foreground">{mobileQueueSummary} shown</span>
+                    </Button>
                   </div>
+
                 </div>
               </div>
             </header>
 
             <div className="study-workspace grid gap-5 p-4 lg:p-6 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
               {activeQuestion && activeGuide ? (
-                <article key={activeQuestion.id} className="flex min-w-0 flex-col gap-5">
+                <article
+                  id="study-surface"
+                  key={activeQuestion.id}
+                  className={cn("min-w-0 flex-col gap-5 xl:flex", mobilePane === "queue" ? "hidden" : "flex")}
+                >
                   <Card
                     className="study-stage overflow-hidden"
                     data-revealed={revealed[activeQuestion.id] ? "true" : undefined}
                     data-reviewed={reviewed[activeQuestion.id] ? "true" : undefined}
                   >
-                    <CardHeader className="gap-5 border-b">
+                    <CardHeader className="gap-5 sm:border-b sm:pb-6">
                       <div className="flex flex-wrap gap-1.5">
                         {showTrackBadges && <Badge variant="outline">{questionTrack(activeQuestion)}</Badge>}
                         <Badge variant="secondary">{activeQuestion.category}</Badge>
                         <Badge variant="outline">{activeQuestion.level}</Badge>
-                        <Badge variant={revealed[activeQuestion.id] ? "secondary" : "outline"}>
+                        <Badge className="question-status-badge" variant={revealed[activeQuestion.id] ? "secondary" : "outline"}>
                           {revealed[activeQuestion.id] ? "Answer shown" : "Try first"}
                         </Badge>
                         {reviewed[activeQuestion.id] && <Badge variant="secondary">Reviewed</Badge>}
@@ -1587,8 +1810,8 @@ function App({
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="grid gap-5 p-5 sm:p-6">
-                      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <CardContent className="hidden gap-5 p-5 sm:grid sm:p-6">
+                      <div className="flex flex-col gap-4 2xl:flex-row 2xl:items-center 2xl:justify-between">
                         <div className="flex flex-wrap gap-2">
                           {revealed[activeQuestion.id] ? (
                             <Button className="study-primary-action" type="button" size="lg" onClick={markReviewedAndContinue}>
@@ -1769,7 +1992,7 @@ function App({
                   </section>
 
                   {!revealed[activeQuestion.id] && (
-                    <Alert className="answer-panel">
+                    <Alert className="answer-panel hidden sm:block">
                       <AlertTitle>{isFirstRun ? "Start here" : "Think first"}</AlertTitle>
                       <AlertDescription>
                         {isFirstRun
@@ -1780,7 +2003,7 @@ function App({
                   )}
                 </article>
               ) : isSavedEmpty ? (
-                <Card key="saved-empty" className="answer-panel">
+                <Card key="saved-empty" className={cn("answer-panel xl:flex", mobilePane === "queue" && "hidden")}>
                   <CardContent>
                     <Empty>
                       <EmptyHeader>
@@ -1795,7 +2018,7 @@ function App({
                   </CardContent>
                 </Card>
               ) : (
-                <Card key="empty" className="answer-panel">
+                <Card key="empty" className={cn("answer-panel xl:flex", mobilePane === "queue" && "hidden")}>
                   <CardContent>
                     <Empty>
                       <EmptyHeader>
@@ -1814,7 +2037,10 @@ function App({
               <Card
                 role="region"
                 aria-label="Questions. Use arrow keys to move through the queue."
-                className="question-rail min-h-[360px] xl:sticky xl:top-[88px] xl:h-[calc(100dvh-178px)]"
+                className={cn(
+                  "question-rail min-h-[360px] xl:sticky xl:top-[88px] xl:h-[calc(100dvh-178px)] xl:flex",
+                  mobilePane === "study" && "hidden"
+                )}
               >
                 <CardHeader>
                   <CardTitle>
@@ -1848,7 +2074,11 @@ function App({
                               tabIndex={isTabStop ? 0 : -1}
                               title={item.question}
                               aria-label={queueRowLabel(item, index, !!reviewed[item.id])}
-                              onClick={() => setActiveId(item.id)}
+                              onClick={() => {
+                                setActiveId(item.id);
+                                setMobilePane("study");
+                                scrollMobileElement("study-surface");
+                              }}
                               onKeyDown={(event) => handleQueueRowKeyDown(event, index)}
                             >
                               <Badge variant="outline" className="mt-0.5 font-mono tabular-nums">
@@ -1921,10 +2151,11 @@ function App({
                 </CardContent>
               </Card>
             </div>
+
           </main>
 
           <aside
-            className="study-rail border-t border-sidebar-border bg-sidebar text-sidebar-foreground lg:order-1 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-t-0"
+            className="study-rail hidden border-t border-sidebar-border bg-sidebar text-sidebar-foreground lg:order-1 lg:sticky lg:top-0 lg:block lg:h-screen lg:border-r lg:border-t-0"
             aria-label="Study deck"
           >
             <div className="flex h-full min-h-0 flex-col">
@@ -2041,10 +2272,84 @@ function App({
           </aside>
         </div>
 
+        {activeQuestion && mobilePane === "study" && (
+          <div className="mobile-study-actions sm:hidden" role="group" aria-label="Current question actions">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Previous question"
+              onClick={() => moveQuestion(-1)}
+            >
+              <CaretLeftIcon />
+            </Button>
+            <div className="mobile-study-action-stack">
+              {revealed[activeQuestion.id] ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    aria-expanded
+                    aria-controls={`answer-${activeQuestion.id}`}
+                    onClick={toggleRevealed}
+                  >
+                    Hide
+                  </Button>
+                  <Button
+                    className="study-primary-action flex-1"
+                    type="button"
+                    size="lg"
+                    onClick={reviewed[activeQuestion.id] ? toggleReviewed : markReviewedAndContinue}
+                  >
+                    <CheckCircleIcon data-icon="inline-start" />
+                    {reviewed[activeQuestion.id] ? "Unmark" : "Review + next"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant={reviewed[activeQuestion.id] ? "secondary" : "outline"}
+                    size="lg"
+                    aria-pressed={!!reviewed[activeQuestion.id]}
+                    onClick={toggleReviewed}
+                  >
+                    {reviewed[activeQuestion.id] ? "Unmark" : "Mark"}
+                  </Button>
+                  <Button
+                    className="study-primary-action flex-1"
+                    type="button"
+                    size="lg"
+                    aria-expanded={false}
+                    aria-controls={`answer-${activeQuestion.id}`}
+                    onClick={toggleRevealed}
+                  >
+                    <CaretDownIcon data-icon="inline-start" />
+                    {isFirstRun ? "Reveal" : "Reveal"}
+                  </Button>
+                </>
+              )}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Next question"
+              onClick={() => moveQuestion(1)}
+            >
+              <CaretRightIcon />
+            </Button>
+          </div>
+        )}
+
         {sessionNote && (
           <div
             key={sessionNoteKey}
-            className="study-session-note fixed bottom-4 left-1/2 z-50 max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-4xl border border-border bg-popover px-4 py-2.5 text-sm font-medium text-popover-foreground shadow-lg data-[tone=success]:border-primary data-[tone=warning]:border-destructive data-[tone=action]:border-ring data-[tone=milestone]:border-primary"
+            className={cn(
+              "study-session-note fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-4xl border border-border bg-popover px-4 py-2.5 text-sm font-medium text-popover-foreground shadow-lg data-[tone=success]:border-primary data-[tone=warning]:border-destructive data-[tone=action]:border-ring data-[tone=milestone]:border-primary",
+              activeQuestion && mobilePane === "study" && "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] sm:bottom-4"
+            )}
             data-tone={sessionTone}
             role="status"
             aria-live="polite"
