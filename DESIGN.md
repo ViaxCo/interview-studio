@@ -2,7 +2,7 @@
 
 ## System
 
-Frontend Interview Studio is a restrained product UI. Design serves focused study: dense enough to scan quickly, calm enough for sustained reading, and explicit enough for keyboard and screen reader users.
+Interview Studio is a restrained product UI. Design serves focused interview practice: dense enough to scan quickly, calm enough for sustained reading, and explicit enough for keyboard and screen reader users. The shell should support future collections without making the current frontend collection feel bolted on.
 
 ## Color
 

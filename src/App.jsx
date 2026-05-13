@@ -542,6 +542,53 @@ function normalizeStoredState(value, storageAvailable = true) {
   };
 }
 
+function mapFromIds(ids) {
+  if (!Array.isArray(ids)) return {};
+  return Object.fromEntries(ids.filter((id) => questionIds.has(id)).map((id) => [id, true]));
+}
+
+function serializeProgress(state) {
+  const normalized = normalizeStoredState(state);
+
+  return {
+    revealed: Object.keys(normalized.revealed).sort(),
+    reviewed: Object.keys(normalized.reviewed).sort(),
+    starred: Object.keys(normalized.starred).sort(),
+    theme: normalized.theme
+  };
+}
+
+function progressKey(state) {
+  return JSON.stringify(serializeProgress(state));
+}
+
+function hasProgressMissingFromAccount(deviceState, accountState) {
+  return ["revealed", "reviewed", "starred"].some((key) =>
+    Object.keys(deviceState[key]).some((id) => !accountState[key][id])
+  );
+}
+
+function hasDeviceStateToImport(deviceState, accountState) {
+  return hasProgressMissingFromAccount(deviceState, accountState) || deviceState.theme !== accountState.theme;
+}
+
+function applyQuestionUpdate(state, questionId, update) {
+  for (const key of ["revealed", "reviewed", "starred"]) {
+    if (update[key] === undefined) continue;
+    if (update[key]) {
+      state[key][questionId] = true;
+    } else {
+      delete state[key][questionId];
+    }
+  }
+}
+
+function questionUpdateMatches(state, questionId, update) {
+  return ["revealed", "reviewed", "starred"].every(
+    (key) => update[key] === undefined || Boolean(state[key][questionId]) === update[key]
+  );
+}
+
 function getStorage() {
   try {
     return globalThis.localStorage || null;
@@ -573,7 +620,16 @@ function saveStoredState(state) {
   }
 }
 
-function App() {
+function App({
+  accountCanSave = false,
+  accountPending = false,
+  accountPanel = null,
+  accountProgress,
+  importAccountProgress = null,
+  resetAccountProgress = null,
+  saveQuestionProgress = null,
+  saveThemePreference = null
+}) {
   const searchInputRef = useRef(null);
   const [storedState] = useState(loadStoredState);
   const [query, setQuery] = useState("");
@@ -588,14 +644,96 @@ function App() {
   const [storageAvailable, setStorageAvailable] = useState(storedState.storageAvailable);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetBackup, setResetBackup] = useState(null);
+  const [pendingGuestImport, setPendingGuestImport] = useState(null);
   const [sessionNote, setSessionNote] = useState("");
   const [sessionTone, setSessionTone] = useState("neutral");
   const [sessionNoteKey, setSessionNoteKey] = useState(0);
   const [visibleLimit, setVisibleLimit] = useState(initialVisibleLimit);
+  const syncedAccountKey = useRef("");
+  const hadAccountSession = useRef(false);
+  const pendingQuestionEdits = useRef(new Map());
+  const pendingTheme = useRef(null);
 
   useEffect(() => {
-    setStorageAvailable(saveStoredState({ revealed, reviewed, starred, theme }));
-  }, [revealed, reviewed, starred, theme]);
+    if (accountCanSave) {
+      hadAccountSession.current = true;
+      return;
+    }
+
+    syncedAccountKey.current = "";
+    pendingQuestionEdits.current.clear();
+    pendingTheme.current = null;
+    setPendingGuestImport(null);
+    setResetBackup(null);
+
+    if (hadAccountSession.current) {
+      const guestState = loadStoredState();
+      setRevealed(guestState.revealed);
+      setReviewed(guestState.reviewed);
+      setStarred(guestState.starred);
+      setTheme(guestState.theme);
+      setStorageAvailable(guestState.storageAvailable);
+      hadAccountSession.current = false;
+    }
+  }, [accountCanSave]);
+
+  useEffect(() => {
+    if (!accountCanSave || accountProgress === undefined) return;
+
+    if (accountProgress) {
+      const accountState = {
+        revealed: mapFromIds(accountProgress.revealed),
+        reviewed: mapFromIds(accountProgress.reviewed),
+        starred: mapFromIds(accountProgress.starred),
+        theme: accountProgress.theme === "dark" ? "dark" : "light"
+      };
+      const accountKey = `${accountProgress.userId}:${progressKey(accountState)}`;
+      for (const [questionId, update] of pendingQuestionEdits.current) {
+        if (questionUpdateMatches(accountState, questionId, update)) {
+          pendingQuestionEdits.current.delete(questionId);
+        }
+      }
+      if (pendingTheme.current && accountState.theme === pendingTheme.current) {
+        pendingTheme.current = null;
+      }
+      if (syncedAccountKey.current === accountKey) return;
+
+      const currentState = { revealed, reviewed, starred, theme };
+
+      if (
+        !syncedAccountKey.current &&
+        hasDeviceStateToImport(currentState, accountState)
+      ) {
+        setPendingGuestImport(currentState);
+      }
+
+      const nextState = {
+        revealed: { ...accountState.revealed },
+        reviewed: { ...accountState.reviewed },
+        starred: { ...accountState.starred },
+        theme: pendingTheme.current || accountState.theme
+      };
+
+      for (const [questionId, update] of pendingQuestionEdits.current) {
+        applyQuestionUpdate(nextState, questionId, update);
+      }
+
+      setRevealed(nextState.revealed);
+      setReviewed(nextState.reviewed);
+      setStarred(nextState.starred);
+      setTheme(nextState.theme);
+      if (!syncedAccountKey.current) {
+        showSessionNote("Account progress synced.", "success");
+      }
+      syncedAccountKey.current = accountKey;
+    }
+  }, [accountCanSave, accountProgress, revealed, reviewed, starred, theme]);
+
+  useEffect(() => {
+    if (!accountCanSave) {
+      setStorageAvailable(saveStoredState({ revealed, reviewed, starred, theme }));
+    }
+  }, [accountCanSave, revealed, reviewed, starred, theme]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -680,7 +818,7 @@ function App() {
 
       if (event.key.toLowerCase() === "r") {
         event.preventDefault();
-        toggleMap(setRevealed, activeQuestion.id);
+        toggleRevealed();
       }
 
       if (event.key.toLowerCase() === "n") {
@@ -696,7 +834,7 @@ function App() {
 
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [activeQuestion, activeQueueIndex, mode, revealed, studyQueue]);
+  }, [accountPending, activeQuestion, activeQueueIndex, mode, revealed, studyQueue]);
 
   useEffect(() => {
     const milestone = milestoneMessages[reviewedCount];
@@ -727,6 +865,47 @@ function App() {
     setSessionNoteKey((current) => current + 1);
   }
 
+  function blockProgressEdit() {
+    if (!accountPending) return false;
+    showSessionNote("Account progress is loading.", "warning");
+    return true;
+  }
+
+  function saveAccountQuestion(questionId, progressUpdate) {
+    if (!accountCanSave || !saveQuestionProgress) return;
+    pendingQuestionEdits.current.set(questionId, {
+      ...pendingQuestionEdits.current.get(questionId),
+      ...progressUpdate
+    });
+    saveQuestionProgress(questionId, progressUpdate).catch(() => {
+      showSessionNote("Account sync failed. Your change is still visible here.", "warning");
+    });
+  }
+
+  function saveAccountTheme(themeValue) {
+    if (!accountCanSave || !saveThemePreference) return;
+    pendingTheme.current = themeValue;
+    saveThemePreference(themeValue).catch(() => {
+      showSessionNote("Theme sync failed. Your change is still visible here.", "warning");
+    });
+  }
+
+  function serializeQuestionProgress(state) {
+    const { revealed: revealedIds, reviewed: reviewedIds, starred: starredIds } = serializeProgress(state);
+    return { revealed: revealedIds, reviewed: reviewedIds, starred: starredIds };
+  }
+
+  function queueImportedProgress(state) {
+    for (const key of ["revealed", "reviewed", "starred"]) {
+      for (const id of Object.keys(state[key])) {
+        pendingQuestionEdits.current.set(id, {
+          ...pendingQuestionEdits.current.get(id),
+          [key]: true
+        });
+      }
+    }
+  }
+
   function pickRandomQuestion() {
     const pool = mode === "starred" && starredQueue.length ? starredQueue : filteredQuestions;
     if (!pool.length) return;
@@ -737,22 +916,72 @@ function App() {
   }
 
   function resetProgress() {
+    if (blockProgressEdit()) return;
     if (!hasProgress) return;
     setResetBackup({ revealed, reviewed, starred });
     setRevealed({});
     setReviewed({});
     setStarred({});
     setConfirmReset(false);
-    showSessionNote("Local progress cleared.", "warning");
+    if (accountCanSave && resetAccountProgress) {
+      pendingQuestionEdits.current.clear();
+      resetAccountProgress().catch(() => {
+        showSessionNote("Account reset failed. Try again before leaving.", "warning");
+      });
+    }
+    showSessionNote(accountCanSave ? "Account progress cleared." : "Local progress cleared.", "warning");
   }
 
   function undoReset() {
+    if (blockProgressEdit()) return;
     if (!resetBackup) return;
     setRevealed(resetBackup.revealed);
     setReviewed(resetBackup.reviewed);
     setStarred(resetBackup.starred);
-    setResetBackup(null);
+    if (accountCanSave && importAccountProgress) {
+      queueImportedProgress(resetBackup);
+      importAccountProgress(serializeQuestionProgress({ ...resetBackup, theme }))
+        .then(() => setResetBackup(null))
+        .catch(() => {
+          showSessionNote("Account restore failed. Try again before leaving.", "warning");
+          setResetBackup(resetBackup);
+        });
+    } else {
+      setResetBackup(null);
+    }
     showSessionNote("Local progress restored.", "action");
+  }
+
+  function importGuestProgress() {
+    if (blockProgressEdit() || !pendingGuestImport) return;
+    const nextState = {
+      revealed: { ...revealed, ...pendingGuestImport.revealed },
+      reviewed: { ...reviewed, ...pendingGuestImport.reviewed },
+      starred: { ...starred, ...pendingGuestImport.starred },
+      theme: pendingGuestImport.theme
+    };
+    setRevealed(nextState.revealed);
+    setReviewed(nextState.reviewed);
+    setStarred(nextState.starred);
+    setTheme(nextState.theme);
+    if (accountCanSave && importAccountProgress) {
+      queueImportedProgress(pendingGuestImport);
+      const themeImport =
+        saveThemePreference && pendingGuestImport.theme !== theme
+          ? saveThemePreference(pendingGuestImport.theme)
+          : Promise.resolve();
+      Promise.all([importAccountProgress(serializeQuestionProgress(nextState)), themeImport])
+        .then(() => {
+          setPendingGuestImport(null);
+          showSessionNote("Device progress imported.", "success");
+        })
+        .catch(() => {
+          showSessionNote("Import failed. Try again before leaving.", "warning");
+        });
+    } else {
+      setPendingGuestImport(null);
+      showSessionNote("Device progress imported.", "success");
+    }
   }
 
   function resetFilters() {
@@ -778,23 +1007,29 @@ function App() {
   }
 
   function markReviewedAndContinue() {
+    if (blockProgressEdit()) return;
     if (!activeQuestion) return;
     setReviewed((current) => ({ ...current, [activeQuestion.id]: true }));
+    saveAccountQuestion(activeQuestion.id, { reviewed: true });
     moveQuestion(1);
     showSessionNote("Marked reviewed. Moving to the next question.", "success");
   }
 
   function toggleReviewed() {
+    if (blockProgressEdit()) return;
     if (!activeQuestion) return;
     const willReview = !reviewed[activeQuestion.id];
     toggleMap(setReviewed, activeQuestion.id);
+    saveAccountQuestion(activeQuestion.id, { reviewed: willReview });
     showSessionNote(willReview ? "Marked reviewed." : "Marked unreviewed.", willReview ? "success" : "neutral");
   }
 
   function toggleStarred() {
+    if (blockProgressEdit()) return;
     if (!activeQuestion) return;
     const willStar = !starred[activeQuestion.id];
     toggleMap(setStarred, activeQuestion.id);
+    saveAccountQuestion(activeQuestion.id, { starred: willStar });
     showSessionNote(
       willStar ? "Saved for review." : "Removed from saved questions.",
       willStar ? "success" : "neutral"
@@ -802,13 +1037,18 @@ function App() {
   }
 
   function toggleRevealed() {
+    if (blockProgressEdit()) return;
     if (!activeQuestion) return;
+    const willReveal = !revealed[activeQuestion.id];
     toggleMap(setRevealed, activeQuestion.id);
+    saveAccountQuestion(activeQuestion.id, { revealed: willReveal });
   }
 
   function toggleTheme() {
+    if (blockProgressEdit()) return;
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
+    saveAccountTheme(nextTheme);
     showSessionNote(nextTheme === "dark" ? "Dark mode on." : "Light mode on.", "action");
   }
 
@@ -823,7 +1063,7 @@ function App() {
             <BookOpen size={20} />
           </div>
           <div>
-            <p className="eyebrow">Frontend</p>
+            <p className="eyebrow">Practice</p>
             <h1>Interview Studio</h1>
           </div>
           <button
@@ -848,9 +1088,18 @@ function App() {
           </div>
           <div>
             <strong>{reviewedCount} reviewed</strong>
-            <p>{questions.length} questions with answers, reasoning, and follow-ups.</p>
+            <p>{questions.length} questions in the current frontend collection.</p>
           </div>
         </div>
+
+        {accountPanel || (
+          <section className="account-panel" aria-label="Guest progress">
+            <div>
+              <strong>Guest progress</strong>
+              <p>Saved on this device. Add Convex to sync across devices.</p>
+            </div>
+          </section>
+        )}
 
         <nav className="mode-tabs" aria-label="Study modes">
           <button
@@ -897,12 +1146,16 @@ function App() {
             className="reset-button"
             onClick={() => (confirmReset ? resetProgress() : setConfirmReset(true))}
           >
-            <RotateCcw size={16} /> {confirmReset ? "Clear progress" : "Reset local progress"}
+            <RotateCcw size={16} /> {confirmReset ? "Clear progress" : "Reset progress"}
           </button>
         )}
         {confirmReset && (
           <div className="reset-message" role="status">
-            <p>This clears reviewed, saved, and revealed answers on this device.</p>
+            <p>
+              {accountCanSave
+                ? "This clears reviewed, saved, and revealed answers for your account."
+                : "This clears reviewed, saved, and revealed answers on this device."}
+            </p>
             <button type="button" onClick={() => setConfirmReset(false)}>
               Cancel
             </button>
@@ -910,9 +1163,20 @@ function App() {
         )}
         {resetBackup && (
           <div className="reset-message" role="status">
-            <p>Local progress cleared.</p>
+            <p>{accountCanSave ? "Account progress cleared." : "Local progress cleared."}</p>
             <button type="button" onClick={undoReset}>
               Undo
+            </button>
+          </div>
+        )}
+        {pendingGuestImport && accountCanSave && (
+          <div className="reset-message" role="status">
+            <p>Device progress is available to import into this account.</p>
+            <button type="button" onClick={importGuestProgress}>
+              Import
+            </button>
+            <button type="button" onClick={() => setPendingGuestImport(null)}>
+              Dismiss
             </button>
           </div>
         )}

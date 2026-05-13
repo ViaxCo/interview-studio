@@ -176,6 +176,8 @@ p {
 
 .brand > div,
 .progress-panel > div,
+.account-panel,
+.account-panel > div,
 .question-row,
 .row-copy,
 .detail-heading > div,
@@ -188,6 +190,7 @@ p {
 }
 
 .progress-panel p,
+.account-panel p,
 .row-copy strong,
 .row-copy small,
 .detail-heading h2,
@@ -260,6 +263,32 @@ h1 {
   font-weight: 850;
 }
 
+.account-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--surface-muted), var(--surface) 52%);
+}
+
+.account-panel p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.account-panel button {
+  justify-content: center;
+  min-height: 38px;
+  padding-block: 7px;
+}
+
+.account-error {
+  color: var(--danger);
+}
+
 .mode-tabs,
 .topic-list {
   display: grid;
@@ -278,6 +307,7 @@ h1 {
 .empty-state button,
 .load-more-button,
 .star-button,
+.account-panel button,
 .primary-action {
   border: 1px solid transparent;
   border-radius: 8px;
@@ -315,6 +345,7 @@ h1 {
 .queue-controls button:hover,
 .empty-state button:hover,
 .load-more-button:hover,
+.account-panel button:hover,
 .star-button:not(.active):hover {
   background: var(--surface);
   border-color: var(--border-strong);
@@ -454,6 +485,7 @@ h1 {
 }
 
 :root[data-theme="dark"] .progress-panel,
+:root[data-theme="dark"] .account-panel,
 :root[data-theme="dark"] .search-box,
 :root[data-theme="dark"] .select-box,
 :root[data-theme="dark"] .question-row,

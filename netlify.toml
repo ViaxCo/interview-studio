@@ -1,0 +1,3 @@
+[build]
+  command = "if [ \"$CONTEXT\" = \"production\" ]; then npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name VITE_CONVEX_URL; else npm run build; fi"
+  publish = "dist"
