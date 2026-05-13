@@ -1,7 +1,10 @@
 import type { Question } from "./questionTypes";
 
-export type TopicSpec = [string, string, string, string, string, string];
+export type TopicSpec = [string, string, string, string, string, string, string?];
 type TopicContext = {
+  track: string;
+  role: string;
+  behaviorScope: string;
   category: string;
   level: string;
   concept: string;
@@ -17,6 +20,23 @@ type QuestionAngle = {
   tests: (context: TopicContext) => string;
   followUps: (context: TopicContext) => string[];
 };
+
+const frontendTrack = "Frontend";
+const tpmTrack = "TPM";
+
+function contextForTrack(track: string) {
+  if (track === tpmTrack) {
+    return {
+      role: "technical product manager",
+      behaviorScope: "product, delivery, compliance, integration, and business behavior"
+    };
+  }
+
+  return {
+    role: "frontend engineer",
+    behaviorScope: "real frontend behavior"
+  };
+}
 
 export const topicSpecs: TopicSpec[] = [
   ["JavaScript", "Foundational", "the prototype chain", "object behavior is resolved through linked prototypes before reaching built-in defaults", "assuming every property lives directly on the object", "shared model objects and component helpers"],
@@ -118,36 +138,122 @@ export const topicSpecs: TopicSpec[] = [
   ["Build Tools", "Intermediate", "Vite plugins", "plugins can transform modules, inject behavior, and shape the build pipeline", "using plugins without understanding dev and production differences", "asset handling and framework integration"],
   ["Build Tools", "Advanced", "module federation", "separately built frontends can share modules at runtime", "adding distributed deployment complexity for a team problem that modular code could solve", "large organizations"],
   ["Build Tools", "Advanced", "source map strategy", "debuggability, privacy, and deployment artifact management have to be balanced", "uploading maps inconsistently and breaking production error traces", "release pipelines"],
-  ["Build Tools", "Intermediate", "CI preview builds", "every change can get a temporary environment for review and testing", "treating previews as production without matching data, flags, or auth assumptions", "pull request review"]
+  ["Build Tools", "Intermediate", "CI preview builds", "every change can get a temporary environment for review and testing", "treating previews as production without matching data, flags, or auth assumptions", "pull request review"],
+  ["Payments & Remittance", "Foundational", "payment rails", "each rail has different speed, cost, coverage, risk, settlement, and reconciliation behavior", "treating all transfers as the same once money leaves the app", "domestic bank transfers, card payouts, mobile money, and cross-border corridors", tpmTrack],
+  ["Payments & Remittance", "Intermediate", "FX quote lifecycle", "rate sourcing, spread, quote expiry, fees, and settlement timing must be explicit to the customer and operations team", "showing a great rate in the UI while the backend settles on stale assumptions", "cross-border send-money flows", tpmTrack],
+  ["Payments & Remittance", "Advanced", "correspondent banking", "cross-border transfers often move through intermediaries with their own fees, cutoffs, compliance checks, and failure modes", "promising instant delivery when the route depends on external banks and clearing windows", "international remittance corridors", tpmTrack],
+  ["Payments & Remittance", "Intermediate", "mobile money ecosystems", "wallet providers, agent networks, transaction limits, KYC tiers, reversal rules, and uptime shape the product promise", "designing mobile-money payouts like ordinary bank-account credits", "Africa-focused payout products", tpmTrack],
+  ["Payments & Remittance", "Advanced", "ISO 20022 messaging", "structured payment messages carry richer party, purpose, and remittance data than older formats", "treating payment messages as flat references and losing data needed for compliance or reconciliation", "bank integrations and treasury operations", tpmTrack],
+  ["Payments & Remittance", "Advanced", "ISO 8583 transaction flows", "card and switch transactions depend on message types, response codes, reversals, advice messages, and settlement files", "only testing the approval path and missing reversals or partial failures", "card-funded wallets and POS channels", tpmTrack],
+  ["API & Partner Integration", "Foundational", "REST API contracts", "resources, methods, status codes, idempotency, authentication, pagination, and error shapes form the product contract", "reducing API work to endpoint lists without agreement on behavior", "partner onboarding and internal platform APIs", tpmTrack],
+  ["API & Partner Integration", "Intermediate", "GraphQL integration", "clients can request precise data shapes but teams still need schema governance, authorization, caching, and versioning discipline", "assuming GraphQL removes the need for product-level contract management", "data-heavy dashboards and partner portals", tpmTrack],
+  ["API & Partner Integration", "Intermediate", "webhook reliability", "event delivery needs signing, retries, idempotency, ordering expectations, and dead-letter handling", "assuming a webhook is a guaranteed real-time command", "payment status callbacks and KYC provider updates", tpmTrack],
+  ["API & Partner Integration", "Advanced", "event-driven architecture", "events decouple systems but require clear ownership, schemas, replay rules, monitoring, and consumer expectations", "turning every workflow into events without knowing who owns the source of truth", "wallet ledgers, notifications, and fraud scoring", tpmTrack],
+  ["API & Partner Integration", "Advanced", "message queues", "queues buffer work and protect services but introduce latency, retry, duplication, and poison-message handling", "calling a queue a fix without defining failure and recovery behavior", "settlement jobs and partner-file processing", tpmTrack],
+  ["API & Partner Integration", "Intermediate", "Postman and Swagger validation", "API tools help prove examples, auth, schemas, errors, and environment assumptions before engineering escalates issues", "using API tooling only for happy-path demos", "partner certification and bug triage", tpmTrack],
+  ["Data & Schema Design", "Foundational", "entity relationships", "schemas should represent customer, account, wallet, transaction, beneficiary, quote, and compliance facts without duplicating truth", "modeling screens instead of domain facts", "remittance product databases", tpmTrack],
+  ["Data & Schema Design", "Intermediate", "ledger design", "financial products need auditable immutable entries, balances derived from postings, and clear reversal behavior", "storing only mutable balances and hoping logs explain the money trail", "wallet and payment systems", tpmTrack],
+  ["Data & Schema Design", "Intermediate", "SQL analysis", "basic joins, filters, aggregation, cohort cuts, and reconciliation queries help validate product assumptions", "waiting for analysts for every operational question", "payment failure analysis and funnel review", tpmTrack],
+  ["Data & Schema Design", "Advanced", "data governance", "ownership, definitions, lineage, quality checks, retention, and access rules keep metrics and audits trustworthy", "shipping dashboards where every team defines active customer differently", "executive reporting and regulatory evidence", tpmTrack],
+  ["Data & Schema Design", "Intermediate", "analytics instrumentation", "events should represent meaningful user and transaction behavior with stable names, properties, and privacy controls", "tracking random clicks while missing send-money success, failure, and abandonment reasons", "Mixpanel, Firebase, Google Analytics, and product funnels", tpmTrack],
+  ["Data & Schema Design", "Advanced", "reconciliation data", "product teams need transaction states, provider references, fees, FX rates, timestamps, and exception reasons to close books", "building status pages that cannot explain money movement", "finance operations and partner settlement", tpmTrack],
+  ["Cloud & Infrastructure", "Foundational", "cloud platform primitives", "compute, storage, databases, networking, IAM, queues, logs, and managed services are the building blocks behind delivery commitments", "speaking about cloud as hosting without understanding operational tradeoffs", "AWS, Azure, and GCP delivery planning", tpmTrack],
+  ["Cloud & Infrastructure", "Intermediate", "containerized services", "Docker and Kubernetes support repeatable deployment, scaling, rollout control, and service isolation", "assuming Kubernetes is required before the team has operational maturity", "cloud-native fintech platforms", tpmTrack],
+  ["Cloud & Infrastructure", "Intermediate", "serverless architecture", "serverless can reduce operations for event-driven work but changes cold starts, limits, observability, and cost patterns", "using serverless for every workload without checking latency and vendor limits", "webhook processors and scheduled compliance jobs", tpmTrack],
+  ["Cloud & Infrastructure", "Advanced", "infrastructure as code", "Terraform and similar tools make environments reviewable, repeatable, and auditable", "letting production drift through console changes no one can reproduce", "regulated cloud environments", tpmTrack],
+  ["Cloud & Infrastructure", "Intermediate", "CI/CD pipelines", "pipelines should automate build, test, security checks, deployment, rollback, and release evidence", "treating deployment as a manual checklist owned by one engineer", "Jenkins, GitHub Actions, and release governance", tpmTrack],
+  ["Cloud & Infrastructure", "Advanced", "disaster recovery", "recovery objectives, backups, failover, runbooks, and regular drills define whether the business can survive outages", "writing a DR plan that has never been tested", "payment products with uptime obligations", tpmTrack],
+  ["Security & Compliance", "Foundational", "KYC identity verification", "customer onboarding needs identity capture, verification, risk tiering, document handling, and fallback review paths", "treating KYC as a form instead of a regulated decision workflow", "wallet signup and remittance onboarding", tpmTrack],
+  ["Security & Compliance", "Intermediate", "AML transaction monitoring", "rules, risk signals, thresholds, review queues, and audit evidence help detect suspicious activity", "bolting on AML after launch without product-state integration", "cross-border payment monitoring", tpmTrack],
+  ["Security & Compliance", "Intermediate", "sanctions screening", "screening needs reliable party data, fuzzy matching, false-positive handling, escalation, and evidence retention", "blocking good customers forever because review operations were not designed", "beneficiary creation and payout approval", tpmTrack],
+  ["Security & Compliance", "Advanced", "PCI DSS scope", "card data handling choices determine compliance scope, vendor responsibilities, tokenization, logging rules, and audit burden", "letting sensitive card data pass through systems that do not need it", "card-funded remittance and wallet top-up", tpmTrack],
+  ["Security & Compliance", "Intermediate", "OAuth2 and Open Banking", "authorization flows, consent, token lifetime, scopes, refresh, and revocation define safe access to financial data", "confusing login with delegated financial-data permission", "bank-linking and account-information products", tpmTrack],
+  ["Security & Compliance", "Advanced", "audit trails", "regulated products need who did what, when, why, from where, and what changed, preserved in tamper-aware records", "adding audit logs only after an incident or regulator request", "admin tools and operations consoles", tpmTrack],
+  ["Fraud & Risk", "Foundational", "fraud risk signals", "device, velocity, beneficiary, geography, amount, account age, and behavioral signals help separate normal activity from risky patterns", "using one static rule that blocks growth and still misses sophisticated abuse", "remittance send flows", tpmTrack],
+  ["Fraud & Risk", "Intermediate", "risk-based friction", "higher-risk actions can require extra verification while low-risk users continue smoothly", "adding the same friction to everyone and harming conversion", "step-up verification and transaction review", tpmTrack],
+  ["Fraud & Risk", "Advanced", "chargeback and dispute handling", "card-funded payments need evidence, timelines, provisional credits, provider rules, and customer communication", "treating disputes as support tickets without financial liability tracking", "card-to-wallet funding", tpmTrack],
+  ["Fraud & Risk", "Intermediate", "limits and controls", "daily, monthly, corridor, KYC-tier, partner, and risk limits protect the business and satisfy regulation", "hard-coding limits with no operations override or audit trail", "wallet transfers and cross-border payouts", tpmTrack],
+  ["Fraud & Risk", "Advanced", "case management", "alerts need assignment, evidence, disposition, SLA, escalation, and feedback into rules or models", "creating alerts faster than operations can resolve them", "fraud and AML operations", tpmTrack],
+  ["Fraud & Risk", "Intermediate", "risk appetite", "product decisions should reflect explicit tolerance for loss, false positives, customer friction, and compliance exposure", "letting every team optimize a different hidden risk target", "executive risk reviews", tpmTrack],
+  ["Agile Delivery", "Foundational", "Scrum rituals", "planning, standups, reviews, retrospectives, and backlog refinement create alignment when they produce decisions and feedback", "performing ceremonies while scope and blockers remain unclear", "cross-functional fintech squads", tpmTrack],
+  ["Agile Delivery", "Intermediate", "technical milestone slicing", "large programs should be broken into integrations, data contracts, controls, rollout gates, and measurable increments", "building a huge launch plan with no independently testable slices", "new remittance corridor delivery", tpmTrack],
+  ["Agile Delivery", "Intermediate", "Jira and Linear hygiene", "tickets should carry outcome, scope, dependencies, acceptance criteria, owner, and current risk", "turning project tools into status theater instead of delivery control", "multi-team roadmap execution", tpmTrack],
+  ["Agile Delivery", "Advanced", "dependency management", "integration work needs visible dependencies across vendors, backend, mobile, web, compliance, operations, and data", "discovering blocked work only at sprint review", "partner API launches", tpmTrack],
+  ["Agile Delivery", "Intermediate", "release planning", "release plans should include scope, testing, approvals, communications, rollback, monitoring, and support readiness", "treating release as merge day", "regulated payment launches", tpmTrack],
+  ["Agile Delivery", "Advanced", "technical debt management", "debt should be named by business risk, maintenance cost, and delivery drag, then paid down deliberately", "calling everything technical debt without prioritization", "platform modernization roadmaps", tpmTrack],
+  ["Stakeholder Communication", "Foundational", "executive translation", "technical status should become business impact, decision options, risks, costs, and next steps", "dumping implementation jargon on leaders who need a decision", "steering committees and C-suite updates", tpmTrack],
+  ["Stakeholder Communication", "Intermediate", "requirements elicitation", "good requirements uncover users, constraints, rules, data, integrations, exceptions, and success measures", "writing feature requests without understanding the process behind them", "payments operations and compliance workflows", tpmTrack],
+  ["Stakeholder Communication", "Intermediate", "technical documentation", "docs should capture decisions, contracts, diagrams, assumptions, open questions, and operating rules", "creating beautiful documents no one can use to build or operate the product", "Confluence, Notion, and architecture briefs", tpmTrack],
+  ["Stakeholder Communication", "Advanced", "governance forums", "governance should surface risks, decisions, dependencies, and tradeoffs before they damage delivery", "using forums as reporting meetings with no decision ownership", "program boards and steering committees", tpmTrack],
+  ["Stakeholder Communication", "Intermediate", "conflict resolution", "technical product managers resolve conflict by clarifying constraints, shared goals, evidence, and decision rights", "treating disagreement as attitude instead of missing information or competing incentives", "vendor, engineering, compliance, and business alignment", tpmTrack],
+  ["Stakeholder Communication", "Advanced", "global team communication", "distributed teams need timezone-aware rituals, written decisions, async updates, and culturally clear expectations", "forcing every decision into live meetings across time zones", "multi-region fintech programs", tpmTrack],
+  ["Architecture & Systems", "Foundational", "system architecture diagrams", "diagrams should show actors, services, data stores, integrations, trust boundaries, and failure paths", "drawing boxes that look official but do not explain behavior", "solution-design reviews", tpmTrack],
+  ["Architecture & Systems", "Intermediate", "microservices tradeoffs", "services can improve ownership and scaling but add distributed data, observability, deployment, and failure complexity", "splitting services because it sounds modern", "wallet, KYC, payment, and notification platforms", tpmTrack],
+  ["Architecture & Systems", "Advanced", "enterprise integration platforms", "API gateways, iPaaS, ESBs, queues, and event buses need governance, cost control, security, and performance design", "buying an integration platform before defining integration ownership", "ERP, CRM, core banking, and partner ecosystems", tpmTrack],
+  ["Architecture & Systems", "Intermediate", "API management", "gateway policies, auth, rate limits, developer portals, versioning, analytics, and monetization shape integration products", "publishing APIs without lifecycle management", "partner-facing fintech APIs", tpmTrack],
+  ["Architecture & Systems", "Advanced", "interoperability", "systems need shared identifiers, mapping rules, data contracts, retry behavior, and operational ownership to work together", "assuming two vendors integrate cleanly because both say REST", "core-banking and digital-channel integration", tpmTrack],
+  ["Architecture & Systems", "Intermediate", "scalability planning", "capacity should be tied to transaction volume, concurrency, peak events, partner limits, and failure isolation", "asking if it scales without defining the load and bottleneck", "high-volume payment periods", tpmTrack],
+  ["Observability & Operations", "Foundational", "logs, metrics, and traces", "observability should reveal what happened, where, who was affected, and what business process is at risk", "collecting telemetry that cannot answer customer or operations questions", "payment incident triage", tpmTrack],
+  ["Observability & Operations", "Intermediate", "service-level indicators", "SLIs should measure user and business outcomes such as API success, payout latency, quote availability, and reconciliation freshness", "tracking only CPU while customers cannot complete transfers", "SLO reviews and incident prevention", tpmTrack],
+  ["Observability & Operations", "Intermediate", "incident management", "incidents need severity, owner, communication, mitigation, rollback, postmortem, and follow-up accountability", "letting engineering fix quietly while support and executives guess", "payment outages and degraded partners", tpmTrack],
+  ["Observability & Operations", "Advanced", "operational dashboards", "dashboards should separate health, flow, exceptions, partner status, risk queues, and financial exposure", "building charts that look busy but do not drive action", "PowerBI, Grafana, Datadog, and New Relic reporting", tpmTrack],
+  ["Observability & Operations", "Intermediate", "runbooks", "runbooks turn known incidents and operating tasks into repeatable steps with ownership and escalation paths", "depending on whoever remembers how the old fix worked", "supporting remittance operations", tpmTrack],
+  ["Observability & Operations", "Advanced", "cost optimization", "cloud, vendor, data, and support costs should be connected to product volume, architecture choices, and unit economics", "cutting cost blindly and damaging reliability or compliance", "fintech platform economics", tpmTrack],
+  ["Product Strategy", "Foundational", "roadmap alignment", "roadmaps should connect customer outcomes, technical constraints, regulatory obligations, and business priorities", "listing features without a strategic reason", "payments product planning", tpmTrack],
+  ["Product Strategy", "Intermediate", "business case development", "a business case should include problem, opportunity, users, costs, risks, ROI, dependencies, and measurement plan", "selling a technology project without proving why it matters", "new corridor and platform investment", tpmTrack],
+  ["Product Strategy", "Intermediate", "OKR design", "objectives and key results should connect product work to measurable customer, business, risk, or delivery outcomes", "setting output targets like ship API instead of outcome targets", "quarterly product planning", tpmTrack],
+  ["Product Strategy", "Advanced", "portfolio management", "programs should be balanced across growth, compliance, reliability, platform health, and customer experience", "funding only visible features while infrastructure risk grows", "executive prioritization", tpmTrack],
+  ["Product Strategy", "Intermediate", "go-to-market readiness", "launch needs product, operations, compliance, support, marketing, analytics, training, and rollback readiness", "treating GTM as a marketing task after engineering is done", "fintech product launches", tpmTrack],
+  ["Product Strategy", "Advanced", "emerging technology assessment", "AI, ML, and automation bets need use-case fit, data readiness, risk controls, governance, and measurable value", "adding AI because competitors mention it", "fraud detection, support automation, and analytics", tpmTrack],
+  ["Mobile & Channels", "Foundational", "mobile and web architecture", "channels differ in release cadence, offline behavior, device constraints, authentication, analytics, and accessibility", "assuming a web flow can be copied into mobile without product changes", "consumer remittance apps", tpmTrack],
+  ["Mobile & Channels", "Intermediate", "USSD channel constraints", "USSD flows need short sessions, simple menus, low literacy assumptions, limited input, and reliable recovery", "designing USSD like a mobile app with infinite context", "financial access in low-connectivity markets", tpmTrack],
+  ["Mobile & Channels", "Intermediate", "POS integration", "POS products need device management, transaction routing, reversals, receipts, settlement, and support tooling", "treating terminals as just another frontend", "merchant payment acceptance", tpmTrack],
+  ["Mobile & Channels", "Advanced", "omnichannel consistency", "users and operations need consistent identity, limits, state, support history, and audit trails across channels", "letting mobile, web, POS, and support tools become separate truths", "enterprise digital banking", tpmTrack],
+  ["Mobile & Channels", "Intermediate", "CDN and web delivery", "web performance depends on caching, invalidation, edge routing, asset strategy, and observability", "using a CDN without planning stale content, purge rules, and failure behavior", "public web and partner portals", tpmTrack],
+  ["Mobile & Channels", "Advanced", "localization and jurisdiction", "language, currency, date formats, legal copy, limits, KYC rules, and payment options vary by market", "translating text while ignoring regulatory and operational differences", "global fintech expansion", tpmTrack],
+  ["Vendor & Partner Management", "Foundational", "vendor evaluation", "selection should compare capability, security, compliance, uptime, support, cost, roadmap fit, and exit options", "choosing the vendor with the best demo", "KYC, payment, fraud, and analytics platforms", tpmTrack],
+  ["Vendor & Partner Management", "Intermediate", "partner certification", "integrations often require test evidence, edge-case proof, operational readiness, and signed-off runbooks", "declaring integration complete after one successful API call", "bank and mobile-money partner onboarding", tpmTrack],
+  ["Vendor & Partner Management", "Intermediate", "SLA management", "SLAs should define availability, latency, support response, incident communication, credits, and measurement method", "quoting uptime without knowing how it is measured or enforced", "critical payment providers", tpmTrack],
+  ["Vendor & Partner Management", "Advanced", "exit strategy", "critical vendors need migration paths, data portability, contract terms, fallback providers, and operational playbooks", "becoming dependent on a vendor with no switching plan", "regulated fintech procurement", tpmTrack],
+  ["Vendor & Partner Management", "Intermediate", "commercial negotiation", "TPMs should understand volume tiers, minimums, implementation fees, support cost, liability, and product roadmap impact", "optimizing sticker price while ignoring total cost and risk", "provider selection and renewal", tpmTrack],
+  ["Vendor & Partner Management", "Advanced", "partner performance review", "ongoing management should track success rate, latency, incident history, cost, support quality, compliance issues, and roadmap fit", "only reviewing partners when something breaks", "multi-provider payment routing", tpmTrack]
 ];
 
 export const questionAngles: QuestionAngle[] = [
   {
     kind: "concept",
-    question: ({ concept }) => `What should a frontend engineer understand about ${concept}?`,
-    answer: ({ concept, practice }) =>
-      `${sentenceCase(concept)} means ${practice}. A strong answer explains the behavior, the boundary it creates, and why it changes the reliability or clarity of the interface.`,
-    reasoning: ({ concept, trap, example }) =>
-      `This matters in ${example} because the common failure mode is ${trap}. In product code, ${concept} should be explained through user-visible consequences: broken state, inaccessible controls, stale data, slow interactions, or maintenance friction.`,
-    tests: ({ concept }) =>
-      `Core understanding of ${concept}, practical vocabulary, and the ability to connect the concept to real frontend behavior.`,
-    followUps: ({ concept, trap }) => [
+    question: ({ concept, role }) => `What should a ${role} understand about ${concept}?`,
+    answer: ({ concept, practice, track }) =>
+      `${sentenceCase(concept)} means ${practice}. A strong answer explains the behavior, the boundary it creates, and why it changes the reliability or clarity of the ${track === tpmTrack ? "product workflow" : "interface"}.`,
+    reasoning: ({ concept, trap, example, track }) =>
+      track === tpmTrack
+        ? `This matters in ${example} because the common failure mode is ${trap}. A TPM should connect ${concept} to customer trust, delivery risk, compliance exposure, operating cost, and the decision the team must make next.`
+        : `This matters in ${example} because the common failure mode is ${trap}. In product code, ${concept} should be explained through user-visible consequences: broken state, inaccessible controls, stale data, slow interactions, or maintenance drag.`,
+    tests: ({ concept, behaviorScope }) =>
+      `Core understanding of ${concept}, practical vocabulary, and the ability to connect the concept to ${behaviorScope}.`,
+    followUps: ({ concept, trap, track }) => [
       `What user-visible bug can happen when ${concept} is misunderstood?`,
-      `How would you explain the risk of ${trap} in a code review?`
+      `How would you explain the risk of ${trap} in a ${track === tpmTrack ? "delivery review" : "code review"}?`
     ]
   },
   {
     kind: "application",
     question: ({ concept, example }) => `How would you apply ${concept} in ${example}?`,
-    answer: ({ concept, practice, example }) =>
-      `Start by naming the user task in ${example}, then use ${concept} to support that task with clear state, predictable behavior, and recovery paths. The implementation should be as small as possible while still handling real edge cases.`,
-    reasoning: ({ concept, trap }) =>
-      `The engineering reason is that the idea only helps when it reduces ambiguity. If the implementation ignores the risk of ${trap}, the feature may look correct in the happy path while failing under real data, timing, permissions, or assistive technology.`,
-    tests: ({ concept }) =>
-      `Ability to translate ${concept} into implementation steps, state handling, accessibility, and product tradeoffs.`,
-    followUps: ({ example }) => [
+    answer: ({ concept, practice, example, track }) =>
+      track === tpmTrack
+        ? `Start by naming the customer or business workflow in ${example}, then use ${concept} to define the product rule, integration boundary, risk control, and release evidence. The plan should be small enough to test, but complete enough to operate.`
+        : `Start by naming the user task in ${example}, then use ${concept} to support that task with clear state, predictable behavior, and recovery paths. The implementation should be as small as possible while still handling real edge cases.`,
+    reasoning: ({ concept, trap, track }) =>
+      track === tpmTrack
+        ? `The product reason is that ${concept} only helps when it turns ambiguity into a clear decision, owner, or control. If the plan ignores ${trap}, the launch may pass a demo while failing in operations, compliance, partner support, or customer trust.`
+        : `The engineering reason is that the idea only helps when it reduces ambiguity. If the implementation ignores the risk of ${trap}, the feature may look correct in the happy path while failing under real data, timing, permissions, or assistive technology.`,
+    tests: ({ concept, track }) =>
+      track === tpmTrack
+        ? `Ability to translate ${concept} into requirements, milestones, controls, metrics, and launch tradeoffs.`
+        : `Ability to translate ${concept} into implementation steps, state handling, accessibility, and product tradeoffs.`,
+    followUps: ({ example, track }) => [
       `What would you build first for ${example}?`,
-      "Which edge case would you test before release?"
+      track === tpmTrack ? "What evidence would you need before launch?" : "Which edge case would you test before release?"
     ]
   },
   {
@@ -155,27 +261,37 @@ export const questionAngles: QuestionAngle[] = [
     question: ({ concept }) => `What common mistakes happen with ${concept}?`,
     answer: ({ concept, trap }) =>
       `The common mistake is ${trap}. A better answer identifies the assumption behind the mistake, then replaces it with a safer rule the team can apply repeatedly.`,
-    reasoning: ({ concept, example }) =>
-      `In ${example}, mistakes around ${concept} usually survive because the first demo works. The risk appears later: a different device, longer content, slower network, changed permissions, or a user who interacts through keyboard or assistive technology.`,
-    tests: ({ concept }) =>
-      `Risk detection, debugging judgment, and the ability to prevent subtle ${concept} regressions.`,
-    followUps: ({ concept }) => [
+    reasoning: ({ concept, example, track }) =>
+      track === tpmTrack
+        ? `In ${example}, mistakes around ${concept} usually survive because the first meeting or demo sounds plausible. The risk appears later in partner behavior, exception handling, audit evidence, operational queues, or customer support.`
+        : `In ${example}, mistakes around ${concept} usually survive because the first demo works. The risk appears later: a different device, longer content, slower network, changed permissions, or a user who interacts through keyboard or assistive technology.`,
+    tests: ({ concept, track }) =>
+      track === tpmTrack
+        ? `Risk detection, delivery judgment, and the ability to prevent subtle ${concept} failures before launch.`
+        : `Risk detection, debugging judgment, and the ability to prevent subtle ${concept} regressions.`,
+    followUps: ({ concept, track }) => [
       `How would you spot this ${concept} mistake during review?`,
-      "What small guardrail would prevent the mistake from returning?"
+      track === tpmTrack ? "What operating guardrail would prevent the mistake from returning?" : "What small guardrail would prevent the mistake from returning?"
     ]
   },
   {
     kind: "verification",
     question: ({ concept }) => `How would you test or debug ${concept}?`,
-    answer: ({ concept }) =>
-      `Test ${concept} by driving the user-visible behavior first, then add lower-level checks only for logic that is hard to observe through the UI. Debug with evidence: reproduction steps, browser tools, logs, profiling, and targeted experiments.`,
-    reasoning: ({ concept, practice }) =>
-      `The goal is confidence, not ceremony. This concept involves a concrete rule: ${practice}. The right verification should prove both the normal path and at least one failure or boundary case. That keeps tests connected to product risk.`,
-    tests: ({ concept }) =>
-      `Verification strategy, use of browser tooling, and ability to choose the smallest test that gives confidence in ${concept}.`,
-    followUps: ({ concept }) => [
+    answer: ({ concept, track }) =>
+      track === tpmTrack
+        ? `Verify ${concept} with evidence from the workflow: API examples, test cases, logs, dashboards, reconciliation checks, support paths, and sign-offs from the teams that operate the product.`
+        : `Test ${concept} by driving the user-visible behavior first, then add lower-level checks only for logic that is hard to observe through the UI. Debug with evidence: reproduction steps, browser tools, logs, profiling, and targeted experiments.`,
+    reasoning: ({ concept, practice, track }) =>
+      track === tpmTrack
+        ? `The goal is launch confidence, not ceremony. This concept involves a concrete rule: ${practice}. The right verification proves the normal path, the exception path, and the owner for follow-up when something fails.`
+        : `The goal is confidence, not ceremony. This concept involves a concrete rule: ${practice}. The right verification should prove both the normal path and at least one failure or boundary case. That keeps tests connected to product risk.`,
+    tests: ({ concept, track }) =>
+      track === tpmTrack
+        ? `Verification strategy, operational readiness, and ability to choose evidence that gives confidence in ${concept}.`
+        : `Verification strategy, use of browser tooling, and ability to choose the smallest test that gives confidence in ${concept}.`,
+    followUps: ({ concept, track }) => [
       `Which part of ${concept} is easiest to miss in automated tests?`,
-      "What signal would tell you the fix worked in production?"
+      track === tpmTrack ? "What signal would show the launch is healthy?" : "What signal would tell you the fix worked in production?"
     ]
   }
 ];
@@ -189,11 +305,21 @@ function idFor(index: number) {
 }
 
 function makeQuestion(spec: TopicSpec, angle: QuestionAngle, index: number): Question {
-  const [category, level, concept, practice, trap, example] = spec;
-  const context = { category, level, concept, practice, trap, example };
+  const [category, level, concept, practice, trap, example, rawTrack = frontendTrack] = spec;
+  const context = {
+    ...contextForTrack(rawTrack),
+    track: rawTrack,
+    category,
+    level,
+    concept,
+    practice,
+    trap,
+    example
+  };
 
   return {
     id: idFor(index),
+    track: rawTrack,
     category,
     level,
     question: angle.question(context),

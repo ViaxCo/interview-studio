@@ -4,7 +4,7 @@
 
 Interview Studio is a restrained product UI for focused study. Design serves the workflow: find a question, try the answer, reveal reasoning, save or review it, and continue. The shell should feel dense enough for scanning but calm enough for long reading sessions.
 
-The current app uses a persistent sidebar, search and level controls, a question queue, a detail panel, answer sections, saved queues, mock drills, Google account status, and progress feedback. Future collections should fit this shell without making the current frontend bank feel temporary.
+The current app uses a persistent sidebar, track, search, topic, and level controls, a question queue, a detail panel, answer sections, saved queues, mock drills, Google account status, and progress feedback. Future collections should fit this shell without making any one bank feel temporary.
 
 ## Theme
 
@@ -28,7 +28,7 @@ Primary roles:
 - `--warning-soft`: milestone and recoverable notices.
 - `--danger`: reset and blocked-storage warnings.
 
-Topic colors should clarify category without turning the page into a rainbow. Selected topics and current questions use the topic tint; unselected controls remain quiet.
+Track and topic treatment should clarify scope without turning the page into a rainbow. Selected topics and current questions use the topic tint; unselected controls remain quiet.
 
 ## Typography
 

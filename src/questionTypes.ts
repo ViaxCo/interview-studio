@@ -2,6 +2,7 @@ export type Theme = "light" | "dark";
 
 export type Question = {
   id: string;
+  track?: string;
   category: string;
   level: string;
   question: string;
