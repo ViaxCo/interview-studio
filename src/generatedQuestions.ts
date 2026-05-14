@@ -149,6 +149,104 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is treating performance as only bundle size. Bundle size matters, but a small bundle can still create poor INP if one interaction does too much synchronous work.\n\nAnother mistake is optimizing the wrong page. The homepage might be fine while the dashboard, product detail page, or checkout flow performs badly.\n\nA third mistake is chasing scores without understanding the user journey. A TPM, designer, or frontend engineer should ask which slow moment hurts the user or business most, then improve that moment first."
   },
   {
+    "id": "fe-data-fetching-cache-invalidation",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Intermediate",
+    "question": "How should frontend apps handle data fetching and cache invalidation?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.\n\nThe beginner mistake is thinking the problem ends after `fetch()` returns. Real apps need loading states, error states, retries, stale data, background refresh, mutations, and consistency after the user changes something.\n\nServer data is different from local UI state. A dropdown open state belongs to the browser session. A list of invoices belongs to the server. The frontend can cache it, but the server is the real source of truth."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an issues page.\n\n```jsx\nconst queryKey = [\"issues\", { status, owner }];\n```\n\nThat key means: \"the issues list for this status and owner.\" If the user changes the filter, the key changes and the app needs a different data set.\n\nNow imagine the user closes an issue. The old list may be wrong because one item changed status. Cache invalidation tells the app: \"the issues query may be stale, refetch it.\"\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: closeIssue,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: [\"issues\"] });\n  },\n});\n```\n\nThe key idea is that fetching is not just making requests. It is managing the relationship between UI state, server state, and time."
+      },
+      {
+        "title": "Make it practical",
+        "body": "A good data-fetching plan answers:\n\n1. What is the query key?\n2. What loading UI appears?\n3. What error UI appears?\n4. When is cached data considered stale?\n5. What mutations change this data?\n6. Which queries should be invalidated after mutation?\n7. Should the UI update optimistically?\n8. How does pagination or filtering affect the cache?\n\nHere is a simple optimistic update shape:\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onMutate: async (nextTodo) => {\n    await queryClient.cancelQueries({ queryKey: [\"todos\"] });\n    const previousTodos = queryClient.getQueryData([\"todos\"]);\n\n    queryClient.setQueryData([\"todos\"], (todos) =>\n      todos.map((todo) => todo.id === nextTodo.id ? nextTodo : todo)\n    );\n\n    return { previousTodos };\n  },\n  onError: (_error, _nextTodo, context) => {\n    queryClient.setQueryData([\"todos\"], context.previousTodos);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: [\"todos\"] });\n  },\n});\n```\n\nThis shows the tradeoff. Optimistic updates feel fast, but the app must recover if the server rejects the change."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using one generic key for data that actually depends on filters or user ID. That mixes unrelated data.\n\nAnother mistake is refetching everything after every mutation. That works at small scale but becomes slow and noisy.\n\nA third mistake is forgetting error and stale states. Users need to know whether data is loading, failed, refreshing, or possibly outdated."
+      }
+    ],
+    "answer": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.",
+    "reasoning": "A good data-fetching plan answers:\n\n1. What is the query key?\n2. What loading UI appears?\n3. What error UI appears?\n4. When is cached data considered stale?\n5. What mutations change this data?\n6. Which queries should be invalidated after mutation?\n7. Should the UI update optimistically?\n8. How does pagination or filtering affect the cache?\n\nHere is a simple optimistic update shape:\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onMutate: async (nextTodo) => {\n    await queryClient.cancelQueries({ queryKey: [\"todos\"] });\n    const previousTodos = queryClient.getQueryData([\"todos\"]);\n\n    queryClient.setQueryData([\"todos\"], (todos) =>\n      todos.map((todo) => todo.id === nextTodo.id ? nextTodo : todo)\n    );\n\n    return { previousTodos };\n  },\n  onError: (_error, _nextTodo, context) => {\n    queryClient.setQueryData([\"todos\"], context.previousTodos);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: [\"todos\"] });\n  },\n});\n```\n\nThis shows the tradeoff. Optimistic updates feel fast, but the app must recover if the server rejects the change.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is server data different from local UI state?",
+      "What is a query key?",
+      "What does invalidation mean?",
+      "When might optimistic updates be useful?",
+      "What can go wrong if cache keys are too vague?"
+    ],
+    "interviewAnswer": "Frontend data fetching should treat server data as cached, asynchronous state. I would define query keys, loading and error states, stale timing, mutation behavior, invalidation rules, and optimistic update recovery.\n\nA strong answer shows that the hard part is not calling `fetch`. The hard part is keeping the UI honest when data changes, requests fail, filters change, or cached data becomes stale.",
+    "sourceLinks": [
+      {
+        "label": "TanStack Query: Query invalidation",
+        "url": "https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation"
+      },
+      {
+        "label": "React: Fetching data with Effects",
+        "url": "https://react.dev/reference/react/useEffect#fetching-data-with-effects"
+      }
+    ],
+    "beginnerExplanation": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.\n\nThe beginner mistake is thinking the problem ends after `fetch()` returns. Real apps need loading states, error states, retries, stale data, background refresh, mutations, and consistency after the user changes something.\n\nServer data is different from local UI state. A dropdown open state belongs to the browser session. A list of invoices belongs to the server. The frontend can cache it, but the server is the real source of truth.",
+    "example": "Imagine an issues page.\n\n```jsx\nconst queryKey = [\"issues\", { status, owner }];\n```\n\nThat key means: \"the issues list for this status and owner.\" If the user changes the filter, the key changes and the app needs a different data set.\n\nNow imagine the user closes an issue. The old list may be wrong because one item changed status. Cache invalidation tells the app: \"the issues query may be stale, refetch it.\"\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: closeIssue,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: [\"issues\"] });\n  },\n});\n```\n\nThe key idea is that fetching is not just making requests. It is managing the relationship between UI state, server state, and time.",
+    "commonMistakes": "A common mistake is using one generic key for data that actually depends on filters or user ID. That mixes unrelated data.\n\nAnother mistake is refetching everything after every mutation. That works at small scale but becomes slow and noisy.\n\nA third mistake is forgetting error and stale states. Users need to know whether data is loading, failed, refreshing, or possibly outdated."
+  },
+  {
+    "id": "fe-debounce-throttle",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Foundational",
+    "question": "What is the difference between debounce and throttle?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Debounce and throttle are techniques for controlling how often a function runs.\n\nThey matter because frontend events can fire very quickly. Typing, scrolling, resizing, mouse movement, and input changes can trigger many calls per second. If every event runs expensive work, the UI can feel slow or the server can receive too many requests.\n\nDebounce waits until activity pauses. Throttle runs at most once in a fixed time window.\n\nUse debounce when you care about the final value after the user stops. Use throttle when you want regular updates while activity continues."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Search input is a debounce example. If a user types `react`, you usually do not want to call the API for `r`, `re`, `rea`, `reac`, and `react`. You can wait until the user pauses typing.\n\n```js\nfunction debounce(callback, delay) {\n  let timerId;\n\n  return function debounced(...args) {\n    clearTimeout(timerId);\n\n    timerId = setTimeout(() => {\n      callback(...args);\n    }, delay);\n  };\n}\n```\n\nScroll tracking is often a throttle example. If a user scrolls continuously, you may want to update position at most every 100ms.\n\n```js\nfunction throttle(callback, delay) {\n  let waiting = false;\n\n  return function throttled(...args) {\n    if (waiting) return;\n\n    callback(...args);\n    waiting = true;\n\n    setTimeout(() => {\n      waiting = false;\n    }, delay);\n  };\n}\n```\n\nThe difference is timing. Debounce resets the timer each time. Throttle allows periodic execution."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Use debounce for:\n\n- Search suggestions.\n- Auto-save after typing pauses.\n- Validation after input pauses.\n- Resizing work after the resize stops.\n\nUse throttle for:\n\n- Scroll position updates.\n- Infinite-scroll checks.\n- Drag movement.\n- Mouse movement tracking.\n- Sending periodic analytics during continuous activity.\n\nIn React, be careful that the debounced or throttled function has stable identity. If you recreate it on every render, it may lose its timer state.\n\n```jsx\nfunction SearchBox({ onSearch }) {\n  const debouncedSearch = useMemo(\n    () => debounce(onSearch, 300),\n    [onSearch]\n  );\n\n  return (\n    <input onChange={(event) => debouncedSearch(event.target.value)} />\n  );\n}\n```\n\nIn production, you also need cleanup if a component unmounts while a timer is waiting."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using debounce when the user expects continuous feedback. Scroll position should not wait until scrolling fully stops.\n\nAnother mistake is using throttle for search and still sending intermediate values the user did not mean to submit.\n\nA third mistake is forgetting stale closures. A delayed callback may use old props or state if you do not design it carefully."
+      }
+    ],
+    "answer": "Debounce and throttle are techniques for controlling how often a function runs.",
+    "reasoning": "Use debounce for:\n\n- Search suggestions.\n- Auto-save after typing pauses.\n- Validation after input pauses.\n- Resizing work after the resize stops.\n\nUse throttle for:\n\n- Scroll position updates.\n- Infinite-scroll checks.\n- Drag movement.\n- Mouse movement tracking.\n- Sending periodic analytics during continuous activity.\n\nIn React, be careful that the debounced or throttled function has stable identity. If you recreate it on every render, it may lose its timer state.\n\n```jsx\nfunction SearchBox({ onSearch }) {\n  const debouncedSearch = useMemo(\n    () => debounce(onSearch, 300),\n    [onSearch]\n  );\n\n  return (\n    <input onChange={(event) => debouncedSearch(event.target.value)} />\n  );\n}\n```\n\nIn production, you also need cleanup if a component unmounts while a timer is waiting.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does debounce wait for?",
+      "What does throttle limit?",
+      "Why is search usually debounced?",
+      "Why is scroll usually throttled?",
+      "What React bug can happen if a debounced function is recreated every render?"
+    ],
+    "interviewAnswer": "Debounce delays a function until activity has stopped for a period of time. Throttle allows a function to run at most once per time interval while activity continues.\n\nI would use debounce for search, validation, and autosave after typing pauses. I would use throttle for scroll, resize, drag, or pointer updates where periodic feedback matters. A strong answer mentions performance, user intent, timers, cleanup, and stale closures.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Debounce",
+        "url": "https://developer.mozilla.org/en-US/docs/Glossary/Debounce"
+      },
+      {
+        "label": "MDN: Throttle",
+        "url": "https://developer.mozilla.org/en-US/docs/Glossary/Throttle"
+      }
+    ],
+    "beginnerExplanation": "Debounce and throttle are techniques for controlling how often a function runs.\n\nThey matter because frontend events can fire very quickly. Typing, scrolling, resizing, mouse movement, and input changes can trigger many calls per second. If every event runs expensive work, the UI can feel slow or the server can receive too many requests.\n\nDebounce waits until activity pauses. Throttle runs at most once in a fixed time window.\n\nUse debounce when you care about the final value after the user stops. Use throttle when you want regular updates while activity continues.",
+    "example": "Search input is a debounce example. If a user types `react`, you usually do not want to call the API for `r`, `re`, `rea`, `reac`, and `react`. You can wait until the user pauses typing.\n\n```js\nfunction debounce(callback, delay) {\n  let timerId;\n\n  return function debounced(...args) {\n    clearTimeout(timerId);\n\n    timerId = setTimeout(() => {\n      callback(...args);\n    }, delay);\n  };\n}\n```\n\nScroll tracking is often a throttle example. If a user scrolls continuously, you may want to update position at most every 100ms.\n\n```js\nfunction throttle(callback, delay) {\n  let waiting = false;\n\n  return function throttled(...args) {\n    if (waiting) return;\n\n    callback(...args);\n    waiting = true;\n\n    setTimeout(() => {\n      waiting = false;\n    }, delay);\n  };\n}\n```\n\nThe difference is timing. Debounce resets the timer each time. Throttle allows periodic execution.",
+    "commonMistakes": "A common mistake is using debounce when the user expects continuous feedback. Scroll position should not wait until scrolling fully stops.\n\nAnother mistake is using throttle for search and still sending intermediate values the user did not mean to submit.\n\nA third mistake is forgetting stale closures. A delayed callback may use old props or state if you do not design it carefully."
+  },
+  {
     "id": "fe-event-loop",
     "track": "Frontend",
     "category": "JavaScript",
@@ -392,6 +490,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Keys help React understand which item is which when a list changes.\n\nWhen React renders a list, it does not only see text on the screen. It also has component instances, DOM nodes, input state, focus, and sometimes local component state attached to each item. If the list changes, React needs to match the old items to the new items.\n\nThe key is the stable identity for each item.\n\n```jsx\nconst rows = users.map((user) => (\n  <UserRow key={user.id} user={user} />\n));\n```\n\nHere, `user.id` tells React that this row belongs to this specific user. If the list is sorted, filtered, inserted into, or deleted from, React can still match each row to the same user identity.\n\nWithout good keys, React may reuse the wrong row. That can cause visual bugs, wrong input values, lost state, strange animations, or focus jumping.",
     "example": "Imagine a list of editable todo items.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo, index) => (\n    <TodoRow key={index} todo={todo} />\n  ));\n}\n```\n\nUsing `index` looks harmless when the list never changes. But if a new todo is inserted at the top, every old item gets a new index.\n\nBefore insert:\n\n1. Buy milk has key `0`.\n2. Pay rent has key `1`.\n\nAfter insert:\n\n1. Call bank has key `0`.\n2. Buy milk has key `1`.\n3. Pay rent has key `2`.\n\nReact sees key `0` and thinks the first row identity stayed the same, even though the actual todo changed from Buy milk to Call bank. If `TodoRow` has local state, React may preserve that state on the wrong todo.\n\nWith stable IDs, the identity stays attached to the data.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo) => (\n    <TodoRow key={todo.id} todo={todo} />\n  ));\n}\n```\n\nNow inserting, deleting, or sorting does not confuse item identity.",
     "commonMistakes": "A common mistake is thinking keys are passed as normal props. They are not. React uses `key` internally. If the child component needs the ID, pass it separately.\n\n```jsx\n<UserRow key={user.id} userId={user.id} />\n```\n\nAnother mistake is thinking keys only affect performance. They affect correctness too. Bad keys can attach state to the wrong item.\n\nA third mistake is using the array index because it removes a warning. Removing the warning is not the goal. Giving React stable identity is the goal."
+  },
+  {
+    "id": "fe-react-rerenders",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Intermediate",
+    "question": "What causes React components to re-render?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.\n\nThe beginner mistake is thinking a render always means the DOM changed. Rendering is calculation. After rendering, React compares the new result to the previous result and commits the necessary DOM changes.\n\nComponents re-render when their state changes, their parent renders, or context they use changes. Props are part of the parent render path: if a parent renders, React may call the child again with the current props."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Here is a simple example:\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  console.log(\"render\");\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      {count}\n    </button>\n  );\n}\n```\n\nClicking the button updates state. React calls `Counter` again. The new render returns UI with the new count.\n\nParent renders can also cause child renders:\n\n```jsx\nfunction Parent() {\n  const [theme, setTheme] = useState(\"light\");\n\n  return <Child />;\n}\n```\n\nIf `theme` changes, `Parent` renders again. `Child` may also be called again even if its props did not change. That is not automatically a bug. React rendering should be pure and cheap enough that normal renders are fine."
+      },
+      {
+        "title": "Make it practical",
+        "body": "The right question is not \"how do I stop all renders?\" The right question is \"which renders are expensive or causing visible problems?\"\n\nCommon tools:\n\n- Move state down so only the component that needs it re-renders.\n- Split large components into smaller components.\n- Use `React.memo` when a child receives stable props and rendering it is expensive.\n- Use `useMemo` for expensive derived calculations.\n- Use `useCallback` when function identity causes memoized children to re-render.\n- Avoid putting frequently changing values in broad context providers.\n\n```jsx\nconst UserRow = React.memo(function UserRow({ user, onSelect }) {\n  return <button onClick={() => onSelect(user.id)}>{user.name}</button>;\n});\n```\n\nMemoization is not free. It adds comparison work and complexity. Use it when there is a measured or obvious reason."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating every re-render as bad. Many renders are harmless.\n\nAnother mistake is memoizing everything. That can make code harder to understand without improving performance.\n\nA third mistake is mutating objects. If you mutate state in place, React may not see a meaningful change, and memoized components may behave incorrectly.\n\nAlso remember that render should be pure. Do not start network requests, change DOM manually, or write to storage during render."
+      }
+    ],
+    "answer": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.",
+    "reasoning": "The right question is not \"how do I stop all renders?\" The right question is \"which renders are expensive or causing visible problems?\"\n\nCommon tools:\n\n- Move state down so only the component that needs it re-renders.\n- Split large components into smaller components.\n- Use `React.memo` when a child receives stable props and rendering it is expensive.\n- Use `useMemo` for expensive derived calculations.\n- Use `useCallback` when function identity causes memoized children to re-render.\n- Avoid putting frequently changing values in broad context providers.\n\n```jsx\nconst UserRow = React.memo(function UserRow({ user, onSelect }) {\n  return <button onClick={() => onSelect(user.id)}>{user.name}</button>;\n});\n```\n\nMemoization is not free. It adds comparison work and complexity. Use it when there is a measured or obvious reason.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is React doing during render?",
+      "Does every render change the DOM?",
+      "What causes a component to re-render?",
+      "Why should render logic be pure?",
+      "When is memoization useful?"
+    ],
+    "interviewAnswer": "React components re-render when state changes, a parent renders, or consumed context changes. Rendering means React calls the component to calculate the next UI; it does not always mean the DOM changed.\n\nA strong answer should explain render versus commit, purity, parent-child render behavior, and practical optimization tools like moving state down, splitting components, memoization, and avoiding overly broad context updates.",
+    "sourceLinks": [
+      {
+        "label": "React: Render and commit",
+        "url": "https://react.dev/learn/render-and-commit"
+      },
+      {
+        "label": "React: Keeping components pure",
+        "url": "https://react.dev/learn/keeping-components-pure"
+      }
+    ],
+    "beginnerExplanation": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.\n\nThe beginner mistake is thinking a render always means the DOM changed. Rendering is calculation. After rendering, React compares the new result to the previous result and commits the necessary DOM changes.\n\nComponents re-render when their state changes, their parent renders, or context they use changes. Props are part of the parent render path: if a parent renders, React may call the child again with the current props.",
+    "example": "Here is a simple example:\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  console.log(\"render\");\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      {count}\n    </button>\n  );\n}\n```\n\nClicking the button updates state. React calls `Counter` again. The new render returns UI with the new count.\n\nParent renders can also cause child renders:\n\n```jsx\nfunction Parent() {\n  const [theme, setTheme] = useState(\"light\");\n\n  return <Child />;\n}\n```\n\nIf `theme` changes, `Parent` renders again. `Child` may also be called again even if its props did not change. That is not automatically a bug. React rendering should be pure and cheap enough that normal renders are fine.",
+    "commonMistakes": "A common mistake is treating every re-render as bad. Many renders are harmless.\n\nAnother mistake is memoizing everything. That can make code harder to understand without improving performance.\n\nA third mistake is mutating objects. If you mutate state in place, React may not see a meaningful change, and memoized components may behave incorrectly.\n\nAlso remember that render should be pure. Do not start network requests, change DOM manually, or write to storage during render."
   },
   {
     "id": "fe-semantic-html",
@@ -639,6 +786,153 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "The biggest mistake is calling the integration ready after one successful sandbox call. That proves the API can work. It does not prove the product can operate.\n\nAnother mistake is leaving failure ownership vague. If the integration fails at night, who sees the alert? Who contacts the partner? Who updates support? Who decides whether to pause the feature? If those answers are not clear, launch risk is still high.\n\nA third mistake is ignoring reconciliation. Especially in financial products, it is not enough for the UI to say success. Your records, partner records, ledger entries, fees, and customer-facing status need to agree or have a clear process for resolving mismatch."
   },
   {
+    "id": "tpm-api-product-design",
+    "track": "TPM",
+    "category": "API & Partner Integration",
+    "level": "Intermediate",
+    "question": "How would you design an API product from scratch?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An API product is a product other builders use. The users are developers, partners, internal teams, support teams, and sometimes compliance or operations teams who rely on the API's behavior.\n\nThe beginner mistake is thinking API design starts with endpoints. It does not. It starts with the job the API helps another system complete. What action is the partner trying to perform? What data do they need? What errors will they see? How will they test? How will they know whether the integration is working?\n\nAn API product needs a clear promise. For example: \"This API lets partners create payouts, track payout status, receive status updates, and reconcile final outcomes.\" That promise is more useful than starting with `/v1/payouts`."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a company wants to expose a payout API to partners.\n\nThe API needs more than a create endpoint. A partner needs to:\n\n1. Authenticate safely.\n2. Create a payout request.\n3. Avoid duplicate payouts if they retry.\n4. Know whether the payout is accepted, processing, paid, failed, reversed, or unknown.\n5. Receive webhook events when status changes.\n6. Query status later.\n7. Understand errors.\n8. Test in a sandbox.\n9. Reconcile their records with yours.\n\nThat means the TPM should think in resources, workflows, states, and operating needs.\n\n```txt\nCore resources\n- Partner\n- Recipient\n- Payout\n- Payout status event\n- Reconciliation report\n\nCore actions\n- Create payout\n- Retrieve payout\n- Cancel payout if still cancellable\n- Receive status webhook\n- List reports\n```\n\nNow engineering can discuss endpoints, schemas, auth, rate limits, and versioning with a real product shape."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would define the API product in layers.\n\nFirst, define the user and use case. Is this API for public developers, strategic partners, internal teams, or one integration?\n\nSecond, define the resource model. What are the nouns? What state transitions are allowed? Which fields are required? Which fields are returned?\n\nThird, define reliability behavior. What happens on timeout? Can clients retry? Is the API idempotent? Are webhooks guaranteed, duplicated, delayed, or best effort?\n\nFourth, define developer experience. The API needs docs, examples, sandbox data, test credentials, error-code explanations, SDK decisions, changelog, and support path.\n\nFifth, define operations. What dashboards show API health? Who sees partner errors? How are rate limits enforced? What happens during incidents?\n\n```txt\nAPI readiness checklist\n\n- Authentication model approved.\n- Resource names and status model documented.\n- Error codes written in developer-friendly language.\n- Idempotency behavior tested.\n- Webhook retry behavior documented.\n- Sandbox supports happy and failure paths.\n- Monitoring includes latency, error rate, webhook delivery, and partner-level failures.\n- Support knows how to identify a partner request by ID.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is designing around internal database tables. API users do not care how your tables are shaped. They need stable product concepts.\n\nAnother mistake is treating docs as an afterthought. For an API product, documentation is part of the product experience.\n\nA third mistake is ignoring failure behavior. A partner needs to know what to do when a request times out, a webhook is late, or a status is unknown."
+      }
+    ],
+    "answer": "An API product is a product other builders use. The users are developers, partners, internal teams, support teams, and sometimes compliance or operations teams who rely on the API's behavior.",
+    "reasoning": "I would define the API product in layers.\n\nFirst, define the user and use case. Is this API for public developers, strategic partners, internal teams, or one integration?\n\nSecond, define the resource model. What are the nouns? What state transitions are allowed? Which fields are required? Which fields are returned?\n\nThird, define reliability behavior. What happens on timeout? Can clients retry? Is the API idempotent? Are webhooks guaranteed, duplicated, delayed, or best effort?\n\nFourth, define developer experience. The API needs docs, examples, sandbox data, test credentials, error-code explanations, SDK decisions, changelog, and support path.\n\nFifth, define operations. What dashboards show API health? Who sees partner errors? How are rate limits enforced? What happens during incidents?\n\n```txt\nAPI readiness checklist\n\n- Authentication model approved.\n- Resource names and status model documented.\n- Error codes written in developer-friendly language.\n- Idempotency behavior tested.\n- Webhook retry behavior documented.\n- Sandbox supports happy and failure paths.\n- Monitoring includes latency, error rate, webhook delivery, and partner-level failures.\n- Support knows how to identify a partner request by ID.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Who are the users of an API product?",
+      "Why should API design start with workflows instead of endpoints?",
+      "What does idempotency protect against?",
+      "Why do webhook behavior and retry rules matter?",
+      "What should be in an API readiness checklist?"
+    ],
+    "interviewAnswer": "I would design an API product by starting with the developer or partner workflow, then defining resources, state transitions, request and response contracts, errors, authentication, idempotency, webhooks, versioning, documentation, sandbox, monitoring, and support paths.\n\nA strong TPM answer treats the API as a product experience, not just a set of endpoints. The API must be understandable, reliable, testable, operable, and safe to change.",
+    "sourceLinks": [
+      {
+        "label": "Google Cloud: API design guide",
+        "url": "https://cloud.google.com/apis/design"
+      },
+      {
+        "label": "Microsoft Azure: Web API design best practices",
+        "url": "https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design"
+      }
+    ],
+    "beginnerExplanation": "An API product is a product other builders use. The users are developers, partners, internal teams, support teams, and sometimes compliance or operations teams who rely on the API's behavior.\n\nThe beginner mistake is thinking API design starts with endpoints. It does not. It starts with the job the API helps another system complete. What action is the partner trying to perform? What data do they need? What errors will they see? How will they test? How will they know whether the integration is working?\n\nAn API product needs a clear promise. For example: \"This API lets partners create payouts, track payout status, receive status updates, and reconcile final outcomes.\" That promise is more useful than starting with `/v1/payouts`.",
+    "example": "Imagine a company wants to expose a payout API to partners.\n\nThe API needs more than a create endpoint. A partner needs to:\n\n1. Authenticate safely.\n2. Create a payout request.\n3. Avoid duplicate payouts if they retry.\n4. Know whether the payout is accepted, processing, paid, failed, reversed, or unknown.\n5. Receive webhook events when status changes.\n6. Query status later.\n7. Understand errors.\n8. Test in a sandbox.\n9. Reconcile their records with yours.\n\nThat means the TPM should think in resources, workflows, states, and operating needs.\n\n```txt\nCore resources\n- Partner\n- Recipient\n- Payout\n- Payout status event\n- Reconciliation report\n\nCore actions\n- Create payout\n- Retrieve payout\n- Cancel payout if still cancellable\n- Receive status webhook\n- List reports\n```\n\nNow engineering can discuss endpoints, schemas, auth, rate limits, and versioning with a real product shape.",
+    "commonMistakes": "A common mistake is designing around internal database tables. API users do not care how your tables are shaped. They need stable product concepts.\n\nAnother mistake is treating docs as an afterthought. For an API product, documentation is part of the product experience.\n\nA third mistake is ignoring failure behavior. A partner needs to know what to do when a request times out, a webhook is late, or a status is unknown."
+  },
+  {
+    "id": "tpm-api-versioning",
+    "track": "TPM",
+    "category": "API & Partner Integration",
+    "level": "Intermediate",
+    "question": "How would you handle API versioning and backwards compatibility?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "API versioning is how you change an API without breaking the systems that already depend on it.\n\nThis matters because API users are not inside your sprint. A partner may have built code around your current fields, errors, statuses, and assumptions. If you change those suddenly, their product may break even if your own product still works.\n\nBackwards compatibility means old clients can keep working after you ship a change. A compatible change adds something without changing the meaning of what already exists. A breaking change removes, renames, changes type, changes required behavior, or changes the meaning of a field."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a payout API returns this:\n\n```json\n{\n  \"id\": \"po_123\",\n  \"status\": \"paid\",\n  \"amount\": 5000\n}\n```\n\nAdding a new optional field is usually safe:\n\n```json\n{\n  \"id\": \"po_123\",\n  \"status\": \"paid\",\n  \"amount\": 5000,\n  \"paid_at\": \"2026-05-14T10:00:00Z\"\n}\n```\n\nBut changing `amount` from cents to dollars is breaking. Changing `status` from `\"paid\"` to `\"completed\"` is breaking. Making a previously optional field required is breaking.\n\nThe TPM has to help the team separate \"we want cleaner design\" from \"partners can safely absorb this change.\""
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would manage API changes with a compatibility policy.\n\n```txt\nSafe changes\n- Add optional response fields.\n- Add new endpoints.\n- Add new optional request parameters.\n- Add new webhook event types if consumers can ignore unknown events.\n\nRisky or breaking changes\n- Remove fields.\n- Rename fields.\n- Change field type.\n- Change status meanings.\n- Change required parameters.\n- Change error-code behavior.\n- Change authentication behavior.\n```\n\nThen I would define the migration plan.\n\n```txt\nMigration plan\n\n1. Announce the new version and what changed.\n2. Provide docs and before/after examples.\n3. Let partners test in sandbox.\n4. Keep the old version available for a defined period.\n5. Track partner adoption.\n6. Send reminders before deprecation.\n7. Provide support for high-value or high-risk partners.\n8. Remove the old version only after the agreed deprecation window.\n```\n\nThe exact versioning method can vary: URL versions, headers, date-based versions, or account-level pinned versions. The product decision is less about which style sounds best and more about whether partners can understand, test, and adopt changes safely."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is assuming a small change cannot break anyone. Small schema changes can break strict clients.\n\nAnother mistake is versioning too late. If the team waits until the first breaking change, partners may already depend on undocumented behavior.\n\nA third mistake is forgetting webhooks. Webhook payloads and event names are API contracts too."
+      }
+    ],
+    "answer": "API versioning is how you change an API without breaking the systems that already depend on it.",
+    "reasoning": "I would manage API changes with a compatibility policy.\n\n```txt\nSafe changes\n- Add optional response fields.\n- Add new endpoints.\n- Add new optional request parameters.\n- Add new webhook event types if consumers can ignore unknown events.\n\nRisky or breaking changes\n- Remove fields.\n- Rename fields.\n- Change field type.\n- Change status meanings.\n- Change required parameters.\n- Change error-code behavior.\n- Change authentication behavior.\n```\n\nThen I would define the migration plan.\n\n```txt\nMigration plan\n\n1. Announce the new version and what changed.\n2. Provide docs and before/after examples.\n3. Let partners test in sandbox.\n4. Keep the old version available for a defined period.\n5. Track partner adoption.\n6. Send reminders before deprecation.\n7. Provide support for high-value or high-risk partners.\n8. Remove the old version only after the agreed deprecation window.\n```\n\nThe exact versioning method can vary: URL versions, headers, date-based versions, or account-level pinned versions. The product decision is less about which style sounds best and more about whether partners can understand, test, and adopt changes safely.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What makes an API change breaking?",
+      "Why is adding an optional response field usually safer than renaming one?",
+      "What should be in a deprecation plan?",
+      "Why do webhook payloads need compatibility thinking?",
+      "What adoption signals would you track during migration?"
+    ],
+    "interviewAnswer": "I would handle API versioning by defining a compatibility policy, separating safe additive changes from breaking changes, and creating a migration plan with docs, sandbox support, adoption tracking, deprecation timelines, and partner communication.\n\nA strong answer shows respect for external dependencies. The goal is not only to ship a cleaner API. It is to change the API without surprising or breaking the systems that rely on it.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Docs: Versioning",
+        "url": "https://docs.stripe.com/api/versioning"
+      },
+      {
+        "label": "Microsoft Azure: API versioning guidance",
+        "url": "https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design#versioning-a-restful-web-api"
+      }
+    ],
+    "beginnerExplanation": "API versioning is how you change an API without breaking the systems that already depend on it.\n\nThis matters because API users are not inside your sprint. A partner may have built code around your current fields, errors, statuses, and assumptions. If you change those suddenly, their product may break even if your own product still works.\n\nBackwards compatibility means old clients can keep working after you ship a change. A compatible change adds something without changing the meaning of what already exists. A breaking change removes, renames, changes type, changes required behavior, or changes the meaning of a field.",
+    "example": "Imagine a payout API returns this:\n\n```json\n{\n  \"id\": \"po_123\",\n  \"status\": \"paid\",\n  \"amount\": 5000\n}\n```\n\nAdding a new optional field is usually safe:\n\n```json\n{\n  \"id\": \"po_123\",\n  \"status\": \"paid\",\n  \"amount\": 5000,\n  \"paid_at\": \"2026-05-14T10:00:00Z\"\n}\n```\n\nBut changing `amount` from cents to dollars is breaking. Changing `status` from `\"paid\"` to `\"completed\"` is breaking. Making a previously optional field required is breaking.\n\nThe TPM has to help the team separate \"we want cleaner design\" from \"partners can safely absorb this change.\"",
+    "commonMistakes": "A common mistake is assuming a small change cannot break anyone. Small schema changes can break strict clients.\n\nAnother mistake is versioning too late. If the team waits until the first breaking change, partners may already depend on undocumented behavior.\n\nA third mistake is forgetting webhooks. Webhook payloads and event names are API contracts too."
+  },
+  {
+    "id": "tpm-build-versus-buy",
+    "track": "TPM",
+    "category": "Technical Strategy",
+    "level": "Intermediate",
+    "question": "How would you make a build versus buy decision?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A build versus buy decision asks whether the team should create a capability itself, buy a vendor product, use open source, or combine approaches.\n\nThe beginner mistake is reducing the decision to cost. Buying can look cheaper because the first invoice is smaller than a build estimate. Building can look cheaper because the team ignores maintenance, support, compliance, uptime, security, and opportunity cost.\n\nThe better question is: what capability should this company own, and what capability should it rent?\n\nIf the capability differentiates the product, gives strategic control, or is tightly tied to the customer promise, building may make sense. If it is a commodity capability where vendors are mature and switching risk is manageable, buying may be better."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a fintech company deciding whether to build identity verification or buy a vendor.\n\nBuying may give faster launch, tested document capture, global coverage, fraud signals, compliance reporting, and operational tooling. But it creates vendor dependency, cost at scale, less customization, and potential data-sharing concerns.\n\nBuilding may give control, custom risk logic, tailored UX, and long-term differentiation. But it requires engineering, fraud expertise, compliance review, document processing, support tooling, monitoring, and ongoing regulatory updates.\n\nThe decision is not emotional. It is a tradeoff.\n\n```txt\nBuild if:\n- The capability differentiates the product.\n- Requirements are unusual or deeply tied to strategy.\n- Vendor limitations would block the roadmap.\n- Data control or compliance needs require ownership.\n- The team can maintain it responsibly.\n\nBuy if:\n- The capability is common and vendors are mature.\n- Speed matters more than customization.\n- Internal expertise is limited.\n- Compliance or operational burden is high.\n- Switching risk is acceptable.\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would compare options across dimensions:\n\n```txt\nDecision: Build, buy, open source, or hybrid?\n\nCriteria:\n- User impact\n- Strategic differentiation\n- Time to market\n- Total cost of ownership\n- Integration effort\n- Maintenance burden\n- Security and compliance risk\n- Vendor lock-in\n- Data ownership\n- Reliability and support\n- Exit path\n```\n\nThen I would make a recommendation with assumptions.\n\n```txt\nRecommendation:\nBuy identity verification for launch, but build internal risk rules and vendor abstraction.\n\nWhy:\nVendor coverage gets us live faster, while internal rules preserve control over our highest-risk decisions.\n\nRisk:\nVendor cost may rise with volume.\n\nMitigation:\nNegotiate volume tiers, export decision data, and design integration boundaries so a future second vendor is possible.\n```\n\nThat is better than saying \"buy because it is faster\" or \"build because we want control.\" It shows the product logic."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is comparing vendor price to only initial build cost. The real comparison is total cost of ownership.\n\nAnother mistake is ignoring exit risk. If leaving a vendor later would be painful, that cost belongs in the decision.\n\nA third mistake is building a commodity capability because the team enjoys technical control. Product strategy should drive ownership, not engineering pride."
+      }
+    ],
+    "answer": "A build versus buy decision asks whether the team should create a capability itself, buy a vendor product, use open source, or combine approaches.",
+    "reasoning": "I would compare options across dimensions:\n\n```txt\nDecision: Build, buy, open source, or hybrid?\n\nCriteria:\n- User impact\n- Strategic differentiation\n- Time to market\n- Total cost of ownership\n- Integration effort\n- Maintenance burden\n- Security and compliance risk\n- Vendor lock-in\n- Data ownership\n- Reliability and support\n- Exit path\n```\n\nThen I would make a recommendation with assumptions.\n\n```txt\nRecommendation:\nBuy identity verification for launch, but build internal risk rules and vendor abstraction.\n\nWhy:\nVendor coverage gets us live faster, while internal rules preserve control over our highest-risk decisions.\n\nRisk:\nVendor cost may rise with volume.\n\nMitigation:\nNegotiate volume tiers, export decision data, and design integration boundaries so a future second vendor is possible.\n```\n\nThat is better than saying \"buy because it is faster\" or \"build because we want control.\" It shows the product logic.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is cost alone not enough for build versus buy?",
+      "What does strategic differentiation mean?",
+      "What is total cost of ownership?",
+      "Why does exit path matter?",
+      "When might a hybrid approach be best?"
+    ],
+    "interviewAnswer": "I would evaluate build versus buy by looking at strategic differentiation, user impact, time to market, total cost, integration effort, maintenance burden, compliance, reliability, vendor lock-in, data ownership, and exit path.\n\nA strong answer does not default to building or buying. It explains which capabilities the company should own and which it can safely rent, then recommends a path with risks and mitigations.",
+    "sourceLinks": [
+      {
+        "label": "Product School: Build vs buy",
+        "url": "https://productschool.com/blog/leadership/build-vs-buy"
+      },
+      {
+        "label": "Atlassian Team Playbook: Trade-offs",
+        "url": "https://www.atlassian.com/team-playbook/plays/trade-offs"
+      }
+    ],
+    "beginnerExplanation": "A build versus buy decision asks whether the team should create a capability itself, buy a vendor product, use open source, or combine approaches.\n\nThe beginner mistake is reducing the decision to cost. Buying can look cheaper because the first invoice is smaller than a build estimate. Building can look cheaper because the team ignores maintenance, support, compliance, uptime, security, and opportunity cost.\n\nThe better question is: what capability should this company own, and what capability should it rent?\n\nIf the capability differentiates the product, gives strategic control, or is tightly tied to the customer promise, building may make sense. If it is a commodity capability where vendors are mature and switching risk is manageable, buying may be better.",
+    "example": "Imagine a fintech company deciding whether to build identity verification or buy a vendor.\n\nBuying may give faster launch, tested document capture, global coverage, fraud signals, compliance reporting, and operational tooling. But it creates vendor dependency, cost at scale, less customization, and potential data-sharing concerns.\n\nBuilding may give control, custom risk logic, tailored UX, and long-term differentiation. But it requires engineering, fraud expertise, compliance review, document processing, support tooling, monitoring, and ongoing regulatory updates.\n\nThe decision is not emotional. It is a tradeoff.\n\n```txt\nBuild if:\n- The capability differentiates the product.\n- Requirements are unusual or deeply tied to strategy.\n- Vendor limitations would block the roadmap.\n- Data control or compliance needs require ownership.\n- The team can maintain it responsibly.\n\nBuy if:\n- The capability is common and vendors are mature.\n- Speed matters more than customization.\n- Internal expertise is limited.\n- Compliance or operational burden is high.\n- Switching risk is acceptable.\n```",
+    "commonMistakes": "A common mistake is comparing vendor price to only initial build cost. The real comparison is total cost of ownership.\n\nAnother mistake is ignoring exit risk. If leaving a vendor later would be painful, that cost belongs in the decision.\n\nA third mistake is building a commodity capability because the team enjoys technical control. Product strategy should drive ownership, not engineering pride."
+  },
+  {
     "id": "tpm-compliance-ux",
     "track": "TPM",
     "category": "Compliance & Risk",
@@ -735,6 +1029,202 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A production incident is when the product is not behaving in a way customers, the business, or internal teams can safely rely on. It might be an outage, broken checkout, delayed payments, incorrect pricing, missing notifications, a data issue, or a third-party partner failure.\n\nFor a Technical Product Manager, the goal is not to personally debug every system. The goal is to help the team protect customers, restore service, coordinate decisions, communicate clearly, and learn after the incident.\n\nA good incident response has two modes.\n\nDuring the incident, focus on containment and recovery. What is broken? Who is affected? How severe is it? What can we do now to reduce harm?\n\nAfter the incident, focus on learning and prevention. Why did it happen? Why did our defenses not catch it earlier? What changes would reduce the chance or impact next time?",
     "example": "Imagine users cannot complete card payments.\n\nThe first thing to establish is severity and scope. Is it all users or one region? All payment methods or one provider? New payments only or refunds too? Is money being captured but the UI showing failure? Is there risk of duplicate charges?\n\nThen establish roles. Engineering investigates technical cause. Support gathers customer reports. Operations may pause affected workflows. Product helps decide customer impact, acceptable workarounds, communication, and priority tradeoffs. Leadership may need updates if the incident is severe.\n\nThe team needs a single source of truth. That could be an incident channel, status doc, or incident tool. Decisions should be written down: what changed, what was tried, what was rolled back, what customers were told, and what remains unknown.\n\nThe TPM should keep asking customer-centered questions: Which users are affected? What can they still do? Do we need to disable a feature to prevent harm? What message should support use? Is there a regulatory or financial exposure?",
     "commonMistakes": "A common mistake is optimizing for silence. Teams sometimes avoid declaring incidents because it feels dramatic. That delays coordination.\n\nAnother mistake is communicating certainty too early. It is better to say what is known, what is unknown, and when the next update will come.\n\nA third mistake is calling the incident done when the service recovers but customers are still affected. Payment reversals, stuck orders, missing notifications, or support tickets may continue after the technical fix."
+  },
+  {
+    "id": "tpm-migration-planning",
+    "track": "TPM",
+    "category": "Technical Strategy",
+    "level": "Intermediate",
+    "question": "How would you plan a platform or data migration?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A migration moves users, data, traffic, or workflows from an old system to a new one. Migrations are risky because the user may not care that a new platform is cleaner. They care whether their data is correct, the product still works, and nothing disappears.\n\nFor a TPM, the migration is a product and operations problem, not just an engineering project. You need to know what changes for users, what changes for internal teams, what data must be preserved, how the team validates correctness, and how to recover if the migration goes wrong."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine moving scheduled transfers from an old payments service to a new orchestration platform.\n\nThe risky questions are:\n\n- Which scheduled transfers already exist?\n- Which service owns them during migration?\n- Can both systems execute the same transfer by accident?\n- What happens to transfers scheduled during the migration window?\n- How do we verify every schedule moved correctly?\n- Can we roll back?\n- What does support see if a user asks about a migrated transfer?\n\nThis is why a migration plan needs phases.\n\n```txt\nPhase 1: Inventory\n- List data, users, workflows, dependencies, and owners.\n\nPhase 2: Dual read or shadow mode\n- New system observes or mirrors behavior without owning the user outcome.\n\nPhase 3: Limited migration\n- Move a low-risk cohort or one corridor.\n\nPhase 4: Expand\n- Increase traffic or data volume after validation.\n\nPhase 5: Decommission\n- Remove old paths only after no active dependency remains.\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would define migration readiness before moving anything.\n\n```txt\nMigration readiness\n\n- Source data is understood.\n- Target data model is mapped.\n- Validation rules are written.\n- Duplicate execution risk is controlled.\n- Rollback or forward-fix plan exists.\n- Support and operations have visibility.\n- Monitoring covers success, failure, latency, and data mismatch.\n- Stakeholders know the migration window and escalation path.\n```\n\nFor data, I would define reconciliation checks:\n\n```txt\nReconciliation checks\n\n- Count of records before and after.\n- Sum of money fields before and after.\n- Status mapping completeness.\n- Missing required fields.\n- Duplicate IDs.\n- Failed transformations.\n- Sample manual review of high-risk records.\n```\n\nThe TPM should also define communication. Users may not need to know about a backend migration, but support and operations usually do."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating migration as complete when data is copied. It is not complete until the product works, the data reconciles, and old dependencies are safely retired.\n\nAnother mistake is forgetting in-flight activity. Users may create, edit, or cancel things while migration is happening.\n\nA third mistake is assuming rollback is always easy. If the new system mutates data, the team may need a forward-fix plan instead."
+      }
+    ],
+    "answer": "A migration moves users, data, traffic, or workflows from an old system to a new one. Migrations are risky because the user may not care that a new platform is cleaner. They care whether their data is correct, the product still works, and nothing disappears.",
+    "reasoning": "I would define migration readiness before moving anything.\n\n```txt\nMigration readiness\n\n- Source data is understood.\n- Target data model is mapped.\n- Validation rules are written.\n- Duplicate execution risk is controlled.\n- Rollback or forward-fix plan exists.\n- Support and operations have visibility.\n- Monitoring covers success, failure, latency, and data mismatch.\n- Stakeholders know the migration window and escalation path.\n```\n\nFor data, I would define reconciliation checks:\n\n```txt\nReconciliation checks\n\n- Count of records before and after.\n- Sum of money fields before and after.\n- Status mapping completeness.\n- Missing required fields.\n- Duplicate IDs.\n- Failed transformations.\n- Sample manual review of high-risk records.\n```\n\nThe TPM should also define communication. Users may not need to know about a backend migration, but support and operations usually do.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is migration a product risk, not only an engineering task?",
+      "What does shadow mode help test?",
+      "Why is reconciliation important?",
+      "What makes rollback hard?",
+      "What should support know during a migration?"
+    ],
+    "interviewAnswer": "I would plan a migration by inventorying users, data, workflows, dependencies, and risks; defining phases; validating data mapping; controlling duplicate execution; adding reconciliation checks; preparing monitoring, support, rollback or forward-fix plans; and migrating gradually.\n\nA strong answer shows that the goal is not simply moving data. The goal is preserving customer trust while changing the system underneath.",
+    "sourceLinks": [
+      {
+        "label": "Martin Fowler: Strangler Fig Application",
+        "url": "https://martinfowler.com/bliki/StranglerFigApplication.html"
+      },
+      {
+        "label": "AWS Prescriptive Guidance: Migration strategies",
+        "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/application-portfolio-assessment-guide/migration-strategies.html"
+      }
+    ],
+    "beginnerExplanation": "A migration moves users, data, traffic, or workflows from an old system to a new one. Migrations are risky because the user may not care that a new platform is cleaner. They care whether their data is correct, the product still works, and nothing disappears.\n\nFor a TPM, the migration is a product and operations problem, not just an engineering project. You need to know what changes for users, what changes for internal teams, what data must be preserved, how the team validates correctness, and how to recover if the migration goes wrong.",
+    "example": "Imagine moving scheduled transfers from an old payments service to a new orchestration platform.\n\nThe risky questions are:\n\n- Which scheduled transfers already exist?\n- Which service owns them during migration?\n- Can both systems execute the same transfer by accident?\n- What happens to transfers scheduled during the migration window?\n- How do we verify every schedule moved correctly?\n- Can we roll back?\n- What does support see if a user asks about a migrated transfer?\n\nThis is why a migration plan needs phases.\n\n```txt\nPhase 1: Inventory\n- List data, users, workflows, dependencies, and owners.\n\nPhase 2: Dual read or shadow mode\n- New system observes or mirrors behavior without owning the user outcome.\n\nPhase 3: Limited migration\n- Move a low-risk cohort or one corridor.\n\nPhase 4: Expand\n- Increase traffic or data volume after validation.\n\nPhase 5: Decommission\n- Remove old paths only after no active dependency remains.\n```",
+    "commonMistakes": "A common mistake is treating migration as complete when data is copied. It is not complete until the product works, the data reconciles, and old dependencies are safely retired.\n\nAnother mistake is forgetting in-flight activity. Users may create, edit, or cancel things while migration is happening.\n\nA third mistake is assuming rollback is always easy. If the new system mutates data, the team may need a forward-fix plan instead."
+  },
+  {
+    "id": "tpm-onboarding-activation-metrics",
+    "track": "TPM",
+    "category": "Metrics",
+    "level": "Foundational",
+    "question": "How would you measure onboarding and activation for a product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Onboarding is the path that helps a new user become ready to use the product. Activation is the moment or behavior that shows the user has reached meaningful value.\n\nThe beginner mistake is treating signup as activation. A signup means someone entered the door. Activation means they did something that makes future usage more likely.\n\nFor a remittance app, activation might be completing the first successful transfer. For a developer API, activation might be making the first successful sandbox request and receiving a webhook. For a TPM, the work is to define the behavior that proves value, then measure the path to that behavior."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a money transfer product.\n\nThe onboarding funnel might be:\n\n```txt\n1. Account created.\n2. Profile completed.\n3. Identity submitted.\n4. Identity approved.\n5. Recipient added.\n6. Quote viewed.\n7. Transfer started.\n8. Transfer funded.\n9. Transfer completed.\n```\n\nThe activation metric may be \"first successful transfer completed within seven days of signup.\" That is stronger than \"user clicked send\" because it captures the real product promise.\n\nBut activation can have guardrails. If users activate faster but failed transfers or fraud alerts rise, the product may be creating risk."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would define metrics in layers.\n\n```txt\nPrimary activation metric\n- First successful transfer within seven days.\n\nFunnel metrics\n- Signup completion.\n- Profile completion.\n- Verification approval.\n- Recipient creation.\n- Quote view.\n- Transfer start.\n- Transfer completion.\n\nQuality metrics\n- Verification retry rate.\n- Transfer failure rate.\n- Time stuck in pending.\n- Support contacts during onboarding.\n\nRisk guardrails\n- Fraud alerts.\n- Compliance review rate.\n- Mistaken recipient reports.\n- Chargebacks or reversals.\n```\n\nThen I would segment the metrics. New users from one country may fail identity checks more often. Mobile users may abandon document capture. Users with unsupported payout methods may stop at recipient setup. Segmentation turns \"activation is low\" into a fixable product problem.\n\nI would also define event instrumentation before launch. If the app does not log each step consistently, the team will not know where users are dropping."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is choosing an activation metric because it is easy to measure. The metric should represent value, not convenience.\n\nAnother mistake is ignoring time. Activation in one day and activation in sixty days mean different things.\n\nA third mistake is optimizing conversion while damaging trust or risk. In regulated products, guardrails matter."
+      }
+    ],
+    "answer": "Onboarding is the path that helps a new user become ready to use the product. Activation is the moment or behavior that shows the user has reached meaningful value.",
+    "reasoning": "I would define metrics in layers.\n\n```txt\nPrimary activation metric\n- First successful transfer within seven days.\n\nFunnel metrics\n- Signup completion.\n- Profile completion.\n- Verification approval.\n- Recipient creation.\n- Quote view.\n- Transfer start.\n- Transfer completion.\n\nQuality metrics\n- Verification retry rate.\n- Transfer failure rate.\n- Time stuck in pending.\n- Support contacts during onboarding.\n\nRisk guardrails\n- Fraud alerts.\n- Compliance review rate.\n- Mistaken recipient reports.\n- Chargebacks or reversals.\n```\n\nThen I would segment the metrics. New users from one country may fail identity checks more often. Mobile users may abandon document capture. Users with unsupported payout methods may stop at recipient setup. Segmentation turns \"activation is low\" into a fixable product problem.\n\nI would also define event instrumentation before launch. If the app does not log each step consistently, the team will not know where users are dropping.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between signup and activation?",
+      "Why should activation represent meaningful value?",
+      "What funnel steps might matter in a remittance app?",
+      "Why do guardrail metrics matter?",
+      "How can segmentation make onboarding problems easier to fix?"
+    ],
+    "interviewAnswer": "I would define activation as the first behavior that proves the user experienced meaningful value, then measure the onboarding funnel leading to that behavior. For a remittance app, that might be first successful transfer within seven days.\n\nA strong answer includes funnel metrics, quality metrics, risk guardrails, segmentation, and instrumentation. It avoids treating signup or clicks as proof of activation.",
+    "sourceLinks": [
+      {
+        "label": "Amplitude: Activation metric",
+        "url": "https://amplitude.com/blog/activation-metric"
+      },
+      {
+        "label": "Atlassian Team Playbook: Goals, signals, measures",
+        "url": "https://www.atlassian.com/team-playbook/plays/goals-signals-measures"
+      }
+    ],
+    "beginnerExplanation": "Onboarding is the path that helps a new user become ready to use the product. Activation is the moment or behavior that shows the user has reached meaningful value.\n\nThe beginner mistake is treating signup as activation. A signup means someone entered the door. Activation means they did something that makes future usage more likely.\n\nFor a remittance app, activation might be completing the first successful transfer. For a developer API, activation might be making the first successful sandbox request and receiving a webhook. For a TPM, the work is to define the behavior that proves value, then measure the path to that behavior.",
+    "example": "Imagine a money transfer product.\n\nThe onboarding funnel might be:\n\n```txt\n1. Account created.\n2. Profile completed.\n3. Identity submitted.\n4. Identity approved.\n5. Recipient added.\n6. Quote viewed.\n7. Transfer started.\n8. Transfer funded.\n9. Transfer completed.\n```\n\nThe activation metric may be \"first successful transfer completed within seven days of signup.\" That is stronger than \"user clicked send\" because it captures the real product promise.\n\nBut activation can have guardrails. If users activate faster but failed transfers or fraud alerts rise, the product may be creating risk.",
+    "commonMistakes": "A common mistake is choosing an activation metric because it is easy to measure. The metric should represent value, not convenience.\n\nAnother mistake is ignoring time. Activation in one day and activation in sixty days mean different things.\n\nA third mistake is optimizing conversion while damaging trust or risk. In regulated products, guardrails matter."
+  },
+  {
+    "id": "tpm-partner-outage-fallback",
+    "track": "TPM",
+    "category": "Operations",
+    "level": "Intermediate",
+    "question": "How would you handle a critical partner API outage?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A partner API outage happens when a system your product depends on becomes unavailable, slow, unreliable, or returns unclear results. The product may still be online, but the user journey is broken because an external dependency is broken.\n\nFor a TPM, the key question is not only \"when will the partner come back?\" It is \"how do we protect users, reduce harm, communicate clearly, and keep the business operating while the dependency is unhealthy?\"\n\nIf the partner moves money, verifies identity, sends notifications, or screens fraud, the outage can create financial, compliance, support, and trust risk."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a payout partner is timing out. Users are trying to send money.\n\nThe dangerous cases are:\n\n- A request timed out, but the partner may still process it.\n- A user retries and might create a duplicate payout.\n- Your app shows failure even though money may move later.\n- Webhooks are delayed, so status is stale.\n- Support cannot tell customers what happened.\n\nThe TPM should help classify the outage:\n\n```txt\nSeverity questions\n\n- Is every user affected or only one corridor?\n- Are new requests failing, or only status updates?\n- Is money movement uncertain?\n- Can users safely retry?\n- Is there a backup partner?\n- What message should users and support see?\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would handle the outage in phases.\n\nFirst, contain risk. If duplicate money movement is possible, stop new attempts or disable retries until the state is known.\n\nSecond, degrade gracefully. If a backup partner exists, route eligible traffic there. If not, show clear pending or unavailable states instead of pretending everything is fine.\n\nThird, communicate internally. Engineering, support, operations, compliance, and leadership need a shared incident channel and status updates.\n\nFourth, communicate to users when needed. The message should explain what is affected, what users can do, and when the next update is expected.\n\nFifth, recover and reconcile. When the partner returns, confirm final statuses, identify stuck transactions, resolve duplicates, and update customers.\n\n```txt\nFallback decision guide\n\nIf partner status is unknown:\n- Pause new requests if duplicate execution is possible.\n- Show pending state for affected transactions.\n- Disable user retry until idempotency or final state is confirmed.\n\nIf backup partner is available:\n- Route only supported corridors or payment types.\n- Monitor failure rate and cost.\n- Keep partner-specific limits visible to support.\n\nIf no fallback exists:\n- Stop the affected flow.\n- Preserve user input where safe.\n- Notify when service returns.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is letting users retry when the first request may still complete. That can create duplicates.\n\nAnother mistake is hiding the problem behind generic errors. Users and support need the truth in plain language.\n\nA third mistake is ending the incident when the partner returns. Recovery also includes reconciliation, customer communication, and operational cleanup."
+      }
+    ],
+    "answer": "A partner API outage happens when a system your product depends on becomes unavailable, slow, unreliable, or returns unclear results. The product may still be online, but the user journey is broken because an external dependency is broken.",
+    "reasoning": "I would handle the outage in phases.\n\nFirst, contain risk. If duplicate money movement is possible, stop new attempts or disable retries until the state is known.\n\nSecond, degrade gracefully. If a backup partner exists, route eligible traffic there. If not, show clear pending or unavailable states instead of pretending everything is fine.\n\nThird, communicate internally. Engineering, support, operations, compliance, and leadership need a shared incident channel and status updates.\n\nFourth, communicate to users when needed. The message should explain what is affected, what users can do, and when the next update is expected.\n\nFifth, recover and reconcile. When the partner returns, confirm final statuses, identify stuck transactions, resolve duplicates, and update customers.\n\n```txt\nFallback decision guide\n\nIf partner status is unknown:\n- Pause new requests if duplicate execution is possible.\n- Show pending state for affected transactions.\n- Disable user retry until idempotency or final state is confirmed.\n\nIf backup partner is available:\n- Route only supported corridors or payment types.\n- Monitor failure rate and cost.\n- Keep partner-specific limits visible to support.\n\nIf no fallback exists:\n- Stop the affected flow.\n- Preserve user input where safe.\n- Notify when service returns.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why can a timeout be more dangerous than a clear failure?",
+      "When should retries be disabled?",
+      "What makes a fallback partner safe to use?",
+      "Why does support need partner-specific visibility?",
+      "What recovery work remains after the partner is back?"
+    ],
+    "interviewAnswer": "I would handle a partner outage by triaging scope and risk, containing harmful actions, disabling unsafe retries, routing to fallback where possible, communicating clearly, monitoring the affected flow, and reconciling final states after recovery.\n\nA strong TPM answer shows that partner outages are product incidents. The priority is customer trust, operational clarity, and safe recovery, not only waiting for the partner status page to turn green.",
+    "sourceLinks": [
+      {
+        "label": "Google SRE: Addressing cascading failures",
+        "url": "https://sre.google/sre-book/addressing-cascading-failures/"
+      },
+      {
+        "label": "Atlassian: Incident management",
+        "url": "https://www.atlassian.com/incident-management"
+      }
+    ],
+    "beginnerExplanation": "A partner API outage happens when a system your product depends on becomes unavailable, slow, unreliable, or returns unclear results. The product may still be online, but the user journey is broken because an external dependency is broken.\n\nFor a TPM, the key question is not only \"when will the partner come back?\" It is \"how do we protect users, reduce harm, communicate clearly, and keep the business operating while the dependency is unhealthy?\"\n\nIf the partner moves money, verifies identity, sends notifications, or screens fraud, the outage can create financial, compliance, support, and trust risk.",
+    "example": "Imagine a payout partner is timing out. Users are trying to send money.\n\nThe dangerous cases are:\n\n- A request timed out, but the partner may still process it.\n- A user retries and might create a duplicate payout.\n- Your app shows failure even though money may move later.\n- Webhooks are delayed, so status is stale.\n- Support cannot tell customers what happened.\n\nThe TPM should help classify the outage:\n\n```txt\nSeverity questions\n\n- Is every user affected or only one corridor?\n- Are new requests failing, or only status updates?\n- Is money movement uncertain?\n- Can users safely retry?\n- Is there a backup partner?\n- What message should users and support see?\n```",
+    "commonMistakes": "A common mistake is letting users retry when the first request may still complete. That can create duplicates.\n\nAnother mistake is hiding the problem behind generic errors. Users and support need the truth in plain language.\n\nA third mistake is ending the incident when the partner returns. Recovery also includes reconciliation, customer communication, and operational cleanup."
+  },
+  {
+    "id": "tpm-payments-remittance-requirements",
+    "track": "TPM",
+    "category": "Product Requirements",
+    "level": "Intermediate",
+    "question": "How would you define requirements for a payments or remittance feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Payments and remittance features need unusually careful requirements because mistakes can move money incorrectly, block legitimate users, create regulatory risk, or overwhelm support.\n\nThe beginner mistake is writing only the happy path: \"User sends money to a recipient.\" A real payments feature has states, limits, fees, exchange rates, funding methods, compliance checks, partner statuses, reversals, refunds, retries, reconciliation, notifications, and support visibility.\n\nThe TPM's job is to turn the money movement into a clear product and system contract."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user sends $100 to a family member in another country.\n\nThe product must answer:\n\n- Who is the sender?\n- Who is the recipient?\n- Is the sender verified?\n- Is the recipient allowed?\n- What is the exchange rate?\n- What fees apply?\n- How will the sender fund the transfer?\n- Which payout partner will deliver it?\n- What happens if funding succeeds but payout fails?\n- What status does the user see?\n- What does support see?\n\nThis is why requirements should include a state model.\n\n```txt\nTransfer states\n\nDraft\nQuote shown\nUser confirmed\nFunding pending\nFunded\nCompliance review\nPayout processing\nPaid\nFailed\nReversed\nRefunded\nUnknown\n```\n\nEach state should have allowed actions, user copy, support visibility, and system owner."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would write requirements across product, technical, risk, and operations.\n\n```txt\nCore requirements\n\n- User can enter amount, recipient, funding method, and payout method.\n- User sees fees, exchange rate, estimated delivery time, and total cost before confirming.\n- System checks user eligibility, recipient eligibility, limits, sanctions, and fraud risk before payout.\n- Each transfer has a unique idempotency key so retries do not create duplicates.\n- User receives clear status updates.\n- Support can search by transfer ID and see status history.\n- Reconciliation identifies partner mismatches.\n```\n\nThen I would define edge cases:\n\n```txt\nEdge cases\n\n- Funding fails.\n- Funding succeeds but payout fails.\n- Partner timeout.\n- Duplicate submit.\n- Exchange rate expires.\n- Recipient details are invalid.\n- Compliance review is required.\n- User cancels before funding.\n- Refund is required.\n```\n\nGood requirements make these cases explicit before engineering has to guess."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating payment status as a single success or failure. Real money movement often has pending, uncertain, reversed, and manually reviewed states.\n\nAnother mistake is ignoring idempotency. Retrying money movement without duplicate protection is dangerous.\n\nA third mistake is forgetting support and reconciliation. If customers ask where their money is, the company needs evidence."
+      }
+    ],
+    "answer": "Payments and remittance features need unusually careful requirements because mistakes can move money incorrectly, block legitimate users, create regulatory risk, or overwhelm support.",
+    "reasoning": "I would write requirements across product, technical, risk, and operations.\n\n```txt\nCore requirements\n\n- User can enter amount, recipient, funding method, and payout method.\n- User sees fees, exchange rate, estimated delivery time, and total cost before confirming.\n- System checks user eligibility, recipient eligibility, limits, sanctions, and fraud risk before payout.\n- Each transfer has a unique idempotency key so retries do not create duplicates.\n- User receives clear status updates.\n- Support can search by transfer ID and see status history.\n- Reconciliation identifies partner mismatches.\n```\n\nThen I would define edge cases:\n\n```txt\nEdge cases\n\n- Funding fails.\n- Funding succeeds but payout fails.\n- Partner timeout.\n- Duplicate submit.\n- Exchange rate expires.\n- Recipient details are invalid.\n- Compliance review is required.\n- User cancels before funding.\n- Refund is required.\n```\n\nGood requirements make these cases explicit before engineering has to guess.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is the happy path not enough for payments?",
+      "What states might a transfer move through?",
+      "Why does idempotency matter?",
+      "What should users see before confirming?",
+      "Why do support and reconciliation need requirements?"
+    ],
+    "interviewAnswer": "I would define payments or remittance requirements by covering the full money-movement lifecycle: quote, confirmation, funding, compliance, payout, status updates, failure handling, refunds or reversals, idempotency, reconciliation, notifications, limits, and support tooling.\n\nA strong answer makes edge cases explicit and shows that customer trust depends on accurate status, safe retries, and operational visibility.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Docs: PaymentIntents",
+        "url": "https://docs.stripe.com/payments/payment-intents"
+      },
+      {
+        "label": "Stripe Docs: Idempotent requests",
+        "url": "https://docs.stripe.com/api/idempotent_requests"
+      }
+    ],
+    "beginnerExplanation": "Payments and remittance features need unusually careful requirements because mistakes can move money incorrectly, block legitimate users, create regulatory risk, or overwhelm support.\n\nThe beginner mistake is writing only the happy path: \"User sends money to a recipient.\" A real payments feature has states, limits, fees, exchange rates, funding methods, compliance checks, partner statuses, reversals, refunds, retries, reconciliation, notifications, and support visibility.\n\nThe TPM's job is to turn the money movement into a clear product and system contract.",
+    "example": "Imagine a user sends $100 to a family member in another country.\n\nThe product must answer:\n\n- Who is the sender?\n- Who is the recipient?\n- Is the sender verified?\n- Is the recipient allowed?\n- What is the exchange rate?\n- What fees apply?\n- How will the sender fund the transfer?\n- Which payout partner will deliver it?\n- What happens if funding succeeds but payout fails?\n- What status does the user see?\n- What does support see?\n\nThis is why requirements should include a state model.\n\n```txt\nTransfer states\n\nDraft\nQuote shown\nUser confirmed\nFunding pending\nFunded\nCompliance review\nPayout processing\nPaid\nFailed\nReversed\nRefunded\nUnknown\n```\n\nEach state should have allowed actions, user copy, support visibility, and system owner.",
+    "commonMistakes": "A common mistake is treating payment status as a single success or failure. Real money movement often has pending, uncertain, reversed, and manually reviewed states.\n\nAnother mistake is ignoring idempotency. Retrying money movement without duplicate protection is dangerous.\n\nA third mistake is forgetting support and reconciliation. If customers ask where their money is, the company needs evidence."
   },
   {
     "id": "tpm-prd",

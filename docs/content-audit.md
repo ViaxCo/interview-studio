@@ -10,14 +10,14 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 24 total lessons.
-- 12 Frontend lessons.
-- 12 TPM lessons.
-- 15,290 lesson words, excluding fenced code.
-- 58 fenced code blocks, mostly frontend.
-- 48 source links.
-- 48 source links reachable after cleanup.
-- 0 source links failing after cleanup.
+- 34 total lessons.
+- 15 Frontend lessons.
+- 19 TPM lessons.
+- 19,542 lesson words, excluding fenced code.
+- 96 fenced code blocks.
+- 68 source links.
+- 68 source links reachable after cleanup and the latest batch.
+- 0 source links failing after cleanup and the latest batch.
 
 ## Scoring Rubric
 
@@ -204,7 +204,7 @@ Every new lesson should include:
 
 ## Recommended Next Batch
 
-The next content batch should be 10 lessons, weighted toward TPM:
+Completed on 2026-05-14: the next content batch added 10 lessons, weighted toward TPM:
 
 1. TPM: Design an API product from scratch.
 2. TPM: Build versus buy.
@@ -219,11 +219,11 @@ The next content batch should be 10 lessons, weighted toward TPM:
 
 ## Immediate Next Step
 
-Source cleanup and Priority 1 TPM enrichment are now complete. The next best step is adding the next 10-lesson batch.
+Source cleanup, Priority 1 TPM enrichment, and the first 10-lesson expansion batch are now complete.
 
 Recommended order:
 
-1. Add the next 10-lesson batch.
-2. Keep the batch TPM-heavy.
-3. Run source validation after writing.
-4. Inspect representative lessons in the browser.
+1. Review the new TPM lessons in the app with the client in mind.
+2. Pick the next TPM-heavy batch from the remaining topic map.
+3. Keep adding artifacts: sample memos, decision tables, metric trees, rollout plans, and checklists.
+4. Run source validation and browser spot-checks after every batch.
