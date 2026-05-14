@@ -76,6 +76,58 @@ Non-functional needs: performance, accessibility, security, compliance, observab
 
 Acceptance criteria should not over-specify engineering implementation unless the implementation is truly a requirement. The goal is shared understanding, not micromanagement.
 
+Here is how an oversized epic can be split into useful stories.
+
+```txt
+Epic:
+Help repeat senders use saved recipients.
+
+Story 1:
+As a repeat sender, I want to save a recipient after a successful transfer, so that I can reuse the details next time.
+
+Acceptance criteria:
+- User can save the recipient from the transfer success screen.
+- User sees the recipient name, country, payout method, and masked account identifier before saving.
+- Duplicate recipient is detected and the existing recipient is offered instead.
+- Save failure preserves the transfer receipt and lets the user retry.
+- Audit log records user, recipient ID, and creation time.
+
+Story 2:
+As a repeat sender, I want to choose a saved recipient when starting a transfer, so that I do not re-enter details.
+
+Acceptance criteria:
+- Saved recipients appear in the recipient step.
+- User can search by recipient name.
+- Selecting a recipient pre-fills payout details.
+- User can still choose to enter a new recipient.
+- Ineligible recipients are shown with an explanation or hidden according to policy.
+
+Story 3:
+As a support agent, I want to see which saved recipient was used, so that I can investigate transfer issues.
+
+Acceptance criteria:
+- Support can see recipient ID, display name, payout method, and creation date.
+- Sensitive account details are masked.
+- Agent can see whether the recipient was edited before the failed transfer.
+- Access is limited to support roles.
+```
+
+The lesson is that good stories follow user jobs. "Build saved recipients" is too big. "Save after transfer," "select during transfer," and "support can investigate" are smaller and testable.
+
+A strong acceptance-criteria format is:
+
+```txt
+Given a repeat sender has completed a transfer
+When they choose to save the recipient
+Then the recipient appears in their saved recipient list for the next transfer
+
+Given the recipient already exists
+When the user tries to save it again
+Then the app explains that it is already saved and links to the existing recipient
+```
+
+This format is useful because it forces the team to name the starting state, the user action, and the expected result.
+
 ## Common mistakes
 
 A common mistake is writing stories that are really tasks: "Build recipient API." That may be a valid engineering task, but it does not explain user value.

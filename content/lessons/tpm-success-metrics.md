@@ -63,6 +63,72 @@ Sixth, decide how to measure. What events do we need? What properties? What base
 
 For interview answers, it helps to avoid giving one lonely metric. A real product needs a small set: one primary success metric, supporting diagnostics, and guardrails.
 
+A strong metrics answer often looks like a small tree:
+
+```txt
+Feature:
+Saved recipients for repeat transfers
+
+Product promise:
+Repeat senders can send to trusted recipients faster, with fewer mistakes.
+
+Primary success metric:
+Repeat transfer completion rate for users with saved recipients.
+
+Activation metrics:
+- Percentage of eligible users who save at least one recipient
+- Percentage of repeat senders who see the saved-recipient entry point
+
+Usage metrics:
+- Percentage of repeat transfers started from saved recipients
+- Number of saved recipients used more than once
+
+Efficiency metrics:
+- Median time from "start transfer" to "submit transfer"
+- Number of recipient-detail edits per repeat transfer
+
+Quality metrics:
+- Failed transfers caused by incorrect recipient details
+- Recipient deletion or correction rate
+
+Guardrail metrics:
+- Mistaken-recipient support tickets
+- Fraud or account-takeover flags involving saved recipients
+- Transfer cancellation rate after recipient selection
+```
+
+Then define the instrumentation before launch:
+
+```txt
+Events needed:
+- recipient_save_started
+- recipient_save_completed
+- recipient_selected
+- transfer_submitted
+- transfer_completed
+- transfer_failed
+- recipient_edited
+- recipient_deleted
+
+Useful properties:
+- user_id
+- recipient_id
+- corridor
+- payout_method
+- is_repeat_sender
+- transfer_status
+- failure_reason
+- source: saved_recipient, manual_entry, recent_recipient
+
+Baseline:
+Compare repeat-transfer completion and time-to-submit from the 30 days before launch.
+
+Review window:
+Look at early guardrails after 24 hours, then success metrics after one or two full repeat-transfer cycles.
+```
+
+This is the difference between "I would track conversion" and "I know how to prove whether the feature helped without creating new harm."
+
 ## Common mistakes
 
 A common mistake is calling an output a success metric. "Feature launched" is a delivery milestone, not proof of user value.

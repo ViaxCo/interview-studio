@@ -49,6 +49,74 @@ Fourth, verify recovery. Do not trust one green log line. Confirm with metrics, 
 
 Fifth, run a blameless postmortem. The goal is not to find one person to blame. It is to understand the chain of events and improve the system: monitoring, alerts, test coverage, rollout process, runbooks, dependency resilience, and product fallback states.
 
+During the incident, a TPM can keep a simple timeline like this:
+
+```txt
+Incident:
+Card payments failing for users in Nigeria.
+
+Severity:
+High. Users cannot complete payment. Money movement is blocked, but no evidence of duplicate charge yet.
+
+Known impact:
+- Started around 10:12
+- Affects card payments only
+- Bank transfer still works
+- Existing transfers are not affected
+- Support tickets rising
+
+Open questions:
+- Are any authorizations captured but shown as failed?
+- Is this our change, payment processor issue, or bank/network issue?
+- Can we safely route users to bank transfer?
+
+Actions:
+10:20 Engineering checking payment logs.
+10:23 Support using approved macro.
+10:27 Product paused card option for new attempts in affected corridor.
+10:31 Payments partner contacted.
+10:40 Next update due.
+```
+
+A customer or support update should be plain:
+
+```txt
+We are seeing failed card payment attempts for some users in Nigeria.
+
+Bank transfer is still available. Existing submitted transfers are not affected.
+
+We are investigating with our payment partner and will share the next update by 10:40.
+```
+
+After recovery, the postmortem should separate technical recovery from customer recovery:
+
+```txt
+Postmortem outline
+
+What happened:
+Card payment attempts failed for 42 minutes in one corridor.
+
+Customer impact:
+1,420 failed attempts, 380 support contacts, 0 confirmed duplicate charges.
+
+Detection:
+Support noticed before automated alert.
+
+Root cause:
+Partner response-code mapping changed and our system treated retryable failures as hard failures.
+
+Why existing defenses missed it:
+No alert on corridor-level card failure spike. Contract test did not cover the new response code.
+
+Follow-up actions:
+- Add alert for payment failure rate by corridor and method.
+- Add contract test for partner response-code mapping.
+- Update support dashboard to show partner error category.
+- Add fallback copy that routes users to bank transfer when card failure rate is high.
+```
+
+This is how the TPM answer becomes real. It shows the operating rhythm, the customer language, and the learning loop.
+
 ## Common mistakes
 
 A common mistake is optimizing for silence. Teams sometimes avoid declaring incidents because it feels dramatic. That delays coordination.

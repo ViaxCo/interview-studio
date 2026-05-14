@@ -46,6 +46,77 @@ After that, I would handle non-score factors explicitly. Regulatory deadlines, c
 
 Finally, I would communicate the tradeoff. A good roadmap decision should say what we are doing, why it matters now, what we are not doing, what risk we are accepting, and when we will revisit the decision.
 
+Here is what that can look like as an artifact:
+
+```txt
+Quarter goal:
+Increase successful repeat transfers while keeping operations workload stable.
+
+Capacity:
+Two product engineers, one backend engineer, one shared designer.
+
+Candidates:
+
+1. Saved recipient improvements
+Reach: 18,000 repeat senders per month
+Impact: high
+Confidence: medium
+Effort: medium
+Risk: wrong-recipient mistakes if confirmation is weak
+
+2. New payout partner
+Reach: one new corridor
+Impact: high for expansion
+Confidence: low until partner testing is done
+Effort: high
+Risk: partner reliability and reconciliation gaps
+
+3. Reconciliation automation
+Reach: operations team and all failed/pending transfers
+Impact: medium for users, high for operations
+Confidence: high
+Effort: medium
+Risk: low if shipped behind internal tooling
+
+4. Sales dashboard
+Reach: two enterprise prospects
+Impact: possible revenue
+Confidence: low
+Effort: low to medium
+Risk: could become a custom-reporting trap
+```
+
+A possible decision:
+
+```txt
+Do now:
+- Reconciliation automation
+- Saved recipient improvements
+
+Why:
+They support the quarter goal and reduce both user friction and operational load.
+
+Do discovery only:
+- New payout partner
+
+Why:
+It may be important, but partner risk and effort are still too uncertain for a full build commitment.
+
+Defer:
+- Sales dashboard
+
+Why:
+The evidence is narrow. Offer a manual report for the two prospects and revisit if demand repeats.
+
+Risk accepted:
+Corridor expansion may move slower this quarter.
+
+Revisit trigger:
+If partner testing proves simple or the enterprise deal becomes committed revenue, re-run the decision.
+```
+
+Notice what makes this useful. The TPM is not saying "my score says no." They are explaining the company goal, the evidence, the risk, the deferred work, and the trigger that could change the answer.
+
 ## Common mistakes
 
 A common mistake is using a framework to avoid judgment. RICE can help, but it cannot understand strategy by itself. A high score does not automatically beat a compliance deadline or a critical dependency.

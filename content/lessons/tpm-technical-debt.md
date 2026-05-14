@@ -56,6 +56,57 @@ Good debt work often has a clear scope:
 
 Sometimes the right plan is to allocate a percentage of capacity to debt. Sometimes it is to tie debt work to a feature. Sometimes it is to stop and fix a dangerous foundation before continuing.
 
+Here is an example debt sizing artifact:
+
+```txt
+Debt:
+Payout status mapping is duplicated across three services.
+
+Product impact:
+- New payout partners take six weeks because every partner needs custom status mapping.
+- Support sometimes sees "unknown" when the partner has already returned a useful reason.
+- Reconciliation bugs create manual operations work.
+
+Evidence:
+- 7 payout-status bugs in the last quarter
+- 18 support escalations in the last month
+- Two planned partner launches depend on this area
+
+Options:
+
+Option A: Do nothing now
+Benefit: fastest path to current feature
+Cost: partner launches remain slow and risky
+
+Option B: Full rewrite
+Benefit: clean long-term foundation
+Cost: delays roadmap by a quarter and carries migration risk
+
+Option C: Incremental debt payment
+Benefit: create one shared status-mapping module while building the next partner
+Cost: adds two weeks to the next partner launch
+```
+
+A reasonable TPM recommendation:
+
+```txt
+Recommendation:
+Choose Option C.
+
+Why:
+The debt directly affects two planned launches and repeated support issues, but a full rewrite is too large for the current quarter.
+
+Success measure:
+- Next partner launch uses shared mapping
+- Status-related support escalations drop by 50 percent
+- New partner status mapping can be configured in days, not weeks
+
+Guardrail:
+Do not expand scope into a full payment-platform rewrite.
+```
+
+That is the interview move: translate debt into product consequences, compare options, recommend a scoped investment, and define how the team will know it worked.
+
 ## Common mistakes
 
 A common mistake is treating all debt as equal. Some debt is annoying but harmless. Some debt blocks strategy or creates real risk.

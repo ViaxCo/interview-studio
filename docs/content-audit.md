@@ -13,8 +13,8 @@ Current bank:
 - 44 total lessons.
 - 17 Frontend lessons.
 - 27 TPM lessons.
-- 23,434 lesson words, excluding fenced code.
-- 149 fenced code blocks.
+- 23,675 lesson words, excluding fenced code.
+- 160 fenced code blocks.
 - 89 source links.
 - 89 source links reachable after cleanup and the latest batch.
 - 0 source links failing after cleanup and the latest batch.
@@ -130,6 +130,36 @@ These do not need rewrites, but they should gain more practical examples:
    - Add reflected, stored, DOM XSS.
    - Add URL validation and safe rich text handling examples.
 
+### Priority 3: TPM Quality Pass
+
+Completed on 2026-05-14: five older TPM lessons were enriched with concrete artifacts:
+
+1. `tpm-prioritization`
+   - Added a quarter-goal prioritization artifact.
+   - Added do-now, discovery-only, deferred, risk, and revisit-trigger example.
+
+2. `tpm-success-metrics`
+   - Added a saved-recipient metrics tree.
+   - Added instrumentation events, properties, baseline, and review-window plan.
+
+3. `tpm-incident-management`
+   - Added incident timeline, support/customer update, and postmortem outline.
+
+4. `tpm-user-stories`
+   - Added epic-to-story splitting example.
+   - Added Given/When/Then acceptance criteria examples.
+
+5. `tpm-technical-debt`
+   - Added debt sizing artifact.
+   - Added options, recommendation, success measures, and guardrail.
+
+The app now also has guided learning paths:
+
+1. TPM crash path.
+2. API and platform TPM.
+3. Fintech and risk TPM.
+4. Frontend foundations.
+
 ## Missing Topic Map
 
 ### Frontend Topics To Add Next
@@ -224,7 +254,7 @@ Source cleanup, Priority 1 TPM enrichment, and two 10-lesson expansion batches a
 
 Recommended order:
 
-1. Review the new TPM lessons in the app with the client in mind.
-2. Commit the second expansion batch after review.
+1. Review the guided paths in the app and confirm the sequencing feels right.
+2. Commit the quality-pass and learning-path update after review.
 3. Add the next TPM batch around enterprise, pricing, security/privacy, data products, and post-launch operations.
 4. Keep running source validation and browser spot-checks after every batch.
