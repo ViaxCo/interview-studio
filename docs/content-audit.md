@@ -10,13 +10,13 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 44 total lessons.
+- 52 total lessons.
 - 17 Frontend lessons.
-- 27 TPM lessons.
-- 23,675 lesson words, excluding fenced code.
-- 160 fenced code blocks.
-- 89 source links.
-- 89 source links reachable after cleanup and the latest batch.
+- 35 TPM lessons.
+- 26,344 lesson words, excluding fenced code.
+- 196 fenced code blocks.
+- 105 source links.
+- 105 source links reachable after cleanup and the latest batch.
 - 0 source links failing after cleanup and the latest batch.
 
 ## Scoring Rubric
@@ -71,7 +71,7 @@ These source URLs failed or were blocked during the initial audit and have been 
 | `tpm-vendor-evaluation` | `https://owasp.org/www-project-vendor-security-questionnaire/` | 404 | Replaced with Google VSAQ source. |
 | `tpm-vendor-evaluation` | `https://www.atlassian.com/team-playbook/plays/trade-off-sliders` | 404 | Replaced with current Atlassian trade-offs source. |
 
-All 89 source links passed the latest reachability check.
+All 105 source links passed the latest reachability check.
 
 ## Priority Rewrite List
 
@@ -153,12 +153,33 @@ Completed on 2026-05-14: five older TPM lessons were enriched with concrete arti
    - Added debt sizing artifact.
    - Added options, recommendation, success measures, and guardrail.
 
-The app now also has guided learning paths:
+### Priority 4: Senior TPM Scenario Batch
 
-1. TPM crash path.
-2. API and platform TPM.
-3. Fintech and risk TPM.
-4. Frontend foundations.
+Completed on 2026-05-14: eight senior TPM lessons were added:
+
+1. `tpm-enterprise-permissions-auditability`
+   - Added permissions matrix and audit-event model.
+
+2. `tpm-usage-based-pricing-packaging`
+   - Added package design, usage meter, entitlements, and billing edge cases.
+
+3. `tpm-data-product-reporting-requirements`
+   - Added dashboard requirements artifact with metric definitions, freshness, trust, and permissions.
+
+4. `tpm-privacy-by-design`
+   - Added privacy review artifact covering minimization, access, retention, controls, and risk.
+
+5. `tpm-security-review-product-manager`
+   - Added security review checklist for API keys and product-facing security requirements.
+
+6. `tpm-post-launch-operations`
+   - Added post-launch operating plan with product, system, operational, and customer-safety metrics.
+
+7. `tpm-ambiguous-executive-ask`
+   - Added clarification memo for turning vague leadership asks into options and decisions.
+
+8. `tpm-migration-communications`
+   - Added migration communication plan and customer email structure.
 
 ## Missing Topic Map
 
@@ -254,7 +275,7 @@ Source cleanup, Priority 1 TPM enrichment, and two 10-lesson expansion batches a
 
 Recommended order:
 
-1. Review the guided paths in the app and confirm the sequencing feels right.
-2. Commit the quality-pass and learning-path update after review.
-3. Add the next TPM batch around enterprise, pricing, security/privacy, data products, and post-launch operations.
+1. Review the new senior TPM lessons in the normal browse flow.
+2. Commit the senior TPM batch after review.
+3. Keep the app focused on browse, search, filters, reveal, save, and review.
 4. Keep running source validation and browser spot-checks after every batch.

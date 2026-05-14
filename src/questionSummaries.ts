@@ -189,6 +189,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ambiguous-executive-ask",
+    "track": "TPM",
+    "category": "Product Strategy",
+    "level": "Intermediate",
+    "question": "How would you handle an ambiguous executive request?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-api-integration",
     "track": "TPM",
     "category": "API & Partner Integration",
@@ -244,11 +255,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-data-product-reporting-requirements",
+    "track": "TPM",
+    "category": "Data & Reporting",
+    "level": "Intermediate",
+    "question": "How would you define requirements for a reporting or data product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-dependency-risk",
     "track": "TPM",
     "category": "Execution & Delivery",
     "level": "Intermediate",
     "question": "How would you manage dependency risk across multiple teams?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-enterprise-permissions-auditability",
+    "track": "TPM",
+    "category": "Enterprise Product",
+    "level": "Intermediate",
+    "question": "How would you design enterprise permissions, roles, and auditability?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -293,6 +326,17 @@ export const questionSummaries: Question[] = [
     "category": "Internal Tools",
     "level": "Foundational",
     "question": "How would you prioritize and build an internal tool for operations or support teams?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-migration-communications",
+    "track": "TPM",
+    "category": "Migration & Change Management",
+    "level": "Intermediate",
+    "question": "How would you communicate a technical migration to customers and internal teams?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -354,6 +398,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-post-launch-operations",
+    "track": "TPM",
+    "category": "Operations",
+    "level": "Intermediate",
+    "question": "What would you monitor after launching a high-risk product feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-prd",
     "track": "TPM",
     "category": "Product Requirements",
@@ -376,6 +431,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-privacy-by-design",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "How would you apply privacy by design to a new product feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-release-readiness",
     "track": "TPM",
     "category": "Launch",
@@ -392,6 +458,17 @@ export const questionSummaries: Question[] = [
     "category": "Roadmap & Prioritization",
     "level": "Intermediate",
     "question": "How would you build a roadmap when engineering, compliance, sales, and leadership all want different things?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-security-review-product-manager",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "How should a product manager work with security review?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -458,6 +535,17 @@ export const questionSummaries: Question[] = [
     "category": "Technical Strategy",
     "level": "Intermediate",
     "question": "How would you explain a technical tradeoff to non-technical stakeholders?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-usage-based-pricing-packaging",
+    "track": "TPM",
+    "category": "Pricing & Packaging",
+    "level": "Intermediate",
+    "question": "How would you design pricing and packaging for an API or usage-based product?",
     "answer": "",
     "reasoning": "",
     "tests": "",

@@ -839,6 +839,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
   },
   {
+    "id": "tpm-ambiguous-executive-ask",
+    "track": "TPM",
+    "category": "Product Strategy",
+    "level": "Intermediate",
+    "question": "How would you handle an ambiguous executive request?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An ambiguous executive request is a direction from leadership that sounds important but is not yet specific enough to build.\n\nExamples:\n\n```txt\n\"We need an AI strategy.\"\n\"Make onboarding enterprise-ready.\"\n\"Improve reliability.\"\n\"Monetize the API.\"\n\"Reduce operational risk.\"\n```\n\nThe beginner mistake is either obeying literally or pushing back too quickly. A stronger TPM treats the request as a signal. The executive may be pointing at a real business concern, but the team still needs clarity before committing roadmap capacity.\n\nThe TPM's job is to turn ambiguity into a decision:\n\n```txt\nWhat outcome are we trying to create?\nWhy now?\nFor whom?\nWhat evidence do we have?\nWhat options exist?\nWhat tradeoffs are acceptable?\nHow will we know it worked?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine the CEO says, \"We need to make the product enterprise-ready this quarter.\"\n\nA weak response is:\n\n```txt\nAdd SSO, audit logs, custom roles, and admin dashboard.\n```\n\nThose may be useful, but the team does not yet know the goal. Enterprise-ready for whom? A bank? A startup with 20 employees? A procurement checklist? A signed customer?\n\nA stronger TPM clarifies:\n\n```txt\nPossible meanings:\n- Close one named enterprise deal\n- Pass security review\n- Support teams and permissions\n- Improve admin controls\n- Meet compliance procurement requirements\n- Support higher-volume usage\n```\n\nEach meaning leads to a different plan."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a clarification memo:\n\n```txt\nRequest:\nMake the product enterprise-ready this quarter.\n\nClarifying questions:\n1. Which customer or segment is driving this?\n2. What deal, risk, or company goal makes this urgent?\n3. Which procurement or security blockers exist today?\n4. What must be true by end of quarter?\n5. What can wait?\n\nCurrent evidence:\n- Two enterprise prospects asked for SSO and audit logs.\n- One existing customer asked for role-based approvals.\n- Security questionnaire flagged data retention and admin access.\n\nOptions:\n\nOption A: Deal unblocker\nBuild SSO, audit log export, and security documentation.\n\nOption B: Admin foundation\nBuild organization model, roles, permissions, and audit events.\n\nOption C: Enterprise platform\nBuild SSO, custom roles, audit logs, approvals, data retention, and SCIM.\n\nRecommendation:\nChoose Option B plus security documentation this quarter.\n\nWhy:\nPermissions and auditability unlock multiple enterprise asks and reduce future rework. Full enterprise platform is too large for one quarter.\n```\n\nThis turns a vague request into options leadership can actually choose between."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is pretending ambiguity is clarity because the request came from an executive.\n\nAnother mistake is asking only \"what do you want us to build?\" Better questions uncover the business outcome and constraint.\n\nA third mistake is turning every executive request into an emergency. Some are urgent. Some need discovery. Some should be declined or reframed."
+      }
+    ],
+    "answer": "An ambiguous executive request is a direction from leadership that sounds important but is not yet specific enough to build.",
+    "reasoning": "Here is a clarification memo:\n\n```txt\nRequest:\nMake the product enterprise-ready this quarter.\n\nClarifying questions:\n1. Which customer or segment is driving this?\n2. What deal, risk, or company goal makes this urgent?\n3. Which procurement or security blockers exist today?\n4. What must be true by end of quarter?\n5. What can wait?\n\nCurrent evidence:\n- Two enterprise prospects asked for SSO and audit logs.\n- One existing customer asked for role-based approvals.\n- Security questionnaire flagged data retention and admin access.\n\nOptions:\n\nOption A: Deal unblocker\nBuild SSO, audit log export, and security documentation.\n\nOption B: Admin foundation\nBuild organization model, roles, permissions, and audit events.\n\nOption C: Enterprise platform\nBuild SSO, custom roles, audit logs, approvals, data retention, and SCIM.\n\nRecommendation:\nChoose Option B plus security documentation this quarter.\n\nWhy:\nPermissions and auditability unlock multiple enterprise asks and reduce future rework. Full enterprise platform is too large for one quarter.\n```\n\nThis turns a vague request into options leadership can actually choose between.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why should an ambiguous executive request be treated as a signal?",
+      "What questions help clarify the real outcome?",
+      "Why is \"enterprise-ready\" not specific enough?",
+      "What should a clarification memo include?",
+      "How can a TPM push back without being dismissive?"
+    ],
+    "interviewAnswer": "I would handle an ambiguous executive request by clarifying the business outcome, customer or segment, urgency, evidence, constraints, options, tradeoffs, and success metrics. Then I would present a recommendation and confirm the decision.\n\nA strong answer shows that the TPM can respect leadership direction while still protecting the team from vague execution.",
+    "sourceLinks": [
+      {
+        "label": "Atlassian: Better team decision making",
+        "url": "https://www.atlassian.com/team-playbook/examples/making-decisions"
+      },
+      {
+        "label": "ProductPlan: Product vision vs product strategy",
+        "url": "https://www.productplan.com/learn/product-vision-vs-product-strategy/"
+      }
+    ],
+    "beginnerExplanation": "An ambiguous executive request is a direction from leadership that sounds important but is not yet specific enough to build.\n\nExamples:\n\n```txt\n\"We need an AI strategy.\"\n\"Make onboarding enterprise-ready.\"\n\"Improve reliability.\"\n\"Monetize the API.\"\n\"Reduce operational risk.\"\n```\n\nThe beginner mistake is either obeying literally or pushing back too quickly. A stronger TPM treats the request as a signal. The executive may be pointing at a real business concern, but the team still needs clarity before committing roadmap capacity.\n\nThe TPM's job is to turn ambiguity into a decision:\n\n```txt\nWhat outcome are we trying to create?\nWhy now?\nFor whom?\nWhat evidence do we have?\nWhat options exist?\nWhat tradeoffs are acceptable?\nHow will we know it worked?\n```",
+    "example": "Imagine the CEO says, \"We need to make the product enterprise-ready this quarter.\"\n\nA weak response is:\n\n```txt\nAdd SSO, audit logs, custom roles, and admin dashboard.\n```\n\nThose may be useful, but the team does not yet know the goal. Enterprise-ready for whom? A bank? A startup with 20 employees? A procurement checklist? A signed customer?\n\nA stronger TPM clarifies:\n\n```txt\nPossible meanings:\n- Close one named enterprise deal\n- Pass security review\n- Support teams and permissions\n- Improve admin controls\n- Meet compliance procurement requirements\n- Support higher-volume usage\n```\n\nEach meaning leads to a different plan.",
+    "commonMistakes": "A common mistake is pretending ambiguity is clarity because the request came from an executive.\n\nAnother mistake is asking only \"what do you want us to build?\" Better questions uncover the business outcome and constraint.\n\nA third mistake is turning every executive request into an emergency. Some are urgent. Some need discovery. Some should be declined or reframed."
+  },
+  {
     "id": "tpm-api-integration",
     "track": "TPM",
     "category": "API & Partner Integration",
@@ -1084,6 +1133,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is hiding compliance requirements until the end of the flow. Users feel tricked when they invest effort and then hit an unexplained wall.\n\nAnother mistake is asking every user for the maximum amount of information immediately. That may satisfy a checklist, but it can destroy trust and conversion.\n\nA third mistake is treating vendor approval as the full product state. The product still needs to explain what happened, what the user can do next, what support can see, and how the business handles edge cases."
   },
   {
+    "id": "tpm-data-product-reporting-requirements",
+    "track": "TPM",
+    "category": "Data & Reporting",
+    "level": "Intermediate",
+    "question": "How would you define requirements for a reporting or data product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A reporting or data product helps people make decisions from data. It might be an internal dashboard, customer-facing analytics page, compliance report, finance export, partner report, or executive KPI view.\n\nThe beginner mistake is asking stakeholders, \"What charts do you want?\" That usually creates dashboards full of numbers nobody trusts or uses.\n\nA stronger TPM starts with the decision the report should support:\n\n```txt\nBad starting point:\nWhat dashboard do you want?\n\nBetter starting point:\nWhat decision will someone make with this data?\n```\n\nData products need product requirements and data requirements. The product side defines users, decisions, workflow, permissions, and usability. The data side defines metrics, sources, freshness, definitions, quality, lineage, and trust."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine operations wants a payout health dashboard.\n\nA weak requirement says:\n\n```txt\nShow payout success rate, failures, and volume.\n```\n\nThat is not enough. The team still does not know who uses it, how fresh the data must be, what counts as success, or what action someone takes when the metric changes.\n\nA better requirement says:\n\n```txt\nUser:\nOperations lead monitoring daily payout health.\n\nDecision:\nShould we pause a corridor, escalate to a partner, or alert support?\n\nCore questions:\n- Are payouts succeeding?\n- Which corridor is unhealthy?\n- Is the issue new or ongoing?\n- Which partner or payout method is involved?\n- How many users and how much money are affected?\n- What should operations do next?\n```\n\nNow the dashboard has a job."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a data product requirements artifact:\n\n```txt\nDashboard:\nPayout health monitor\n\nUsers:\nOperations lead, support manager, TPM, payments engineering\n\nPrimary decisions:\n- Pause a corridor\n- Escalate to partner\n- Prepare support messaging\n- Investigate reconciliation exceptions\n\nMetrics:\n- Payout success rate\n- Failure rate by corridor\n- Pending payouts older than SLA\n- Total affected users\n- Total affected amount\n- Partner error code distribution\n\nDefinitions:\nSuccess = payout reached final paid state.\nFailure = payout reached final failed or reversed state.\nPending breach = payout pending longer than corridor SLA.\n\nDimensions:\nCorridor, partner, payout method, customer segment, status, time window.\n\nFreshness:\nOperational view updates every five minutes.\nExecutive summary updates daily.\n\nPermissions:\nSupport can see status and safe reason.\nFinance can export reconciliation.\nOnly admins can see full sensitive details.\n\nTrust requirements:\n- Show last updated time.\n- Show data source.\n- Show known exclusions.\n- Alert when data pipeline is delayed.\n```\n\nThe TPM should also define non-goals. A dashboard that tries to answer every question becomes unusable."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is building charts before agreeing on metric definitions. If teams disagree on what \"active user\" or \"successful payout\" means, the dashboard will create arguments instead of decisions.\n\nAnother mistake is ignoring freshness. A real-time operations dashboard and a monthly finance report have different needs.\n\nA third mistake is forgetting permissions. Reports often expose sensitive user, financial, or operational data."
+      }
+    ],
+    "answer": "A reporting or data product helps people make decisions from data. It might be an internal dashboard, customer-facing analytics page, compliance report, finance export, partner report, or executive KPI view.",
+    "reasoning": "Here is a data product requirements artifact:\n\n```txt\nDashboard:\nPayout health monitor\n\nUsers:\nOperations lead, support manager, TPM, payments engineering\n\nPrimary decisions:\n- Pause a corridor\n- Escalate to partner\n- Prepare support messaging\n- Investigate reconciliation exceptions\n\nMetrics:\n- Payout success rate\n- Failure rate by corridor\n- Pending payouts older than SLA\n- Total affected users\n- Total affected amount\n- Partner error code distribution\n\nDefinitions:\nSuccess = payout reached final paid state.\nFailure = payout reached final failed or reversed state.\nPending breach = payout pending longer than corridor SLA.\n\nDimensions:\nCorridor, partner, payout method, customer segment, status, time window.\n\nFreshness:\nOperational view updates every five minutes.\nExecutive summary updates daily.\n\nPermissions:\nSupport can see status and safe reason.\nFinance can export reconciliation.\nOnly admins can see full sensitive details.\n\nTrust requirements:\n- Show last updated time.\n- Show data source.\n- Show known exclusions.\n- Alert when data pipeline is delayed.\n```\n\nThe TPM should also define non-goals. A dashboard that tries to answer every question becomes unusable.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why should reporting requirements start with decisions?",
+      "What is a metric definition?",
+      "Why does freshness matter?",
+      "What does data lineage help users trust?",
+      "Why are permissions important for reporting products?"
+    ],
+    "interviewAnswer": "I would define reporting requirements by identifying the users, decisions, key questions, metric definitions, data sources, freshness needs, dimensions, permissions, data quality expectations, and actions the report should support.\n\nA strong TPM answer shows that dashboards are not decoration. They are decision tools, and people must understand and trust the data.",
+    "sourceLinks": [
+      {
+        "label": "Atlassian: Product analytics",
+        "url": "https://www.atlassian.com/agile/product-management/product-analytics"
+      },
+      {
+        "label": "Atlassian: Product management KPIs",
+        "url": "https://www.atlassian.com/agile/product-management/product-management-kpis"
+      }
+    ],
+    "beginnerExplanation": "A reporting or data product helps people make decisions from data. It might be an internal dashboard, customer-facing analytics page, compliance report, finance export, partner report, or executive KPI view.\n\nThe beginner mistake is asking stakeholders, \"What charts do you want?\" That usually creates dashboards full of numbers nobody trusts or uses.\n\nA stronger TPM starts with the decision the report should support:\n\n```txt\nBad starting point:\nWhat dashboard do you want?\n\nBetter starting point:\nWhat decision will someone make with this data?\n```\n\nData products need product requirements and data requirements. The product side defines users, decisions, workflow, permissions, and usability. The data side defines metrics, sources, freshness, definitions, quality, lineage, and trust.",
+    "example": "Imagine operations wants a payout health dashboard.\n\nA weak requirement says:\n\n```txt\nShow payout success rate, failures, and volume.\n```\n\nThat is not enough. The team still does not know who uses it, how fresh the data must be, what counts as success, or what action someone takes when the metric changes.\n\nA better requirement says:\n\n```txt\nUser:\nOperations lead monitoring daily payout health.\n\nDecision:\nShould we pause a corridor, escalate to a partner, or alert support?\n\nCore questions:\n- Are payouts succeeding?\n- Which corridor is unhealthy?\n- Is the issue new or ongoing?\n- Which partner or payout method is involved?\n- How many users and how much money are affected?\n- What should operations do next?\n```\n\nNow the dashboard has a job.",
+    "commonMistakes": "A common mistake is building charts before agreeing on metric definitions. If teams disagree on what \"active user\" or \"successful payout\" means, the dashboard will create arguments instead of decisions.\n\nAnother mistake is ignoring freshness. A real-time operations dashboard and a monthly finance report have different needs.\n\nA third mistake is forgetting permissions. Reports often expose sensitive user, financial, or operational data."
+  },
+  {
     "id": "tpm-dependency-risk",
     "track": "TPM",
     "category": "Execution & Delivery",
@@ -1131,6 +1229,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A dependency is work that one team needs from another team before it can finish its own work.\n\nThe beginner mistake is discovering dependencies late. Late dependency discovery is painful because the other team may already have a full roadmap, a different priority, or a technical constraint nobody planned for.\n\nDependency risk is not only \"Team B is late.\" It can also mean the dependency is unclear, unowned, too large, technically risky, or not actually committed by the team expected to deliver it.\n\nThe mental model is:\n\n```txt\nDependency = \"We need something from someone else.\"\nDependency risk = \"That something may not arrive in the right shape, quality, or time.\"\n```",
     "example": "Imagine the product team is launching business accounts.\n\nYour team owns the user experience. But the launch depends on:\n\n```txt\nIdentity team:\nBusiness verification API\n\nPlatform team:\nOrganization and role model\n\nData team:\nBusiness account reporting tables\n\nCompliance team:\nPolicy approval and review rules\n\nSupport operations:\nMacros and investigation flow\n```\n\nA weak plan says, \"We need these teams.\" A strong plan names the exact contract.\n\n```txt\nDependency register\n\nDependency:\nBusiness verification API\n\nOwner:\nIdentity team\n\nNeeded by:\nMarch 12 for integration testing\n\nDefinition of done:\n- Create verification request\n- Return pending, approved, rejected, needs_more_info\n- Include reason code for support\n- Sandbox supports approved and rejected test businesses\n\nRisk:\nIdentity team has not committed to reason codes.\n\nMitigation:\nEscalate by Feb 16 or reduce launch scope to approved/pending only.\n```\n\nThis makes the dependency visible enough to manage.",
     "commonMistakes": "A common mistake is tracking dependencies as vague bullets. \"Need data team\" is not a manageable dependency.\n\nAnother mistake is assuming another team's roadmap commitment exists because someone said \"sounds good\" in a meeting.\n\nA third mistake is escalating too late. Escalation is not drama. It is making a risk visible while there is still time to change the plan."
+  },
+  {
+    "id": "tpm-enterprise-permissions-auditability",
+    "track": "TPM",
+    "category": "Enterprise Product",
+    "level": "Intermediate",
+    "question": "How would you design enterprise permissions, roles, and auditability?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Enterprise permissions answer a simple question: who is allowed to do what, to which data, and who can prove what happened later?\n\nThe beginner mistake is treating permissions as a few checkboxes. In real enterprise products, permissions affect security, compliance, support, sales, onboarding, customer trust, and incident response.\n\nThere are usually three related ideas:\n\n```txt\nRole:\nA named bundle of permissions, such as Owner, Admin, Analyst, Finance user, or Viewer.\n\nPermission:\nA specific action, such as invite user, approve payout, export report, edit billing, or view audit log.\n\nAuditability:\nThe ability to see who did what, when, from where, and what changed.\n```\n\nFor a TPM, the job is not to invent random roles. The job is to understand customer workflows, risk, compliance needs, and administrative reality."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a business payments product. A customer says: \"We need team accounts before we can use this.\"\n\nThat request hides several product questions:\n\n1. Who can add team members?\n2. Who can create a payout?\n3. Who can approve a payout?\n4. Who can see recipient bank details?\n5. Who can export reports?\n6. Who can change billing or limits?\n7. Who can view audit logs?\n8. What happens when an employee leaves?\n\nA weak answer says, \"We will add Admin and Member.\"\n\nA stronger answer starts with workflows and risk:\n\n```txt\nWorkflow:\nBusiness sends supplier payments.\n\nRisky actions:\n- Add or edit recipient\n- Create payout\n- Approve payout\n- Raise transaction limit\n- Export financial report\n- Invite user\n- Change role\n- View sensitive recipient details\n\nLower-risk actions:\n- View payment status\n- Download own receipt\n- View masked recipient details\n```\n\nNow the team can design roles that match real jobs."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a simple permissions matrix:\n\n```txt\nPermission                      Owner  Admin  Finance  Viewer\n\nInvite user                     Yes    Yes    No       No\nChange user role                Yes    No     No       No\nCreate payout                   Yes    Yes    Yes      No\nApprove payout                  Yes    Yes    No       No\nView payout status              Yes    Yes    Yes      Yes\nExport reconciliation report    Yes    Yes    Yes      No\nView full recipient details     Yes    Yes    Masked   Masked\nChange billing settings         Yes    No     No       No\nView audit log                  Yes    Yes    No       No\n```\n\nThen define audit events:\n\n```txt\nAudit log events\n\nUser management:\n- User invited\n- User removed\n- Role changed\n\nMoney movement:\n- Payout created\n- Payout approved\n- Payout cancelled\n- Recipient edited\n\nSecurity:\n- Login failed repeatedly\n- MFA disabled\n- API key created\n- Webhook endpoint changed\n\nReporting:\n- Sensitive export downloaded\n- Audit log viewed\n```\n\nEach event should include actor, timestamp, organization, target object, old value when safe, new value when safe, IP or device context when available, and request ID.\n\nThe TPM should also decide default roles carefully. Enterprise buyers often expect least privilege. A new user should not accidentally get permission to move money or export sensitive data."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is designing roles around internal implementation instead of customer jobs.\n\nAnother mistake is forgetting audit logs until after enterprise customers ask for them. If the product handles money, identity, health, privacy, or admin actions, auditability is part of the product.\n\nA third mistake is letting every permission become fully custom too early. Custom roles are powerful, but they add complexity to UI, support, testing, docs, and permission bugs."
+      }
+    ],
+    "answer": "Enterprise permissions answer a simple question: who is allowed to do what, to which data, and who can prove what happened later?",
+    "reasoning": "Here is a simple permissions matrix:\n\n```txt\nPermission                      Owner  Admin  Finance  Viewer\n\nInvite user                     Yes    Yes    No       No\nChange user role                Yes    No     No       No\nCreate payout                   Yes    Yes    Yes      No\nApprove payout                  Yes    Yes    No       No\nView payout status              Yes    Yes    Yes      Yes\nExport reconciliation report    Yes    Yes    Yes      No\nView full recipient details     Yes    Yes    Masked   Masked\nChange billing settings         Yes    No     No       No\nView audit log                  Yes    Yes    No       No\n```\n\nThen define audit events:\n\n```txt\nAudit log events\n\nUser management:\n- User invited\n- User removed\n- Role changed\n\nMoney movement:\n- Payout created\n- Payout approved\n- Payout cancelled\n- Recipient edited\n\nSecurity:\n- Login failed repeatedly\n- MFA disabled\n- API key created\n- Webhook endpoint changed\n\nReporting:\n- Sensitive export downloaded\n- Audit log viewed\n```\n\nEach event should include actor, timestamp, organization, target object, old value when safe, new value when safe, IP or device context when available, and request ID.\n\nThe TPM should also decide default roles carefully. Enterprise buyers often expect least privilege. A new user should not accidentally get permission to move money or export sensitive data.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between a role and a permission?",
+      "Why do enterprise customers care about audit logs?",
+      "What actions usually need stricter permission controls?",
+      "Why is least privilege important?",
+      "When might custom roles be worth the complexity?"
+    ],
+    "interviewAnswer": "I would design enterprise permissions by mapping customer workflows, identifying risky actions, defining roles, writing a permissions matrix, and specifying audit events. I would include least-privilege defaults, admin controls, sensitive-data masking, role-change history, and support visibility.\n\nA strong answer shows that permissions are not just UI checkboxes. They are part of security, compliance, customer trust, and enterprise readiness.",
+    "sourceLinks": [
+      {
+        "label": "Google Cloud: IAM roles and permissions",
+        "url": "https://cloud.google.com/iam/docs/permissions-reference"
+      },
+      {
+        "label": "Atlassian Support: Audit log activities",
+        "url": "https://support.atlassian.com/security-and-access-policies/docs/accessing-audit-log-activities/"
+      }
+    ],
+    "beginnerExplanation": "Enterprise permissions answer a simple question: who is allowed to do what, to which data, and who can prove what happened later?\n\nThe beginner mistake is treating permissions as a few checkboxes. In real enterprise products, permissions affect security, compliance, support, sales, onboarding, customer trust, and incident response.\n\nThere are usually three related ideas:\n\n```txt\nRole:\nA named bundle of permissions, such as Owner, Admin, Analyst, Finance user, or Viewer.\n\nPermission:\nA specific action, such as invite user, approve payout, export report, edit billing, or view audit log.\n\nAuditability:\nThe ability to see who did what, when, from where, and what changed.\n```\n\nFor a TPM, the job is not to invent random roles. The job is to understand customer workflows, risk, compliance needs, and administrative reality.",
+    "example": "Imagine a business payments product. A customer says: \"We need team accounts before we can use this.\"\n\nThat request hides several product questions:\n\n1. Who can add team members?\n2. Who can create a payout?\n3. Who can approve a payout?\n4. Who can see recipient bank details?\n5. Who can export reports?\n6. Who can change billing or limits?\n7. Who can view audit logs?\n8. What happens when an employee leaves?\n\nA weak answer says, \"We will add Admin and Member.\"\n\nA stronger answer starts with workflows and risk:\n\n```txt\nWorkflow:\nBusiness sends supplier payments.\n\nRisky actions:\n- Add or edit recipient\n- Create payout\n- Approve payout\n- Raise transaction limit\n- Export financial report\n- Invite user\n- Change role\n- View sensitive recipient details\n\nLower-risk actions:\n- View payment status\n- Download own receipt\n- View masked recipient details\n```\n\nNow the team can design roles that match real jobs.",
+    "commonMistakes": "A common mistake is designing roles around internal implementation instead of customer jobs.\n\nAnother mistake is forgetting audit logs until after enterprise customers ask for them. If the product handles money, identity, health, privacy, or admin actions, auditability is part of the product.\n\nA third mistake is letting every permission become fully custom too early. Custom roles are powerful, but they add complexity to UI, support, testing, docs, and permission bugs."
   },
   {
     "id": "tpm-experiment-design-risk",
@@ -1327,6 +1474,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "An internal tool is still a product. Its users may be support agents, compliance reviewers, operations specialists, sales teams, finance teams, or engineers.\n\nThe beginner mistake is treating internal users as if their pain matters less because they are employees. But internal tool problems can become customer problems. If support cannot investigate a failed payout, the customer waits. If compliance reviewers lack context, safe users may be blocked. If operations relies on spreadsheets, mistakes become expensive.\n\nThe mental model is:\n\n```txt\nExternal product:\nHelps customers complete jobs.\n\nInternal tool:\nHelps the company complete the work needed to serve customers.\n```",
     "example": "Imagine support agents need a tool to investigate payment failures.\n\nA weak requirement says:\n\n```txt\nBuild support dashboard.\n```\n\nThat is too vague. A useful TPM asks what job the agent is trying to do.\n\n```txt\nSupport agent job:\nWhen a customer says \"my payment failed,\" the agent needs to identify the payment, understand the current status, know whether money moved, see the reason for failure, choose the right next action, and explain it clearly to the customer.\n```\n\nNow the product shape is clearer.\n\n```txt\nMinimum useful internal tool\n\nSearch:\n- Customer email\n- Transaction ID\n- Recipient phone\n- Partner reference\n\nPayment view:\n- Current status\n- Status history\n- Failure reason\n- Partner response\n- Retry eligibility\n- Refund or reversal state\n\nAgent guidance:\n- What this status means\n- What action is allowed\n- What the agent should tell the customer\n- When to escalate\n```\n\nThis is much better than a generic admin table.",
     "commonMistakes": "A common mistake is copying database fields into a UI and calling it a tool. Internal users need workflow support, not raw data dumps.\n\nAnother mistake is skipping research because the users are coworkers. Watching five agents do the job can reveal more than a week of guessing.\n\nA third mistake is ignoring governance. Internal tools need permissions, audit logs, and clear rules about who can take risky actions."
+  },
+  {
+    "id": "tpm-migration-communications",
+    "track": "TPM",
+    "category": "Migration & Change Management",
+    "level": "Intermediate",
+    "question": "How would you communicate a technical migration to customers and internal teams?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A technical migration moves users, data, traffic, workflows, or systems from an old implementation to a new one.\n\nThe beginner mistake is treating migration communication as a launch announcement. Migration communication is really change management. Different groups need different information at different times.\n\nCustomers care about:\n\n```txt\nWill anything break?\nWill my data change?\nDo I need to do anything?\nWhen is this happening?\nWho do I contact if something looks wrong?\n```\n\nInternal teams care about:\n\n```txt\nWhat is changing?\nWho is affected?\nWhat is the rollout plan?\nWhat are the known risks?\nHow do we support, monitor, and roll back?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine the company is migrating customers from an old reporting system to a new analytics platform.\n\nA weak communication plan says:\n\n```txt\nEmail customers when the migration is done.\n```\n\nThat is too late. If reports look different, exports change, or data refresh timing changes, customers and support will be surprised.\n\nA better plan segments the audience:\n\n```txt\nInternal engineering:\nTechnical rollout, data validation, rollback, monitoring.\n\nSupport:\nCustomer-facing explanation, known differences, escalation path.\n\nSales and customer success:\nWhich accounts are affected, timing, benefits, risks.\n\nCustomers:\nWhat changes, when, what action is needed, how to get help.\n\nLeadership:\nProgress, risk, customer impact, decision points.\n```\n\nThe message should match the audience. Customers do not need the database migration strategy. Support does need enough detail to answer real questions."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a migration communications plan:\n\n```txt\nMigration:\nMove business reporting from legacy reports to new analytics platform.\n\nCustomer-facing promise:\nReports will be faster, easier to filter, and exportable in the same formats.\n\nCustomer impact:\n- Report layout changes\n- Export names change\n- Historical data remains available\n- No action required for most customers\n- API report endpoint changes for customers using automation\n\nTimeline:\nWeek 1: internal validation\nWeek 2: beta customers\nWeek 3: 20 percent rollout\nWeek 4: full rollout if guardrails pass\n\nCustomer comms:\n- 14 days before: explain change and timeline\n- 3 days before: reminder with support link\n- Day of migration: confirmation and known differences\n- After migration: check-in for high-value accounts\n\nSupport enablement:\n- Macro for \"what changed\"\n- Known differences page\n- Escalation tag\n- Rollback contact\n- Data validation checklist\n```\n\nHere is a customer email structure:\n\n```txt\nSubject:\nUpcoming reporting update on May 28\n\nWhat is changing:\nYour reports will move to a faster analytics experience with the same historical data.\n\nWhen:\nWe plan to migrate your workspace between May 28 and May 30.\n\nWhat you need to do:\nMost customers do not need to take action. If you use automated report exports, review the endpoint notes linked below.\n\nWhat may look different:\nSome report names and filters have changed. Export formats remain available.\n\nHelp:\nContact support if a report looks missing or if totals do not match expectations.\n```\n\nGood migration communication reduces surprise. It does not promise zero risk."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is communicating only the benefit. Customers also need to know what changes and what action is required.\n\nAnother mistake is sending the same message to every audience. Engineering, support, executives, and customers need different levels of detail.\n\nA third mistake is not preparing support. If support learns from customers, the migration already feels sloppy."
+      }
+    ],
+    "answer": "A technical migration moves users, data, traffic, workflows, or systems from an old implementation to a new one.",
+    "reasoning": "Here is a migration communications plan:\n\n```txt\nMigration:\nMove business reporting from legacy reports to new analytics platform.\n\nCustomer-facing promise:\nReports will be faster, easier to filter, and exportable in the same formats.\n\nCustomer impact:\n- Report layout changes\n- Export names change\n- Historical data remains available\n- No action required for most customers\n- API report endpoint changes for customers using automation\n\nTimeline:\nWeek 1: internal validation\nWeek 2: beta customers\nWeek 3: 20 percent rollout\nWeek 4: full rollout if guardrails pass\n\nCustomer comms:\n- 14 days before: explain change and timeline\n- 3 days before: reminder with support link\n- Day of migration: confirmation and known differences\n- After migration: check-in for high-value accounts\n\nSupport enablement:\n- Macro for \"what changed\"\n- Known differences page\n- Escalation tag\n- Rollback contact\n- Data validation checklist\n```\n\nHere is a customer email structure:\n\n```txt\nSubject:\nUpcoming reporting update on May 28\n\nWhat is changing:\nYour reports will move to a faster analytics experience with the same historical data.\n\nWhen:\nWe plan to migrate your workspace between May 28 and May 30.\n\nWhat you need to do:\nMost customers do not need to take action. If you use automated report exports, review the endpoint notes linked below.\n\nWhat may look different:\nSome report names and filters have changed. Export formats remain available.\n\nHelp:\nContact support if a report looks missing or if totals do not match expectations.\n```\n\nGood migration communication reduces surprise. It does not promise zero risk.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is migration communication different from a launch announcement?",
+      "What do customers need to know during a migration?",
+      "Why should support be enabled before customers are notified?",
+      "What should a customer migration email include?",
+      "How can rollout stages reduce migration risk?"
+    ],
+    "interviewAnswer": "I would communicate a migration by segmenting audiences, explaining what changes, who is affected, timeline, required actions, risks, support path, and rollback or mitigation plans. I would prepare internal teams before customer communication and use staged rollout updates.\n\nA strong TPM answer shows that migration success depends on trust, timing, support readiness, and clear expectations, not only technical execution.",
+    "sourceLinks": [
+      {
+        "label": "AWS: Migration strategies",
+        "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/application-portfolio-assessment-guide/migration-strategies.html"
+      },
+      {
+        "label": "Martin Fowler: Strangler Fig Application",
+        "url": "https://martinfowler.com/bliki/StranglerFigApplication.html"
+      }
+    ],
+    "beginnerExplanation": "A technical migration moves users, data, traffic, workflows, or systems from an old implementation to a new one.\n\nThe beginner mistake is treating migration communication as a launch announcement. Migration communication is really change management. Different groups need different information at different times.\n\nCustomers care about:\n\n```txt\nWill anything break?\nWill my data change?\nDo I need to do anything?\nWhen is this happening?\nWho do I contact if something looks wrong?\n```\n\nInternal teams care about:\n\n```txt\nWhat is changing?\nWho is affected?\nWhat is the rollout plan?\nWhat are the known risks?\nHow do we support, monitor, and roll back?\n```",
+    "example": "Imagine the company is migrating customers from an old reporting system to a new analytics platform.\n\nA weak communication plan says:\n\n```txt\nEmail customers when the migration is done.\n```\n\nThat is too late. If reports look different, exports change, or data refresh timing changes, customers and support will be surprised.\n\nA better plan segments the audience:\n\n```txt\nInternal engineering:\nTechnical rollout, data validation, rollback, monitoring.\n\nSupport:\nCustomer-facing explanation, known differences, escalation path.\n\nSales and customer success:\nWhich accounts are affected, timing, benefits, risks.\n\nCustomers:\nWhat changes, when, what action is needed, how to get help.\n\nLeadership:\nProgress, risk, customer impact, decision points.\n```\n\nThe message should match the audience. Customers do not need the database migration strategy. Support does need enough detail to answer real questions.",
+    "commonMistakes": "A common mistake is communicating only the benefit. Customers also need to know what changes and what action is required.\n\nAnother mistake is sending the same message to every audience. Engineering, support, executives, and customers need different levels of detail.\n\nA third mistake is not preparing support. If support learns from customers, the migration already feels sloppy."
   },
   {
     "id": "tpm-migration-planning",
@@ -1574,6 +1770,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is treating documentation as separate from the product. For developer products, docs are part of the product surface.\n\nAnother mistake is ignoring failure paths. Developers judge platforms by what happens when things go wrong.\n\nA third mistake is shipping breaking changes casually. Platform users build businesses and workflows on top of your contracts."
   },
   {
+    "id": "tpm-post-launch-operations",
+    "track": "TPM",
+    "category": "Operations",
+    "level": "Intermediate",
+    "question": "What would you monitor after launching a high-risk product feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Post-launch operations are the activities that happen after a feature is released: monitoring, support, incident response, metric review, rollback decisions, customer communication, and follow-up work.\n\nThe beginner mistake is treating launch as the finish line. For risky features, launch is when the team starts learning whether the feature behaves safely in the real world.\n\nA TPM should think about three kinds of health:\n\n```txt\nProduct health:\nAre users getting the intended value?\n\nSystem health:\nIs the product technically reliable?\n\nOperational health:\nCan support, compliance, operations, and partners handle what is happening?\n```\n\nIf one of these fails, the launch may need to pause even if the code technically works."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine launching a new payout partner behind a feature flag.\n\nThe team should not only watch \"number of payouts.\" They need to know whether payouts are succeeding, how long they stay pending, whether partner errors are rising, whether support tickets are increasing, and whether reconciliation still works.\n\nA weak launch plan says:\n\n```txt\nLaunch Monday and check metrics later.\n```\n\nA stronger plan says:\n\n```txt\nLaunch shape:\n5 percent of eligible payouts in one corridor.\n\nReview windows:\nOne hour, four hours, 24 hours, one week.\n\nPause criteria:\n- Failure rate above threshold\n- Pending duration above SLA\n- Reconciliation mismatch\n- Support contacts spike\n- Partner incident report\n```\n\nNow launch is controlled, not hopeful."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a post-launch operating plan:\n\n```txt\nFeature:\nNew payout partner\n\nProduct metrics:\n- Payout completion rate\n- Median and p95 time to final status\n- User retry rate\n- Drop-off after partner selection\n\nSystem metrics:\n- API latency\n- Error rate\n- Timeout rate\n- Webhook delivery success\n- Queue backlog\n\nOperational metrics:\n- Pending payouts older than SLA\n- Manual review volume\n- Reconciliation exceptions\n- Support tickets by reason\n- Partner escalation count\n\nCustomer safety:\n- Duplicate payout attempts\n- Incorrect status shown to user\n- Money captured but not submitted\n\nDecision rules:\n- Continue rollout if all guardrails stay healthy for 24 hours.\n- Pause if failure rate doubles baseline.\n- Roll back if money movement state becomes unclear.\n- Escalate if partner does not respond within SLA.\n```\n\nThe TPM should also define ownership:\n\n```txt\nOwner map\n\nEngineering:\nSystem metrics, rollback, technical investigation.\n\nOperations:\nPending payouts, manual review, reconciliation.\n\nSupport:\nCustomer reports, macros, escalation tags.\n\nProduct:\nRollout decision, customer impact, tradeoffs, post-launch review.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is monitoring only success metrics. You also need guardrails and failure signals.\n\nAnother mistake is waiting too long for the first review. High-risk launches need early observation.\n\nA third mistake is not defining pause or rollback criteria before launch. Teams make worse decisions under pressure."
+      }
+    ],
+    "answer": "Post-launch operations are the activities that happen after a feature is released: monitoring, support, incident response, metric review, rollback decisions, customer communication, and follow-up work.",
+    "reasoning": "Here is a post-launch operating plan:\n\n```txt\nFeature:\nNew payout partner\n\nProduct metrics:\n- Payout completion rate\n- Median and p95 time to final status\n- User retry rate\n- Drop-off after partner selection\n\nSystem metrics:\n- API latency\n- Error rate\n- Timeout rate\n- Webhook delivery success\n- Queue backlog\n\nOperational metrics:\n- Pending payouts older than SLA\n- Manual review volume\n- Reconciliation exceptions\n- Support tickets by reason\n- Partner escalation count\n\nCustomer safety:\n- Duplicate payout attempts\n- Incorrect status shown to user\n- Money captured but not submitted\n\nDecision rules:\n- Continue rollout if all guardrails stay healthy for 24 hours.\n- Pause if failure rate doubles baseline.\n- Roll back if money movement state becomes unclear.\n- Escalate if partner does not respond within SLA.\n```\n\nThe TPM should also define ownership:\n\n```txt\nOwner map\n\nEngineering:\nSystem metrics, rollback, technical investigation.\n\nOperations:\nPending payouts, manual review, reconciliation.\n\nSupport:\nCustomer reports, macros, escalation tags.\n\nProduct:\nRollout decision, customer impact, tradeoffs, post-launch review.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is launch not the finish line?",
+      "What is the difference between product, system, and operational health?",
+      "What are pause criteria?",
+      "Why are early review windows useful?",
+      "Who should own post-launch monitoring?"
+    ],
+    "interviewAnswer": "I would monitor product outcomes, system reliability, operational workload, customer safety, support volume, and guardrail metrics. I would define review windows, rollout stages, pause criteria, rollback criteria, owners, and communication paths before launch.\n\nA strong TPM answer treats launch as an operating phase, not a celebration.",
+    "sourceLinks": [
+      {
+        "label": "Google SRE: Monitoring distributed systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      },
+      {
+        "label": "LaunchDarkly Docs: Guarded rollouts",
+        "url": "https://launchdarkly.com/docs/home/releases/managing-guarded-rollouts"
+      }
+    ],
+    "beginnerExplanation": "Post-launch operations are the activities that happen after a feature is released: monitoring, support, incident response, metric review, rollback decisions, customer communication, and follow-up work.\n\nThe beginner mistake is treating launch as the finish line. For risky features, launch is when the team starts learning whether the feature behaves safely in the real world.\n\nA TPM should think about three kinds of health:\n\n```txt\nProduct health:\nAre users getting the intended value?\n\nSystem health:\nIs the product technically reliable?\n\nOperational health:\nCan support, compliance, operations, and partners handle what is happening?\n```\n\nIf one of these fails, the launch may need to pause even if the code technically works.",
+    "example": "Imagine launching a new payout partner behind a feature flag.\n\nThe team should not only watch \"number of payouts.\" They need to know whether payouts are succeeding, how long they stay pending, whether partner errors are rising, whether support tickets are increasing, and whether reconciliation still works.\n\nA weak launch plan says:\n\n```txt\nLaunch Monday and check metrics later.\n```\n\nA stronger plan says:\n\n```txt\nLaunch shape:\n5 percent of eligible payouts in one corridor.\n\nReview windows:\nOne hour, four hours, 24 hours, one week.\n\nPause criteria:\n- Failure rate above threshold\n- Pending duration above SLA\n- Reconciliation mismatch\n- Support contacts spike\n- Partner incident report\n```\n\nNow launch is controlled, not hopeful.",
+    "commonMistakes": "A common mistake is monitoring only success metrics. You also need guardrails and failure signals.\n\nAnother mistake is waiting too long for the first review. High-risk launches need early observation.\n\nA third mistake is not defining pause or rollback criteria before launch. Teams make worse decisions under pressure."
+  },
+  {
     "id": "tpm-prd",
     "track": "TPM",
     "category": "Product Requirements",
@@ -1672,6 +1917,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is using a framework to avoid judgment. RICE can help, but it cannot understand strategy by itself. A high score does not automatically beat a compliance deadline or a critical dependency.\n\nAnother mistake is prioritizing whoever is loudest. Escalations should be heard, but they still need to be translated into impact, urgency, evidence, and cost.\n\nA third mistake is ignoring technical and operational work because it is less visible. If technical debt slows every roadmap item or operations teams are drowning in manual work, that is product impact."
   },
   {
+    "id": "tpm-privacy-by-design",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "How would you apply privacy by design to a new product feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Privacy by design means privacy is considered while the product is being shaped, not after the feature is already built.\n\nThe beginner mistake is thinking privacy is only a legal review at the end. By then, the team may have already collected too much data, exposed it to too many people, stored it too long, or made deletion hard.\n\nFor a TPM, privacy by design is a product-thinking discipline:\n\n```txt\nWhat data do we need?\nWhy do we need it?\nWho can see it?\nHow long do we keep it?\nHow does the user understand and control it?\nWhat could go wrong for the person if this data is misused?\n```\n\nPrivacy is not only about avoiding fines. It is about user trust and reducing harm."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a remittance product wants to add \"recipient suggestions.\" When a user sends money, the app suggests previous recipients and maybe contacts from the user's phone.\n\nA weak approach says:\n\n```txt\nAsk for contact access and upload contacts so suggestions work.\n```\n\nA privacy-by-design approach asks:\n\n```txt\nIs contact access actually required?\nCan suggestions work from recipients the user already paid?\nCan contact matching happen on device?\nCan the user choose not to enable contacts?\nWhat exactly is uploaded?\nAre contacts stored?\nCan the user delete imported data?\nDo recipients know their data is being used?\n```\n\nThe product may decide that saved recipients are enough for the first version. That is a privacy-friendly product decision, not a legal afterthought."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a privacy review artifact:\n\n```txt\nFeature:\nRecipient suggestions\n\nUser value:\nHelp repeat senders find trusted recipients faster.\n\nPersonal data involved:\n- Sender account ID\n- Recipient name\n- Recipient country\n- Recipient payout method\n- Recent transfer history\n- Optional phone contacts, if enabled later\n\nData minimization:\nUse saved and recent recipients first. Do not request phone contacts in v1.\n\nAccess:\nUser sees own recipients. Support sees masked details. Admin access is audited.\n\nRetention:\nRecipient records follow account retention policy. Deleted recipients no longer appear in suggestions.\n\nUser control:\nUser can remove a recipient from suggestions.\n\nRisk:\nWrong suggestion could expose recipient name on a shared device.\n\nMitigation:\nShow masked identifiers and require confirmation before transfer.\n```\n\nThe TPM should also ask whether the feature changes the privacy notice, consent flow, deletion process, or support scripts."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is collecting data because it might be useful later. That creates privacy and security burden without clear user value.\n\nAnother mistake is hiding privacy choices in vague copy. Users should understand what is happening in plain language.\n\nA third mistake is forgetting lifecycle. Privacy includes collection, use, access, sharing, retention, deletion, and auditability."
+      }
+    ],
+    "answer": "Privacy by design means privacy is considered while the product is being shaped, not after the feature is already built.",
+    "reasoning": "Here is a privacy review artifact:\n\n```txt\nFeature:\nRecipient suggestions\n\nUser value:\nHelp repeat senders find trusted recipients faster.\n\nPersonal data involved:\n- Sender account ID\n- Recipient name\n- Recipient country\n- Recipient payout method\n- Recent transfer history\n- Optional phone contacts, if enabled later\n\nData minimization:\nUse saved and recent recipients first. Do not request phone contacts in v1.\n\nAccess:\nUser sees own recipients. Support sees masked details. Admin access is audited.\n\nRetention:\nRecipient records follow account retention policy. Deleted recipients no longer appear in suggestions.\n\nUser control:\nUser can remove a recipient from suggestions.\n\nRisk:\nWrong suggestion could expose recipient name on a shared device.\n\nMitigation:\nShow masked identifiers and require confirmation before transfer.\n```\n\nThe TPM should also ask whether the feature changes the privacy notice, consent flow, deletion process, or support scripts.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is privacy by design different from legal review at the end?",
+      "What does data minimization mean?",
+      "Why should retention be defined before launch?",
+      "What user controls might privacy-sensitive features need?",
+      "How can a product feature create privacy harm even if it is useful?"
+    ],
+    "interviewAnswer": "I would apply privacy by design by identifying the data involved, the purpose for each data element, minimization options, access controls, retention, deletion, user consent or control, auditability, and potential user harms.\n\nA strong TPM answer shows that privacy is part of product quality. The feature should collect the least data needed, explain itself clearly, and protect users across the full data lifecycle.",
+    "sourceLinks": [
+      {
+        "label": "NIST: Privacy Framework",
+        "url": "https://www.nist.gov/privacy-framework"
+      },
+      {
+        "label": "ICO: Data protection by design and by default",
+        "url": "https://ico.org.uk/for-organisations/guide-to-data-protection/guide-to-the-general-data-protection-regulation-gdpr/accountability-and-governance/data-protection-by-design-and-default/"
+      }
+    ],
+    "beginnerExplanation": "Privacy by design means privacy is considered while the product is being shaped, not after the feature is already built.\n\nThe beginner mistake is thinking privacy is only a legal review at the end. By then, the team may have already collected too much data, exposed it to too many people, stored it too long, or made deletion hard.\n\nFor a TPM, privacy by design is a product-thinking discipline:\n\n```txt\nWhat data do we need?\nWhy do we need it?\nWho can see it?\nHow long do we keep it?\nHow does the user understand and control it?\nWhat could go wrong for the person if this data is misused?\n```\n\nPrivacy is not only about avoiding fines. It is about user trust and reducing harm.",
+    "example": "Imagine a remittance product wants to add \"recipient suggestions.\" When a user sends money, the app suggests previous recipients and maybe contacts from the user's phone.\n\nA weak approach says:\n\n```txt\nAsk for contact access and upload contacts so suggestions work.\n```\n\nA privacy-by-design approach asks:\n\n```txt\nIs contact access actually required?\nCan suggestions work from recipients the user already paid?\nCan contact matching happen on device?\nCan the user choose not to enable contacts?\nWhat exactly is uploaded?\nAre contacts stored?\nCan the user delete imported data?\nDo recipients know their data is being used?\n```\n\nThe product may decide that saved recipients are enough for the first version. That is a privacy-friendly product decision, not a legal afterthought.",
+    "commonMistakes": "A common mistake is collecting data because it might be useful later. That creates privacy and security burden without clear user value.\n\nAnother mistake is hiding privacy choices in vague copy. Users should understand what is happening in plain language.\n\nA third mistake is forgetting lifecycle. Privacy includes collection, use, access, sharing, retention, deletion, and auditability."
+  },
+  {
     "id": "tpm-release-readiness",
     "track": "TPM",
     "category": "Launch",
@@ -1768,6 +2062,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A roadmap is not a wish list. It is a communication tool that explains the most important outcomes the team is pursuing and the order in which the team intends to pursue them.\n\nThe beginner mistake is trying to satisfy every stakeholder by putting every request on the roadmap. That creates a roadmap that looks aligned in a meeting but fails in real life because the team cannot actually execute it.\n\nWhen engineering, compliance, sales, and leadership disagree, the TPM's job is not to pick the loudest stakeholder. The job is to translate requests into outcomes, constraints, risks, and sequencing.\n\nThe simple mental model is:\n\n```txt\nStakeholder request: \"Build this.\"\nTPM translation: \"What outcome, risk, obligation, or dependency does this represent?\"\nRoadmap decision: \"Given our goals and constraints, what should happen now, next, or later?\"\n```",
     "example": "Imagine a fintech product team has four pressures:\n\n```txt\nSales:\n\"Enterprise client needs team permissions this quarter.\"\n\nCompliance:\n\"We need stronger transaction monitoring before volume increases.\"\n\nEngineering:\n\"The payout system is hard to change and needs refactoring.\"\n\nLeadership:\n\"We promised a new corridor launch.\"\n```\n\nA weak TPM turns this into a fight over whose item gets priority.\n\nA strong TPM clarifies what each request means:\n\n```txt\nTeam permissions:\nOutcome: unlock enterprise deals.\nRisk: poor permissions could expose sensitive financial data.\n\nTransaction monitoring:\nOutcome: reduce regulatory and fraud risk.\nRisk: launching more volume before controls may create compliance exposure.\n\nPayout refactor:\nOutcome: make future corridor launches faster and safer.\nRisk: invisible work may be hard to justify unless tied to launch reliability.\n\nNew corridor:\nOutcome: revenue growth and market expansion.\nRisk: launch fails if operations, compliance, and partner readiness are weak.\n```\n\nNow the roadmap conversation changes. It is no longer \"sales versus engineering.\" It becomes \"what sequence gets us revenue without creating unacceptable risk?\"",
     "commonMistakes": "A common mistake is ranking stakeholder requests without translating them into outcomes and risks.\n\nAnother mistake is treating roadmap dates as promises before dependencies are understood.\n\nA third mistake is hiding the reason for tradeoffs. If stakeholders only hear \"not now,\" they may assume their request was ignored."
+  },
+  {
+    "id": "tpm-security-review-product-manager",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "How should a product manager work with security review?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Security review is how the team identifies and reduces security risk before a feature creates harm.\n\nThe beginner mistake is treating security as a gatekeeper that says yes or no at the end. A better TPM brings security into the product conversation early enough to shape requirements, design, rollout, and operations.\n\nThe TPM does not need to be the security engineer. But they should understand what kind of feature increases security risk:\n\n```txt\n- Authentication or login\n- Permissions and roles\n- Payments or money movement\n- Sensitive data\n- File upload\n- Public APIs\n- Webhooks\n- Admin tools\n- Exports\n- Third-party integrations\n- User-generated content\n```\n\nIf a feature touches one of these areas, security review is not optional polish. It is part of readiness."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine the team is adding API keys for partners.\n\nA weak TPM says:\n\n```txt\nEngineering will make API keys secure.\n```\n\nA stronger TPM asks product-level security questions:\n\n```txt\nWho can create an API key?\nCan keys be scoped?\nCan keys expire?\nCan keys be revoked?\nCan users see the key again after creation?\nHow are keys stored?\nAre key creation and deletion audited?\nCan support see keys?\nWhat rate limits apply?\nWhat happens if a key is leaked?\n```\n\nThose questions shape the product requirements before implementation."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a security review checklist a TPM can use:\n\n```txt\nFeature:\nPartner API keys\n\nData and actions:\n- Create key\n- Name key\n- Scope key to specific API actions\n- Rotate key\n- Revoke key\n- View last used timestamp\n\nThreats:\n- Unauthorized user creates key\n- Key leaks through screenshot, logs, or support tooling\n- Key has too much access\n- Abused key creates high-volume requests\n- Deleted employee keeps access\n\nControls:\n- Only Owner/Admin can create keys\n- Key is shown once\n- Secret is hashed at rest\n- Scopes are required\n- Rate limits apply\n- Creation, rotation, and revocation are audited\n- Last-used timestamp visible\n- Emergency revoke path exists\n\nLaunch evidence:\n- Permission tests pass\n- Logs do not expose secret\n- Rate-limit behavior tested\n- Support runbook written\n- Incident response path known\n```\n\nThe TPM should make security findings actionable. If security says \"scope keys,\" the requirement should become a user-visible behavior, not a vague ticket."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is bringing security in after the UX and engineering plan are fixed. That creates conflict and rework.\n\nAnother mistake is treating security requirements as invisible. Many controls need product decisions: copy, permissions, admin UI, alerts, logs, and recovery.\n\nA third mistake is accepting risk without naming it. If a security issue is deferred, the approver, reason, mitigation, and revisit date should be clear."
+      }
+    ],
+    "answer": "Security review is how the team identifies and reduces security risk before a feature creates harm.",
+    "reasoning": "Here is a security review checklist a TPM can use:\n\n```txt\nFeature:\nPartner API keys\n\nData and actions:\n- Create key\n- Name key\n- Scope key to specific API actions\n- Rotate key\n- Revoke key\n- View last used timestamp\n\nThreats:\n- Unauthorized user creates key\n- Key leaks through screenshot, logs, or support tooling\n- Key has too much access\n- Abused key creates high-volume requests\n- Deleted employee keeps access\n\nControls:\n- Only Owner/Admin can create keys\n- Key is shown once\n- Secret is hashed at rest\n- Scopes are required\n- Rate limits apply\n- Creation, rotation, and revocation are audited\n- Last-used timestamp visible\n- Emergency revoke path exists\n\nLaunch evidence:\n- Permission tests pass\n- Logs do not expose secret\n- Rate-limit behavior tested\n- Support runbook written\n- Incident response path known\n```\n\nThe TPM should make security findings actionable. If security says \"scope keys,\" the requirement should become a user-visible behavior, not a vague ticket.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Which feature types usually need security review?",
+      "Why should security be involved before implementation is complete?",
+      "What product decisions exist in API key security?",
+      "What does it mean to turn a security finding into a requirement?",
+      "How should deferred security risk be documented?"
+    ],
+    "interviewAnswer": "I would work with security early by identifying sensitive data, risky actions, threat scenarios, required controls, test evidence, rollout risks, and operational responses. I would translate security findings into clear product requirements and track any accepted risk explicitly.\n\nA strong TPM answer shows respect for security expertise while owning the product decisions needed to make the feature safe.",
+    "sourceLinks": [
+      {
+        "label": "OWASP: Application Security Verification Standard",
+        "url": "https://owasp.org/www-project-application-security-verification-standard/"
+      },
+      {
+        "label": "OWASP: Product Security Guide",
+        "url": "https://owasp.org/www-project-product-security-guide/"
+      }
+    ],
+    "beginnerExplanation": "Security review is how the team identifies and reduces security risk before a feature creates harm.\n\nThe beginner mistake is treating security as a gatekeeper that says yes or no at the end. A better TPM brings security into the product conversation early enough to shape requirements, design, rollout, and operations.\n\nThe TPM does not need to be the security engineer. But they should understand what kind of feature increases security risk:\n\n```txt\n- Authentication or login\n- Permissions and roles\n- Payments or money movement\n- Sensitive data\n- File upload\n- Public APIs\n- Webhooks\n- Admin tools\n- Exports\n- Third-party integrations\n- User-generated content\n```\n\nIf a feature touches one of these areas, security review is not optional polish. It is part of readiness.",
+    "example": "Imagine the team is adding API keys for partners.\n\nA weak TPM says:\n\n```txt\nEngineering will make API keys secure.\n```\n\nA stronger TPM asks product-level security questions:\n\n```txt\nWho can create an API key?\nCan keys be scoped?\nCan keys expire?\nCan keys be revoked?\nCan users see the key again after creation?\nHow are keys stored?\nAre key creation and deletion audited?\nCan support see keys?\nWhat rate limits apply?\nWhat happens if a key is leaked?\n```\n\nThose questions shape the product requirements before implementation.",
+    "commonMistakes": "A common mistake is bringing security in after the UX and engineering plan are fixed. That creates conflict and rework.\n\nAnother mistake is treating security requirements as invisible. Many controls need product decisions: copy, permissions, admin UI, alerts, logs, and recovery.\n\nA third mistake is accepting risk without naming it. If a security issue is deferred, the approver, reason, mitigation, and revisit date should be clear."
   },
   {
     "id": "tpm-stakeholder-alignment",
@@ -2062,6 +2405,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A technical tradeoff is a choice where improving one thing usually costs something else. Speed may cost reliability. Customization may cost simplicity. A cheaper vendor may cost flexibility. A faster launch may cost maintainability. Strong security may add friction.\n\nNon-technical stakeholders do not need every implementation detail, but they do need to understand the consequences of the decision.\n\nThe TPM's job is to translate technical options into user impact, business impact, risk, cost, timing, and reversibility.\n\nDo not say, \"Engineering wants to use Kafka instead of webhooks.\" That may be meaningful to engineers but not to everyone else.\n\nSay, \"Option A is faster to launch but may struggle when volume grows. Option B takes three extra weeks but gives us better reliability and easier partner onboarding later.\"",
     "example": "Imagine a team deciding whether to build a custom fraud rules engine or use a vendor.\n\nThe technical details may involve APIs, data models, latency, alerting, explainability, integrations, and long-term platform architecture. But the stakeholder decision might be:\n\n- Do we need to launch in six weeks?\n- How much fraud risk can we tolerate?\n- Do we need custom rules for our market?\n- What will compliance need to audit?\n- What happens if the vendor is wrong?\n- What is the cost now versus later?\n\nA clear tradeoff explanation compares options in plain language.\n\nOption 1: Use vendor rules first. Faster launch, lower engineering effort, proven baseline, but less customization and vendor dependency.\n\nOption 2: Build in-house. More control and flexibility, but slower launch, more engineering cost, and more operational responsibility.\n\nOption 3: Hybrid. Start with vendor baseline and build internal rule overrides for our highest-risk cases.\n\nNow stakeholders can decide based on strategy, not hidden technical preference.\n\nHere is a simple tradeoff memo:\n\n```txt\nDecision: Use vendor fraud rules for launch, then add internal rule overrides.\n\nContext:\nWe need fraud screening before launch. Building the full rules engine in-house would delay launch by six to eight weeks.\n\nOptions:\n1. Vendor only.\n2. Build fully in-house.\n3. Vendor baseline plus internal overrides for high-risk cases.\n\nRecommendation:\nChoose option 3.\n\nWhy:\nIt gets us to launch with a proven baseline while preserving control over our highest-risk cases.\n\nWhat we give up:\nWe accept vendor dependency and some limits in rule customization during the first launch.\n\nRisk:\nVendor decisions may be hard to explain to compliance or support.\n\nMitigation:\nLog vendor reason codes, build an admin review view, and create manual override rules for priority cases.\n\nRevisit trigger:\nIf manual overrides exceed 15% of flagged cases for two consecutive weeks, revisit the build-versus-buy decision.\n```\n\nThat memo is not just communication. It becomes a record of why the team chose one path and what would make them change their mind.",
     "commonMistakes": "A common mistake is overexplaining technical internals before explaining why the decision matters.\n\nAnother mistake is hiding the recommendation. TPMs should not only be note takers. They should synthesize and recommend, while being honest about tradeoffs.\n\nA third mistake is making the decision sound binary when there are staged options. Sometimes the best answer is a phased plan that learns quickly while limiting risk."
+  },
+  {
+    "id": "tpm-usage-based-pricing-packaging",
+    "track": "TPM",
+    "category": "Pricing & Packaging",
+    "level": "Intermediate",
+    "question": "How would you design pricing and packaging for an API or usage-based product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Pricing and packaging decide what customers pay for, what they get at each level, and how the company captures value.\n\nFor API and platform products, pricing is often usage-based. Customers may pay per API call, transaction, active user, document processed, webhook delivery, seat, storage unit, or money movement volume.\n\nThe beginner mistake is choosing a meter only because it is easy to count. A good pricing meter should be understandable, connected to customer value, hard to accidentally abuse, and possible to measure accurately.\n\nThe mental model is:\n\n```txt\nPackaging:\nWhat is included?\n\nPricing:\nWhat does it cost?\n\nMetering:\nWhat unit do we count?\n\nEntitlements:\nWhat is the customer allowed to use?\n\nBilling experience:\nCan the customer predict, understand, and trust the bill?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a company sells a fraud-screening API.\n\nPossible meters:\n\n```txt\nPer API request:\nEasy to measure, but customers may worry retries or failed requests cost money.\n\nPer completed screening:\nCloser to value, but the system must define what \"completed\" means.\n\nPer approved transaction:\nVery tied to value, but the vendor takes revenue risk if fraud checks block many transactions.\n\nMonthly platform fee plus usage:\nPredictable base revenue, then scales with customer usage.\n```\n\nThe TPM has to think beyond revenue. Pricing affects product behavior. If customers pay per request, they may avoid useful checks. If the free tier is too generous, heavy users may never convert. If overages are confusing, finance and support will get angry tickets."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a pricing design artifact:\n\n```txt\nProduct:\nFraud screening API\n\nPrimary value:\nReduce fraud losses while allowing good users through.\n\nCustomer segments:\n- Startup: low volume, needs simple setup\n- Growth: medium volume, needs rules and dashboard\n- Enterprise: high volume, needs SLA, audit logs, custom limits\n\nPackages:\n\nStarter:\n- 5,000 screenings/month included\n- Basic risk score\n- Standard support\n\nGrowth:\n- 50,000 screenings/month included\n- Rules engine\n- Webhooks\n- Dashboard exports\n\nEnterprise:\n- Custom volume\n- SLA\n- SSO and audit logs\n- Dedicated support\n- Contracted data-retention terms\n\nMeter:\nCompleted screening event\n\nWhy this meter:\nIt maps to customer value better than raw API calls and avoids charging for failed retries.\n\nGuardrails:\n- Usage dashboard\n- Threshold alerts at 80 percent and 100 percent\n- Idempotency to avoid duplicate billing\n- Clear overage pricing\n```\n\nThe TPM also needs to define billing edge cases.\n\n```txt\nBilling edge cases\n\n- What counts if the API times out?\n- What counts if the customer retries with the same idempotency key?\n- Are sandbox calls billable?\n- Are failed screenings billable?\n- Can customers set spend limits?\n- How are refunds or billing disputes handled?\n- What usage is shown in real time versus after invoice close?\n```\n\nThis is the part interviewers listen for. A strong TPM understands that pricing is also a product experience."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is picking a meter that customers do not understand. Confusing bills create distrust.\n\nAnother mistake is ignoring cost drivers. If the product has expensive third-party checks or compute costs, pricing must account for them.\n\nA third mistake is forgetting entitlements. The app must know what each plan can use before the bill is generated."
+      }
+    ],
+    "answer": "Pricing and packaging decide what customers pay for, what they get at each level, and how the company captures value.",
+    "reasoning": "Here is a pricing design artifact:\n\n```txt\nProduct:\nFraud screening API\n\nPrimary value:\nReduce fraud losses while allowing good users through.\n\nCustomer segments:\n- Startup: low volume, needs simple setup\n- Growth: medium volume, needs rules and dashboard\n- Enterprise: high volume, needs SLA, audit logs, custom limits\n\nPackages:\n\nStarter:\n- 5,000 screenings/month included\n- Basic risk score\n- Standard support\n\nGrowth:\n- 50,000 screenings/month included\n- Rules engine\n- Webhooks\n- Dashboard exports\n\nEnterprise:\n- Custom volume\n- SLA\n- SSO and audit logs\n- Dedicated support\n- Contracted data-retention terms\n\nMeter:\nCompleted screening event\n\nWhy this meter:\nIt maps to customer value better than raw API calls and avoids charging for failed retries.\n\nGuardrails:\n- Usage dashboard\n- Threshold alerts at 80 percent and 100 percent\n- Idempotency to avoid duplicate billing\n- Clear overage pricing\n```\n\nThe TPM also needs to define billing edge cases.\n\n```txt\nBilling edge cases\n\n- What counts if the API times out?\n- What counts if the customer retries with the same idempotency key?\n- Are sandbox calls billable?\n- Are failed screenings billable?\n- Can customers set spend limits?\n- How are refunds or billing disputes handled?\n- What usage is shown in real time versus after invoice close?\n```\n\nThis is the part interviewers listen for. A strong TPM understands that pricing is also a product experience.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between pricing and packaging?",
+      "Why should a usage meter map to customer value?",
+      "What billing edge cases matter for API products?",
+      "Why do usage alerts improve trust?",
+      "How can pricing accidentally shape bad product behavior?"
+    ],
+    "interviewAnswer": "I would design usage-based pricing by identifying customer segments, the value metric, packages, entitlements, usage meter, billing edge cases, cost drivers, and customer controls like dashboards, alerts, and spend limits.\n\nA strong answer treats billing as a product surface. Customers should understand what they are paying for, why it maps to value, and how to avoid surprise.",
+    "sourceLinks": [
+      {
+        "label": "Stripe: Usage-based billing",
+        "url": "https://stripe.com/billing/usage-based-billing"
+      },
+      {
+        "label": "Stripe Docs: Usage-based pricing models",
+        "url": "https://docs.stripe.com/billing/subscriptions/usage-based-legacy/pricing-models"
+      }
+    ],
+    "beginnerExplanation": "Pricing and packaging decide what customers pay for, what they get at each level, and how the company captures value.\n\nFor API and platform products, pricing is often usage-based. Customers may pay per API call, transaction, active user, document processed, webhook delivery, seat, storage unit, or money movement volume.\n\nThe beginner mistake is choosing a meter only because it is easy to count. A good pricing meter should be understandable, connected to customer value, hard to accidentally abuse, and possible to measure accurately.\n\nThe mental model is:\n\n```txt\nPackaging:\nWhat is included?\n\nPricing:\nWhat does it cost?\n\nMetering:\nWhat unit do we count?\n\nEntitlements:\nWhat is the customer allowed to use?\n\nBilling experience:\nCan the customer predict, understand, and trust the bill?\n```",
+    "example": "Imagine a company sells a fraud-screening API.\n\nPossible meters:\n\n```txt\nPer API request:\nEasy to measure, but customers may worry retries or failed requests cost money.\n\nPer completed screening:\nCloser to value, but the system must define what \"completed\" means.\n\nPer approved transaction:\nVery tied to value, but the vendor takes revenue risk if fraud checks block many transactions.\n\nMonthly platform fee plus usage:\nPredictable base revenue, then scales with customer usage.\n```\n\nThe TPM has to think beyond revenue. Pricing affects product behavior. If customers pay per request, they may avoid useful checks. If the free tier is too generous, heavy users may never convert. If overages are confusing, finance and support will get angry tickets.",
+    "commonMistakes": "A common mistake is picking a meter that customers do not understand. Confusing bills create distrust.\n\nAnother mistake is ignoring cost drivers. If the product has expensive third-party checks or compute costs, pricing must account for them.\n\nA third mistake is forgetting entitlements. The app must know what each plan can use before the bill is generated."
   },
   {
     "id": "tpm-user-stories",

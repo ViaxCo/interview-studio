@@ -30,7 +30,6 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { allLearningPaths, learningPaths } from "./learningPaths";
 import { categories, levels, loadQuestions, questionTrack, questions, tracks } from "./questions";
 import type {
   AnswerDepth,
@@ -895,7 +894,6 @@ function App({
   const [track, setTrack] = useState(allTracks);
   const [category, setCategory] = useState("All");
   const [level, setLevel] = useState("All");
-  const [learningPathId, setLearningPathId] = useState(allLearningPaths);
   const [mode, setMode] = useState("browse");
   const [mobilePane, setMobilePane] = useState<MobilePane>("study");
   const [drillScope, setDrillScope] = useState("browse");
@@ -1063,22 +1061,9 @@ function App({
     () => (questionDetails ? questions.map((item) => questionDetails[item.id] || item) : questions),
     [questionDetails]
   );
-  const activeLearningPath = learningPaths.find((item) => item.id === learningPathId);
-  const activeLearningPathIds = useMemo(
-    () => new Set<string>(activeLearningPath?.questionIds || []),
-    [activeLearningPath]
-  );
-  const activeLearningPathOrder = useMemo(
-    () => Object.fromEntries((activeLearningPath?.questionIds || []).map((id, index) => [id, index])),
-    [activeLearningPath]
-  );
   const trackQuestions = useMemo(
-    () =>
-      hydratedQuestions.filter((item) => {
-        const matchesPath = !activeLearningPath || activeLearningPathIds.has(item.id);
-        return matchesPath && (track === allTracks || questionTrack(item) === track);
-      }),
-    [activeLearningPath, activeLearningPathIds, hydratedQuestions, track]
+    () => hydratedQuestions.filter((item) => track === allTracks || questionTrack(item) === track),
+    [hydratedQuestions, track]
   );
   const categoryCounts = useMemo(
     () =>
@@ -1123,21 +1108,18 @@ function App({
     const matches: Question[] = [];
 
     for (const { item, text } of baseQuestionSearchText) {
-      const matchesPath = !activeLearningPath || activeLearningPathIds.has(item.id);
       const matchesTrack = track === allTracks || questionTrack(item) === track;
       const matchesCategory = category === "All" || item.category === category;
       const matchesLevel = level === "All" || item.level === level;
 
-      if (!matchesPath || !matchesTrack || !matchesCategory || !matchesLevel) continue;
+      if (!matchesTrack || !matchesCategory || !matchesLevel) continue;
       if (!normalizedQuery || text.includes(normalizedQuery) || getQuestionSearchText(item, answerDepthMap).includes(normalizedQuery)) {
         matches.push(item);
       }
     }
 
-    return activeLearningPath
-      ? matches.sort((first, second) => activeLearningPathOrder[first.id] - activeLearningPathOrder[second.id])
-      : matches;
-  }, [activeLearningPath, activeLearningPathIds, activeLearningPathOrder, answerDepthMap, category, deferredQuery, level, track]);
+    return matches;
+  }, [answerDepthMap, category, deferredQuery, level, track]);
 
   const starredQueue = useMemo(
     () => filteredQuestions.filter((item) => starred[item.id]),
@@ -1197,7 +1179,7 @@ function App({
 
   useEffect(() => {
     setVisibleLimit(initialVisibleLimit);
-  }, [category, deferredQuery, learningPathId, level, mode, track]);
+  }, [category, deferredQuery, level, mode, track]);
 
   useEffect(() => {
     if (mode !== "mock" && activeQueueIndex >= visibleLimit) {
@@ -1249,9 +1231,7 @@ function App({
   );
   const totalQuestions = trackQuestions.length;
   const collectionDescription =
-    activeLearningPath
-      ? `${activeLearningPath.title}: ${totalQuestions} questions.`
-      : track === allTracks
+    track === allTracks
       ? `${totalQuestions} questions across both roles.`
       : `${track}: ${totalQuestions} questions.`;
   const progress = totalQuestions
@@ -1476,7 +1456,6 @@ function App({
 
   function resetFilters() {
     setQuery("");
-    setLearningPathId(allLearningPaths);
     setTrack(allTracks);
     setCategory("All");
     setLevel("All");
@@ -1589,8 +1568,8 @@ function App({
     showSessionNote(nextTheme === "dark" ? "Dark mode on." : "Light mode on.", "action");
   }
 
-  const activeFilterCount = [learningPathId !== allLearningPaths, track !== allTracks, category !== "All", level !== "All"].filter(Boolean).length;
-  const mobileFilterSummary = learningPathId !== allLearningPaths ? "Path" : activeFilterCount ? `${activeFilterCount} active` : "All";
+  const activeFilterCount = [track !== allTracks, category !== "All", level !== "All"].filter(Boolean).length;
+  const mobileFilterSummary = activeFilterCount ? `${activeFilterCount} active` : "All";
   const mobileStudySummary =
     activeQuestion && studyQueue.length
       ? `${activeQueueIndex + 1} of ${studyQueue.length}`
@@ -1604,47 +1583,12 @@ function App({
 
   function renderFilterControls(idSuffix: string, compact = false) {
     const trackLabelId = `track-filter-label-${idSuffix}`;
-    const pathLabelId = `path-filter-label-${idSuffix}`;
     const topicLabelId = `topic-filter-label-${idSuffix}`;
     const levelLabelId = `level-filter-label-${idSuffix}`;
     const triggerClassName = compact ? "min-w-0 flex-1 bg-card" : "min-w-0 flex-1 bg-card sm:flex-none";
 
     return (
       <>
-        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-          <span id={pathLabelId} className={compact ? "w-12 shrink-0" : undefined}>Path</span>
-          <Select
-            value={learningPathId}
-            onValueChange={(value) => {
-              if (!value) return;
-              setLearningPathId(value);
-              setTrack(allTracks);
-              setCategory("All");
-              setLevel("All");
-            }}
-          >
-            <SelectTrigger
-              aria-labelledby={pathLabelId}
-              className={cn(triggerClassName, !compact && "sm:w-52")}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="start" alignItemWithTrigger={false} className="max-h-80">
-              <SelectGroup>
-                <SelectItem value={allLearningPaths}>All questions</SelectItem>
-                {learningPaths.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    <span className="flex min-w-0 flex-1 items-center justify-between gap-4">
-                      <span className="truncate">{item.title}</span>
-                      <span className="text-xs tabular-nums text-muted-foreground">{item.questionIds.length}</span>
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
           <span id={trackLabelId} className={compact ? "w-12 shrink-0" : undefined}>Role</span>
           <Select
@@ -2235,7 +2179,7 @@ function App({
               >
                 <CardHeader>
                   <CardTitle>
-                    {mode === "mock" ? "Drill card" : mode === "starred" ? "Saved queue" : activeLearningPath?.title || "Question queue"}
+                    {mode === "mock" ? "Drill card" : mode === "starred" ? "Saved queue" : "Question queue"}
                   </CardTitle>
                   <CardDescription>
                     {visibleQuestions.length}
