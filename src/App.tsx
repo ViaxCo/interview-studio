@@ -4,6 +4,7 @@ import {
   CaretDownIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  CaretUpIcon,
   CheckCircleIcon,
   CircleIcon,
   FunnelIcon,
@@ -559,6 +560,23 @@ setPage(1);`
   q099: {
     visualTitle: "Cache lifecycle",
     visual: ["Cache key", "Fresh data", "Stale data", "Background refresh", "Mutation invalidates related keys"]
+  },
+  "fe-closures": {
+    codeTitle: "Closure walkthrough",
+    code: `function createCounter() {
+  let count = 0;
+
+  return function increment() {
+    count += 1;
+    return count;
+  };
+}
+
+const next = createCounter();
+
+next(); // 1
+next(); // 2
+next(); // 3`
   }
 };
 
@@ -588,6 +606,73 @@ function InlineText({ text }: { text: string }) {
         part
       )
     );
+}
+
+function TextBlock({ text }: { text: string }) {
+  const source = String(text);
+  const blocks = [];
+  const pattern = /```([a-zA-Z0-9_-]+)?\n([\s\S]*?)```/g;
+  let cursor = 0;
+  let match;
+
+  while ((match = pattern.exec(source))) {
+    blocks.push({ body: source.slice(cursor, match.index), code: false, language: "" });
+    blocks.push({ body: match[2], code: true, language: match[1] || "" });
+    cursor = match.index + match[0].length;
+  }
+
+  blocks.push({ body: source.slice(cursor), code: false, language: "" });
+
+  return blocks.map((block, index) => {
+    const textPart = block.body.trim();
+    if (!textPart) return null;
+
+    if (block.code) {
+      const isPlainText = ["txt", "text", "plain"].includes(block.language.toLowerCase());
+
+      return (
+        <pre className="lesson-code-block rounded-lg bg-muted p-4 text-[0.9375rem] leading-7" key={`${index}-${textPart.slice(0, 20)}`}>
+          <code>{isPlainText ? textPart : <HighlightedCode code={textPart} />}</code>
+        </pre>
+      );
+    }
+
+    return textPart
+        .split(/\n{2,}/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
+        .map((paragraph) => {
+          const lines = paragraph.split("\n").map((line) => line.trim()).filter(Boolean);
+          const bullets = lines
+            .map((line) => line.match(/^-\s+(.+)$/)?.[1])
+            .filter((item): item is string => Boolean(item));
+          const numbers = lines
+            .map((line) => line.match(/^\d+\.\s+(.+)$/)?.[1])
+            .filter((item): item is string => Boolean(item));
+
+          if (bullets.length === lines.length) {
+            return (
+              <ul className="list-disc pl-5" key={paragraph}>
+                {bullets.map((item) => <li key={item}><InlineText text={item} /></li>)}
+              </ul>
+            );
+          }
+
+          if (numbers.length === lines.length) {
+            return (
+              <ol className="list-decimal pl-5" key={paragraph}>
+                {numbers.map((item) => <li key={item}><InlineText text={item} /></li>)}
+              </ol>
+            );
+          }
+
+          return (
+            <p key={paragraph}>
+              <InlineText text={paragraph} />
+            </p>
+          );
+        });
+  });
 }
 
 function HighlightedCode({ code }: { code: string }) {
@@ -644,14 +729,22 @@ function getQuestionSearchText(question: Question, depthMap: AnswerDepthMap | nu
 
   const text = [
     question.question,
+    question.interviewerIntent,
+    question.beginnerExplanation,
     question.answer,
+    question.interviewAnswer,
+    question.example,
     question.reasoning,
+    question.commonMistakes,
+    question.seniorNuance,
     question.tests,
     questionTrack(question),
     question.category,
     question.level,
+    ...(question.sourceLinks || []).flatMap((source) => [source.label, source.url]),
     guideSearchText(question, depthMap)
   ]
+    .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
@@ -663,13 +756,21 @@ const baseQuestionSearchText = questions.map((item) => ({
   item,
   text: [
     item.question,
+    item.interviewerIntent,
+    item.beginnerExplanation,
     item.answer,
+    item.interviewAnswer,
+    item.example,
     item.reasoning,
+    item.commonMistakes,
+    item.seniorNuance,
     item.tests,
     questionTrack(item),
     item.category,
-    item.level
+    item.level,
+    ...(item.sourceLinks || []).flatMap((source) => [source.label, source.url])
   ]
+    .filter(Boolean)
     .join(" ")
     .toLowerCase()
 }));
@@ -1816,7 +1917,7 @@ function App({
                           {revealed[activeQuestion.id] ? (
                             <Button className="study-primary-action" type="button" size="lg" onClick={markReviewedAndContinue}>
                               <CheckCircleIcon data-icon="inline-start" />
-                              Reviewed and next
+                              Review and next
                             </Button>
                           ) : (
                             <Button
@@ -1853,7 +1954,7 @@ function App({
                               aria-keyshortcuts="R"
                               onClick={toggleRevealed}
                             >
-                              <CaretDownIcon data-icon="inline-start" />
+                              <CaretUpIcon data-icon="inline-start" />
                               Hide answer
                               <Kbd>R</Kbd>
                             </Button>
@@ -1883,101 +1984,67 @@ function App({
                     {revealed[activeQuestion.id] && (
                       <Card className="answer-panel">
                         <CardHeader>
-                          <CardTitle>Answer canvas</CardTitle>
-                          <CardDescription>Work from the direct answer into reasoning, traps, and follow-ups.</CardDescription>
+                          <CardTitle>Learn the concept</CardTitle>
+                          <CardDescription>Understand the idea first, then practice explaining it.</CardDescription>
                         </CardHeader>
                         <CardContent className="reading-copy">
-                          <div className="study-canvas-section pt-0">
-                            <h3 className="study-canvas-label">Model answer</h3>
-                            <p><InlineText text={activeQuestion.answer} /></p>
-                          </div>
+                          {activeQuestion.lessonSections?.length ? (
+                            activeQuestion.lessonSections.map((section, index) => (
+                              <div className={cn("study-canvas-section", index === 0 && "pt-0")} key={section.title}>
+                                <h3 className="study-canvas-label">{section.title}</h3>
+                                <TextBlock text={section.body} />
+                              </div>
+                            ))
+                          ) : (
+                            <>
+                              <div className="study-canvas-section pt-0">
+                                <h3 className="study-canvas-label">Start here</h3>
+                                {activeQuestion.interviewerIntent && <TextBlock text={activeQuestion.interviewerIntent} />}
+                                {activeQuestion.beginnerExplanation && <TextBlock text={activeQuestion.beginnerExplanation} />}
+                                <TextBlock text={activeQuestion.answer} />
+                                <TextBlock text={activeQuestion.reasoning} />
+                              </div>
 
-                          <div className="study-canvas-section">
-                            <h3 className="study-canvas-label">Engineering reasoning</h3>
-                            <p><InlineText text={activeQuestion.reasoning} /></p>
-                          </div>
+                              {activeGuide.code && (
+                                <div className="study-canvas-section">
+                                  <h3 className="study-canvas-label">{activeGuide.codeTitle || "Code example"}</h3>
+                                  <pre className="lesson-code-block rounded-lg bg-muted p-4 text-[0.9375rem] leading-7">
+                                    <code><HighlightedCode code={activeGuide.code} /></code>
+                                  </pre>
+                                </div>
+                              )}
 
-                          <div className="study-canvas-section">
-                            <h3 className="study-canvas-label">Study the reasoning</h3>
-                            {isAnswerDepthLoading && (
-                              <Alert role="status">
-                                <AlertTitle>Loading deeper guide</AlertTitle>
-                                <AlertDescription>
-                                  The direct answer is ready. The richer study notes are still loading.
-                                </AlertDescription>
-                              </Alert>
-                            )}
-                            {answerDepthState === "error" && (
-                              <Alert role="status">
-                                <AlertTitle>Deeper guide unavailable</AlertTitle>
-                                <AlertDescription>
-                                  The model answer is still usable. Try refreshing if you want the extra study notes.
-                                </AlertDescription>
-                              </Alert>
-                            )}
-                            {activeGuide.depth && (
-                              <dl className="study-depth-grid">
-                                <div className="study-depth-item">
-                                  <dt className="study-canvas-label">Mental model</dt>
-                                  <dd><InlineText text={activeGuide.depth.mentalModel} /></dd>
+                              {activeGuide.visual && (
+                                <div className="study-canvas-section">
+                                  <h3 className="study-canvas-label">{activeGuide.visualTitle || "Illustration"}</h3>
+                                  <ol className="grid gap-2 sm:grid-cols-3">
+                                    {activeGuide.visual.map((item, index) => (
+                                      <li key={item} className="rounded-lg border bg-muted/35 p-4 text-[0.95rem]/7">
+                                        <Badge variant="outline">{index + 1}</Badge>
+                                        <span className="mt-3 block">{item}</span>
+                                      </li>
+                                    ))}
+                                  </ol>
                                 </div>
-                                <div className="study-depth-item">
-                                  <dt className="study-canvas-label">Engineering use</dt>
-                                  <dd><InlineText text={activeGuide.depth.engineeringUse} /></dd>
-                                </div>
-                                <div className="study-depth-item">
-                                  <dt className="study-canvas-label">Interview signal</dt>
-                                  <dd><InlineText text={activeGuide.depth.interviewSignal} /></dd>
-                                </div>
-                              </dl>
-                            )}
-                            <div className="max-w-[75ch]">
-                              <h3 className="study-canvas-label">Senior answer moves</h3>
-                              <p className="mt-2"><InlineText text={activeGuide.frame} /></p>
-                              <ul className="mt-3 list-disc pl-5">
-                                {activeGuide.moves.map((item) => (
-                                  <li key={item}><InlineText text={item} /></li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
+                              )}
 
-                          {activeGuide.code && (
-                            <div className="study-canvas-section">
-                              <h3 className="study-canvas-label">{activeGuide.codeTitle || "Code example"}</h3>
-                              <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-[0.9375rem] leading-7">
-                                <code><HighlightedCode code={activeGuide.code} /></code>
-                              </pre>
-                            </div>
+                              {(activeQuestion.example || activeQuestion.commonMistakes || activeQuestion.seniorNuance) && (
+                                <div className="study-canvas-section">
+                                  <h3 className="study-canvas-label">Make it practical</h3>
+                                  {activeQuestion.example && <TextBlock text={activeQuestion.example} />}
+                                  {activeQuestion.commonMistakes && <TextBlock text={activeQuestion.commonMistakes} />}
+                                  {activeQuestion.seniorNuance && <TextBlock text={activeQuestion.seniorNuance} />}
+                                </div>
+                              )}
+                            </>
                           )}
-
-                          {activeGuide.visual && (
-                            <div className="study-canvas-section">
-                              <h3 className="study-canvas-label">{activeGuide.visualTitle || "Illustration"}</h3>
-                              <ol className="grid gap-2 sm:grid-cols-3">
-                                {activeGuide.visual.map((item, index) => (
-                                  <li key={item} className="rounded-lg border bg-muted/35 p-4 text-[0.95rem]/7">
-                                    <Badge variant="outline">{index + 1}</Badge>
-                                    <span className="mt-3 block">{item}</span>
-                                  </li>
-                                ))}
-                              </ol>
-                            </div>
-                          )}
-
-                          <div className="study-canvas-section">
-                            <Alert role="note">
-                              <AlertTitle>Common trap</AlertTitle>
-                              <AlertDescription><InlineText text={activeGuide.trap} /></AlertDescription>
-                            </Alert>
-                          </div>
 
                           <div className="study-canvas-section pb-0">
-                            <h3 className="study-canvas-label">What this tests</h3>
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <h3 className="study-canvas-label">Check your understanding</h3>
+                            <div className="grid gap-5 lg:grid-cols-2">
                               <p><InlineText text={activeQuestion.tests} /></p>
                               <div>
-                                <strong className="study-canvas-label">Follow-up prompts</strong>
+                                <strong className="study-canvas-label">Try answering these</strong>
                                 <ul className="mt-2 list-disc pl-5">
                                   {activeQuestion.followUps.map((item) => (
                                     <li key={item}><InlineText text={item} /></li>
@@ -1985,6 +2052,28 @@ function App({
                                 </ul>
                               </div>
                             </div>
+                            {activeQuestion.interviewAnswer && (
+                              <details className="mt-5 rounded-lg border bg-muted/30 p-4">
+                                <summary className="cursor-pointer font-medium">Show a concise interview version</summary>
+                                <div className="mt-3 grid gap-3">
+                                  <TextBlock text={activeQuestion.interviewAnswer} />
+                                </div>
+                              </details>
+                            )}
+                            {activeQuestion.sourceLinks?.length ? (
+                              <div className="lesson-sources mt-6 border-t pt-5">
+                                <strong className="study-canvas-label">Sources</strong>
+                                <ul className="mt-3">
+                                  {activeQuestion.sourceLinks.map((source) => (
+                                    <li key={source.url}>
+                                      <a className="lesson-source-link" href={source.url} target="_blank" rel="noreferrer">
+                                        {source.label}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ) : null}
                           </div>
                         </CardContent>
                       </Card>
@@ -2297,13 +2386,22 @@ function App({
                     Hide
                   </Button>
                   <Button
-                    className="study-primary-action flex-1"
+                    className="study-primary-action mobile-balanced-action flex-1"
                     type="button"
                     size="lg"
                     onClick={reviewed[activeQuestion.id] ? toggleReviewed : markReviewedAndContinue}
                   >
-                    <CheckCircleIcon data-icon="inline-start" />
-                    {reviewed[activeQuestion.id] ? "Unmark" : "Review + next"}
+                    <CheckCircleIcon className="mobile-balanced-action-icon" data-icon="inline-start" />
+                    <span className="mobile-balanced-action-label">
+                      {reviewed[activeQuestion.id] ? (
+                        "Unmark"
+                      ) : (
+                        <>
+                          <span className="mobile-action-label-full">Review + next</span>
+                          <span className="mobile-action-label-short">Next</span>
+                        </>
+                      )}
+                    </span>
                   </Button>
                 </>
               ) : (
@@ -2318,15 +2416,15 @@ function App({
                     {reviewed[activeQuestion.id] ? "Unmark" : "Mark"}
                   </Button>
                   <Button
-                    className="study-primary-action flex-1"
+                    className="study-primary-action mobile-balanced-action flex-1"
                     type="button"
                     size="lg"
                     aria-expanded={false}
                     aria-controls={`answer-${activeQuestion.id}`}
                     onClick={toggleRevealed}
                   >
-                    <CaretDownIcon data-icon="inline-start" />
-                    {isFirstRun ? "Reveal" : "Reveal"}
+                    <CaretDownIcon className="mobile-balanced-action-icon" data-icon="inline-start" />
+                    <span className="mobile-balanced-action-label">{isFirstRun ? "Reveal" : "Reveal"}</span>
                   </Button>
                 </>
               )}
@@ -2347,8 +2445,8 @@ function App({
           <div
             key={sessionNoteKey}
             className={cn(
-              "study-session-note fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-4xl border border-border bg-popover px-4 py-2.5 text-sm font-medium text-popover-foreground shadow-lg data-[tone=success]:border-primary data-[tone=warning]:border-destructive data-[tone=action]:border-ring data-[tone=milestone]:border-primary",
-              activeQuestion && mobilePane === "study" && "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] sm:bottom-4"
+              "study-session-note fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-4xl border border-border bg-popover px-4 py-2.5 text-sm font-medium text-popover-foreground shadow-md data-[tone=success]:border-primary data-[tone=warning]:border-destructive data-[tone=action]:border-ring data-[tone=milestone]:border-primary",
+              activeQuestion && mobilePane === "study" && "bottom-[calc(6rem+env(safe-area-inset-bottom))] sm:bottom-4"
             )}
             data-tone={sessionTone}
             role="status"

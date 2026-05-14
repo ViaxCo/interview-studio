@@ -6,10 +6,18 @@ export type Question = {
   category: string;
   level: string;
   question: string;
+  lessonSections?: { title: string; body: string }[];
+  interviewerIntent?: string;
+  beginnerExplanation?: string;
   answer: string;
+  interviewAnswer?: string;
+  example?: string;
   reasoning: string;
+  commonMistakes?: string;
+  seniorNuance?: string;
   tests: string;
   followUps: string[];
+  sourceLinks?: { label: string; url: string }[];
 };
 
 export type AnswerDepth = {

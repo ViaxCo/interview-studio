@@ -1,0 +1,74 @@
+---
+id: tpm-api-integration
+track: TPM
+category: API & Partner Integration
+level: Foundational
+question: How would you manage the launch of a new third-party API integration?
+sources:
+  - label: Stripe: Idempotent requests
+    url: https://docs.stripe.com/api/idempotent_requests
+  - label: Atlassian: DACI decision framework
+    url: https://www.atlassian.com/team-playbook/plays/daci
+---
+
+## Learn it
+
+An API integration means your product is depending on another system to complete part of the user journey. That other system might verify identity, move money, send notifications, fetch bank data, screen a customer, create a ticket, or return a price.
+
+For a beginner, the easy mistake is to think the job is "call the API and display the response." That is only the happy path. A real product launch has to answer a wider question: can customers, internal teams, and business operations trust this integration when it succeeds, fails, slows down, returns unclear data, or behaves differently from the demo?
+
+A Technical Product Manager has to translate the integration into a complete product and operating model. That means knowing what customer promise depends on the API, what data is exchanged, what errors can happen, who owns each failure, what evidence proves readiness, and how the team will know the integration is healthy after launch.
+
+## Walkthrough
+
+Imagine a remittance product adding a payout partner. The happy path is simple:
+
+1. A customer enters recipient details.
+2. Your system sends a payout request to the partner.
+3. The partner accepts the request.
+4. The recipient receives money.
+5. Your app shows success.
+
+That is not enough for launch.
+
+You need to know what happens if the partner accepts the request but pays out later. You need to know whether a timeout means the payout failed or only that your system stopped waiting. You need to know what happens if the customer retries. You need to know whether duplicate requests can create duplicate payouts. You need to know how partner statuses map to your product statuses: pending, processing, paid, failed, reversed, rejected, or unknown.
+
+This is why API contract details matter. You need request fields, response fields, authentication, rate limits, timeout behavior, retries, idempotency, webhooks, error codes, versioning, data retention, support escalation, reconciliation, and monitoring.
+
+Idempotency is a good example. In payments, retrying a request should not accidentally create the same transaction twice. A safe integration needs a way to say, "this retry is the same intended action, not a brand-new payout."
+
+## Make it practical
+
+I would manage the work in phases.
+
+First, define the product workflow. What customer action is this integration supporting? What is the success state? What states can the customer see while the partner is still processing? What does support need to know?
+
+Second, define the technical contract with engineering and the partner. What data do we send? What do we receive? Which fields are required? What errors are possible? Which retries are safe? Which events arrive through webhooks? What is the source of truth if our system and the partner disagree?
+
+Third, define ownership. Engineering owns implementation, but the launch also needs product decisions, compliance review, security review, partner contacts, operational runbooks, support scripts, analytics, and executive visibility if money movement or customer trust is at stake. A decision framework like DACI helps clarify the driver, final approver, contributors, and people who need to stay informed.
+
+Fourth, define launch evidence. Sandbox success is not enough. I would want test cases for happy path, pending states, rejection, timeout, retry, duplicate prevention, partner downtime, webhook delay, reconciliation mismatch, and support visibility.
+
+Fifth, roll out with monitoring. Launch to a limited group or corridor if possible. Watch success rate, failure rate, latency, pending duration, duplicate attempts, support contacts, reconciliation exceptions, and partner incident reports.
+
+## Common mistakes
+
+The biggest mistake is calling the integration ready after one successful sandbox call. That proves the API can work. It does not prove the product can operate.
+
+Another mistake is leaving failure ownership vague. If the integration fails at night, who sees the alert? Who contacts the partner? Who updates support? Who decides whether to pause the feature? If those answers are not clear, launch risk is still high.
+
+A third mistake is ignoring reconciliation. Especially in financial products, it is not enough for the UI to say success. Your records, partner records, ledger entries, fees, and customer-facing status need to agree or have a clear process for resolving mismatch.
+
+## Check yourself
+
+- What is the customer workflow this API supports?
+- What are the normal, pending, failed, and unknown states?
+- Which retries are safe, and how do you prevent duplicate actions?
+- Who owns partner escalation, support messaging, and launch sign-off?
+- What metrics would show the integration is healthy after launch?
+
+## Interview version
+
+I would manage a third-party API integration by turning it from an engineering task into a complete launch plan. I would define the customer workflow, API contract, data ownership, failure modes, retry and idempotency behavior, webhooks, security and compliance needs, operational runbooks, support process, rollout plan, monitoring, and partner escalation.
+
+A strong TPM answer shows that launch readiness is not one successful API call. It is evidence that the normal path works, exception paths are handled, owners are clear, customers can recover, and the business can monitor and operate the integration in production.
