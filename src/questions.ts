@@ -1,7 +1,12 @@
 import type { Question } from "./questionTypes";
-import { generatedQuestions } from "./generatedQuestions";
+import { questionSummaries } from "./questionSummaries";
 
-export const questions: Question[] = generatedQuestions;
+export const questions: Question[] = questionSummaries;
+
+export async function loadQuestions() {
+  const { generatedQuestions } = await import("./generatedQuestions");
+  return generatedQuestions;
+}
 
 export function questionTrack(question: Question) {
   return question.track || "Frontend";

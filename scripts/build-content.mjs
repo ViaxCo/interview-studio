@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const contentDir = join(root, "content", "lessons");
 const outputFile = join(root, "src", "generatedQuestions.ts");
+const summariesFile = join(root, "src", "questionSummaries.ts");
 
 function parseValue(value) {
   const trimmed = value.trim();
@@ -122,6 +123,22 @@ const content = `import type { Question } from "./questionTypes";
 
 export const generatedQuestions: Question[] = ${JSON.stringify(questions, null, 2)};
 `;
+const summaries = questions.map(({ id, track, category, level, question }) => ({
+  id,
+  track,
+  category,
+  level,
+  question,
+  answer: "",
+  reasoning: "",
+  tests: "",
+  followUps: []
+}));
+const summariesContent = `import type { Question } from "./questionTypes";
+
+export const questionSummaries: Question[] = ${JSON.stringify(summaries, null, 2)};
+`;
 
 mkdirSync(dirname(outputFile), { recursive: true });
 writeFileSync(outputFile, content);
+writeFileSync(summariesFile, summariesContent);

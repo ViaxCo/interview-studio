@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { categories, levels, questionTrack, questions, tracks } from "./questions";
+import { categories, levels, loadQuestions, questionTrack, questions, tracks } from "./questions";
 import type {
   AnswerDepth,
   ProgressMap,
@@ -52,6 +52,7 @@ type QuestionProgressState = Pick<StoredState, ProgressKey>;
 type ImportableProgressState = QuestionProgressState & Pick<StoredState, "theme" | "hasThemePreference">;
 type SessionTone = "neutral" | "success" | "warning" | "action" | "milestone";
 type AnswerDepthState = "idle" | "loading" | "ready" | "error";
+type QuestionDetailsState = "idle" | "loading" | "ready" | "error";
 type AnswerDepthMap = Record<string, AnswerDepth>;
 type MobilePane = "study" | "queue";
 type TopicCssProperties = CSSProperties &
@@ -752,29 +753,6 @@ function getQuestionSearchText(question: Question, depthMap: AnswerDepthMap | nu
   return text;
 }
 
-const baseQuestionSearchText = questions.map((item) => ({
-  item,
-  text: [
-    item.question,
-    item.interviewerIntent,
-    item.beginnerExplanation,
-    item.answer,
-    item.interviewAnswer,
-    item.example,
-    item.reasoning,
-    item.commonMistakes,
-    item.seniorNuance,
-    item.tests,
-    questionTrack(item),
-    item.category,
-    item.level,
-    ...(item.sourceLinks || []).flatMap((source) => [source.label, source.url])
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase()
-}));
-
 function emptyStoredState(storageAvailable = true): StoredState {
   return {
     revealed: {},
@@ -929,6 +907,8 @@ function App({
   const [resetBackup, setResetBackup] = useState<QuestionProgressState | null>(null);
   const [answerDepthMap, setAnswerDepthMap] = useState<AnswerDepthMap | null>(null);
   const [answerDepthState, setAnswerDepthState] = useState<AnswerDepthState>("idle");
+  const [questionDetails, setQuestionDetails] = useState<Record<string, Question> | null>(null);
+  const [questionDetailsState, setQuestionDetailsState] = useState<QuestionDetailsState>("idle");
   const [pendingGuestImport, setPendingGuestImport] = useState<ImportableProgressState | null>(null);
   const [sessionNote, setSessionNote] = useState("");
   const [sessionTone, setSessionTone] = useState<SessionTone>("neutral");
@@ -940,6 +920,7 @@ function App({
   const pendingTheme = useRef<Theme | null>(null);
   const hasDeviceThemePreference = useRef(storedState.hasThemePreference);
   const answerDepthRequest = useRef<Promise<AnswerDepthMap> | null>(null);
+  const questionDetailsRequest = useRef<Promise<Question[]> | null>(null);
   const previousReviewedCount = useRef(Object.values(storedState.reviewed).filter(Boolean).length);
   const [progressPulseKey, setProgressPulseKey] = useState(0);
 
@@ -1076,9 +1057,13 @@ function App({
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  const hydratedQuestions = useMemo(
+    () => (questionDetails ? questions.map((item) => questionDetails[item.id] || item) : questions),
+    [questionDetails]
+  );
   const trackQuestions = useMemo(
-    () => questions.filter((item) => track === allTracks || questionTrack(item) === track),
-    [track]
+    () => hydratedQuestions.filter((item) => track === allTracks || questionTrack(item) === track),
+    [hydratedQuestions, track]
   );
   const categoryCounts = useMemo(
     () =>
@@ -1091,6 +1076,32 @@ function App({
   const visibleCategories = useMemo(
     () => categories.filter((item) => categoryCounts[item]),
     [categoryCounts]
+  );
+  const baseQuestionSearchText = useMemo(
+    () =>
+      hydratedQuestions.map((item) => ({
+        item,
+        text: [
+          item.question,
+          item.interviewerIntent,
+          item.beginnerExplanation,
+          item.answer,
+          item.interviewAnswer,
+          item.example,
+          item.reasoning,
+          item.commonMistakes,
+          item.seniorNuance,
+          item.tests,
+          questionTrack(item),
+          item.category,
+          item.level,
+          ...(item.sourceLinks || []).flatMap((source) => [source.label, source.url])
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+      })),
+    [hydratedQuestions]
   );
   const filteredQuestions = useMemo(() => {
     const normalizedQuery = deferredQuery.trim().toLowerCase();
@@ -1126,8 +1137,11 @@ function App({
     const safeIndex = index >= 0 ? index : 0;
     return { question: studyQueue[safeIndex], index: safeIndex };
   }, [activeId, studyQueue]);
-  const activeQuestion = activeQueueEntry.question;
+  const activeQuestion = activeQueueEntry.question
+    ? questionDetails?.[activeQueueEntry.question.id] || activeQueueEntry.question
+    : null;
   const activeQueueIndex = activeQueueEntry.index;
+  const needsQuestionDetails = Boolean(activeQuestion && revealed[activeQuestion.id] && !activeQuestion.lessonSections?.length);
   const activeGuide = useMemo(
     () => (activeQuestion ? getAnswerGuide(activeQuestion, answerDepthMap) : null),
     [activeQuestion, answerDepthMap]
@@ -1191,6 +1205,25 @@ function App({
       showSessionNote("Guide failed. Core answer still works.", "warning");
     });
   }, [activeQuestion, answerDepthMap, answerDepthState, deferredQuery, revealed]);
+
+  useEffect(() => {
+    if (questionDetails || questionDetailsState === "loading" || questionDetailsState === "error") return;
+    if (!query.trim() && (!activeQuestion || !revealed[activeQuestion.id])) return;
+
+    setQuestionDetailsState("loading");
+    if (!questionDetailsRequest.current) {
+      questionDetailsRequest.current = loadQuestions();
+    }
+
+    questionDetailsRequest.current.then((loadedQuestions) => {
+      setQuestionDetails(Object.fromEntries(loadedQuestions.map((item) => [item.id, item])));
+      setQuestionDetailsState("ready");
+    }).catch(() => {
+      questionDetailsRequest.current = null;
+      setQuestionDetailsState("error");
+      showSessionNote("Lesson details failed to load. Try again in a moment.", "warning");
+    });
+  }, [activeQuestion, query, questionDetails, questionDetailsState, revealed]);
 
   const reviewedCount = useMemo(
     () => trackQuestions.filter((item) => reviewed[item.id]).length,
@@ -1988,93 +2021,106 @@ function App({
                           <CardDescription>Understand the idea first, then practice explaining it.</CardDescription>
                         </CardHeader>
                         <CardContent className="reading-copy">
-                          {activeQuestion.lessonSections?.length ? (
-                            activeQuestion.lessonSections.map((section, index) => (
-                              <div className={cn("study-canvas-section", index === 0 && "pt-0")} key={section.title}>
-                                <h3 className="study-canvas-label">{section.title}</h3>
-                                <TextBlock text={section.body} />
-                              </div>
-                            ))
+                          {needsQuestionDetails ? (
+                            <div className="study-canvas-section pt-0">
+                              <h3 className="study-canvas-label">Loading lesson</h3>
+                              <p>
+                                {questionDetailsState === "error"
+                                  ? "The full lesson did not load. Check your connection and try revealing again."
+                                  : "Getting the full teaching version ready."}
+                              </p>
+                            </div>
                           ) : (
                             <>
-                              <div className="study-canvas-section pt-0">
-                                <h3 className="study-canvas-label">Start here</h3>
-                                {activeQuestion.interviewerIntent && <TextBlock text={activeQuestion.interviewerIntent} />}
-                                {activeQuestion.beginnerExplanation && <TextBlock text={activeQuestion.beginnerExplanation} />}
-                                <TextBlock text={activeQuestion.answer} />
-                                <TextBlock text={activeQuestion.reasoning} />
+                              {activeQuestion.lessonSections?.length ? (
+                                activeQuestion.lessonSections.map((section, index) => (
+                                  <div className={cn("study-canvas-section", index === 0 && "pt-0")} key={section.title}>
+                                    <h3 className="study-canvas-label">{section.title}</h3>
+                                    <TextBlock text={section.body} />
+                                  </div>
+                                ))
+                              ) : (
+                                <>
+                                  <div className="study-canvas-section pt-0">
+                                    <h3 className="study-canvas-label">Start here</h3>
+                                    {activeQuestion.interviewerIntent && <TextBlock text={activeQuestion.interviewerIntent} />}
+                                    {activeQuestion.beginnerExplanation && <TextBlock text={activeQuestion.beginnerExplanation} />}
+                                    <TextBlock text={activeQuestion.answer} />
+                                    <TextBlock text={activeQuestion.reasoning} />
+                                  </div>
+
+                                  {activeGuide.code && (
+                                    <div className="study-canvas-section">
+                                      <h3 className="study-canvas-label">{activeGuide.codeTitle || "Code example"}</h3>
+                                      <pre className="lesson-code-block rounded-lg bg-muted p-4 text-[0.9375rem] leading-7">
+                                        <code><HighlightedCode code={activeGuide.code} /></code>
+                                      </pre>
+                                    </div>
+                                  )}
+
+                                  {activeGuide.visual && (
+                                    <div className="study-canvas-section">
+                                      <h3 className="study-canvas-label">{activeGuide.visualTitle || "Illustration"}</h3>
+                                      <ol className="grid gap-2 sm:grid-cols-3">
+                                        {activeGuide.visual.map((item, index) => (
+                                          <li key={item} className="rounded-lg border bg-muted/35 p-4 text-[0.95rem]/7">
+                                            <Badge variant="outline">{index + 1}</Badge>
+                                            <span className="mt-3 block">{item}</span>
+                                          </li>
+                                        ))}
+                                      </ol>
+                                    </div>
+                                  )}
+
+                                  {(activeQuestion.example || activeQuestion.commonMistakes || activeQuestion.seniorNuance) && (
+                                    <div className="study-canvas-section">
+                                      <h3 className="study-canvas-label">Make it practical</h3>
+                                      {activeQuestion.example && <TextBlock text={activeQuestion.example} />}
+                                      {activeQuestion.commonMistakes && <TextBlock text={activeQuestion.commonMistakes} />}
+                                      {activeQuestion.seniorNuance && <TextBlock text={activeQuestion.seniorNuance} />}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+
+                              <div className="study-canvas-section pb-0">
+                                <h3 className="study-canvas-label">Check your understanding</h3>
+                                <div className="grid gap-5 lg:grid-cols-2">
+                                  <p><InlineText text={activeQuestion.tests} /></p>
+                                  <div>
+                                    <strong className="study-canvas-label">Try answering these</strong>
+                                    <ul className="mt-2 list-disc pl-5">
+                                      {activeQuestion.followUps.map((item) => (
+                                        <li key={item}><InlineText text={item} /></li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                                {activeQuestion.interviewAnswer && (
+                                  <details className="mt-5 rounded-lg border bg-muted/30 p-4">
+                                    <summary className="cursor-pointer font-medium">Show a concise interview version</summary>
+                                    <div className="mt-3 grid gap-3">
+                                      <TextBlock text={activeQuestion.interviewAnswer} />
+                                    </div>
+                                  </details>
+                                )}
+                                {activeQuestion.sourceLinks?.length ? (
+                                  <div className="lesson-sources mt-6 border-t pt-5">
+                                    <strong className="study-canvas-label">Sources</strong>
+                                    <ul className="mt-3">
+                                      {activeQuestion.sourceLinks.map((source) => (
+                                        <li key={source.url}>
+                                          <a className="lesson-source-link" href={source.url} target="_blank" rel="noreferrer">
+                                            {source.label}
+                                          </a>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ) : null}
                               </div>
-
-                              {activeGuide.code && (
-                                <div className="study-canvas-section">
-                                  <h3 className="study-canvas-label">{activeGuide.codeTitle || "Code example"}</h3>
-                                  <pre className="lesson-code-block rounded-lg bg-muted p-4 text-[0.9375rem] leading-7">
-                                    <code><HighlightedCode code={activeGuide.code} /></code>
-                                  </pre>
-                                </div>
-                              )}
-
-                              {activeGuide.visual && (
-                                <div className="study-canvas-section">
-                                  <h3 className="study-canvas-label">{activeGuide.visualTitle || "Illustration"}</h3>
-                                  <ol className="grid gap-2 sm:grid-cols-3">
-                                    {activeGuide.visual.map((item, index) => (
-                                      <li key={item} className="rounded-lg border bg-muted/35 p-4 text-[0.95rem]/7">
-                                        <Badge variant="outline">{index + 1}</Badge>
-                                        <span className="mt-3 block">{item}</span>
-                                      </li>
-                                    ))}
-                                  </ol>
-                                </div>
-                              )}
-
-                              {(activeQuestion.example || activeQuestion.commonMistakes || activeQuestion.seniorNuance) && (
-                                <div className="study-canvas-section">
-                                  <h3 className="study-canvas-label">Make it practical</h3>
-                                  {activeQuestion.example && <TextBlock text={activeQuestion.example} />}
-                                  {activeQuestion.commonMistakes && <TextBlock text={activeQuestion.commonMistakes} />}
-                                  {activeQuestion.seniorNuance && <TextBlock text={activeQuestion.seniorNuance} />}
-                                </div>
-                              )}
                             </>
                           )}
-
-                          <div className="study-canvas-section pb-0">
-                            <h3 className="study-canvas-label">Check your understanding</h3>
-                            <div className="grid gap-5 lg:grid-cols-2">
-                              <p><InlineText text={activeQuestion.tests} /></p>
-                              <div>
-                                <strong className="study-canvas-label">Try answering these</strong>
-                                <ul className="mt-2 list-disc pl-5">
-                                  {activeQuestion.followUps.map((item) => (
-                                    <li key={item}><InlineText text={item} /></li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-                            {activeQuestion.interviewAnswer && (
-                              <details className="mt-5 rounded-lg border bg-muted/30 p-4">
-                                <summary className="cursor-pointer font-medium">Show a concise interview version</summary>
-                                <div className="mt-3 grid gap-3">
-                                  <TextBlock text={activeQuestion.interviewAnswer} />
-                                </div>
-                              </details>
-                            )}
-                            {activeQuestion.sourceLinks?.length ? (
-                              <div className="lesson-sources mt-6 border-t pt-5">
-                                <strong className="study-canvas-label">Sources</strong>
-                                <ul className="mt-3">
-                                  {activeQuestion.sourceLinks.map((source) => (
-                                    <li key={source.url}>
-                                      <a className="lesson-source-link" href={source.url} target="_blank" rel="noreferrer">
-                                        {source.label}
-                                      </a>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ) : null}
-                          </div>
                         </CardContent>
                       </Card>
                     )}
