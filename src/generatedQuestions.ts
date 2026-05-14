@@ -149,6 +149,59 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is treating performance as only bundle size. Bundle size matters, but a small bundle can still create poor INP if one interaction does too much synchronous work.\n\nAnother mistake is optimizing the wrong page. The homepage might be fine while the dashboard, product detail page, or checkout flow performs badly.\n\nA third mistake is chasing scores without understanding the user journey. A TPM, designer, or frontend engineer should ask which slow moment hurts the user or business most, then improve that moment first."
   },
   {
+    "id": "fe-css-cascade-specificity-stacking",
+    "track": "Frontend",
+    "category": "CSS",
+    "level": "Intermediate",
+    "question": "Explain the CSS cascade, specificity, and stacking context.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.\n\nThe cascade is that decision system. It considers where styles came from, importance, cascade layers, specificity, order, and inheritance.\n\nThe beginner mistake is thinking CSS is only \"last rule wins.\" Order matters, but only after other rules are considered.\n\nSpecificity is one part of the cascade. It is the weight of a selector.\n\n```css\nbutton {\n  color: black;\n}\n\n.primary {\n  color: blue;\n}\n\n#checkout {\n  color: red;\n}\n```\n\nIf the same button has `id=\"checkout\"` and `class=\"primary\"`, the ID selector is more specific, so red wins over blue and black."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Think of specificity like a score:\n\n```txt\nInline styles:\nVery strong\n\nID selectors:\nStrong\n\nClass, attribute, pseudo-class selectors:\nMedium\n\nElement and pseudo-element selectors:\nLow\n```\n\nThis is why deeply specific CSS can become hard to override.\n\n```css\n.app .sidebar nav ul li a.active {\n  color: red;\n}\n```\n\nLater, someone tries:\n\n```css\n.active {\n  color: blue;\n}\n```\n\nThe second rule may come later, but it is less specific. The red rule can still win.\n\nThat is why good CSS often uses low, predictable specificity."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Stacking context is a different but related source of confusion. It affects which things appear in front of other things.\n\nA common beginner belief is:\n\n```txt\nThe biggest z-index always appears on top.\n```\n\nThat is not always true. `z-index` is compared inside stacking contexts. A child can be trapped inside its parent's stacking context.\n\n```html\n<div class=\"modal-shell\">\n  <div class=\"tooltip\">Tooltip</div>\n</div>\n\n<header class=\"site-header\">Header</header>\n```\n\n```css\n.modal-shell {\n  position: relative;\n  z-index: 1;\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 9999;\n}\n\n.site-header {\n  position: relative;\n  z-index: 10;\n}\n```\n\nEven though the tooltip has `z-index: 9999`, it may still appear behind the header because it lives inside `.modal-shell`, and `.modal-shell` is below the header in the parent stacking order.\n\nTo fix stacking bugs, inspect the parent contexts, not only the element with the big `z-index`.\n\n```txt\nDebug checklist\n\n1. Which rule is winning in DevTools?\n2. Is the losing rule less specific?\n3. Is `!important` involved?\n4. Is the element inside a stacking context?\n5. Is a parent setting position, z-index, transform, opacity, filter, or isolation?\n6. Can the CSS be simplified instead of raising z-index again?\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is adding `!important` instead of understanding why a rule lost. That may fix one bug and create the next one.\n\nAnother mistake is increasing `z-index` forever. If the element is inside a lower stacking context, a bigger number may not help.\n\nA third mistake is writing selectors that are too specific. They make future overrides harder and make the stylesheet fragile."
+      }
+    ],
+    "answer": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.",
+    "reasoning": "Stacking context is a different but related source of confusion. It affects which things appear in front of other things.\n\nA common beginner belief is:\n\n```txt\nThe biggest z-index always appears on top.\n```\n\nThat is not always true. `z-index` is compared inside stacking contexts. A child can be trapped inside its parent's stacking context.\n\n```html\n<div class=\"modal-shell\">\n  <div class=\"tooltip\">Tooltip</div>\n</div>\n\n<header class=\"site-header\">Header</header>\n```\n\n```css\n.modal-shell {\n  position: relative;\n  z-index: 1;\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 9999;\n}\n\n.site-header {\n  position: relative;\n  z-index: 10;\n}\n```\n\nEven though the tooltip has `z-index: 9999`, it may still appear behind the header because it lives inside `.modal-shell`, and `.modal-shell` is below the header in the parent stacking order.\n\nTo fix stacking bugs, inspect the parent contexts, not only the element with the big `z-index`.\n\n```txt\nDebug checklist\n\n1. Which rule is winning in DevTools?\n2. Is the losing rule less specific?\n3. Is `!important` involved?\n4. Is the element inside a stacking context?\n5. Is a parent setting position, z-index, transform, opacity, filter, or isolation?\n6. Can the CSS be simplified instead of raising z-index again?\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is CSS not simply \"last rule wins\"?",
+      "What is specificity?",
+      "Why can an ID selector beat a class selector?",
+      "What is a stacking context?",
+      "Why might `z-index: 9999` still appear behind another element?"
+    ],
+    "interviewAnswer": "The cascade is the browser's process for deciding which CSS declaration wins. Specificity is the selector weight used when competing rules apply in the same cascade layer and origin. Stacking context controls how elements are layered on the z-axis, and `z-index` is compared within those contexts.\n\nA strong answer should mention cascade order, specificity, source order, avoiding unnecessary `!important`, and debugging stacking bugs by checking parent stacking contexts.",
+    "sourceLinks": [
+      {
+        "label": "MDN: CSS cascade",
+        "url": "https://developer.mozilla.org/docs/Web/CSS/CSS_cascade/Cascade"
+      },
+      {
+        "label": "MDN: CSS specificity",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascade/Specificity"
+      },
+      {
+        "label": "MDN: Stacking context",
+        "url": "https://developer.mozilla.org/docs/Web/CSS/Guides/Positioned_layout/Stacking_context"
+      }
+    ],
+    "beginnerExplanation": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.\n\nThe cascade is that decision system. It considers where styles came from, importance, cascade layers, specificity, order, and inheritance.\n\nThe beginner mistake is thinking CSS is only \"last rule wins.\" Order matters, but only after other rules are considered.\n\nSpecificity is one part of the cascade. It is the weight of a selector.\n\n```css\nbutton {\n  color: black;\n}\n\n.primary {\n  color: blue;\n}\n\n#checkout {\n  color: red;\n}\n```\n\nIf the same button has `id=\"checkout\"` and `class=\"primary\"`, the ID selector is more specific, so red wins over blue and black.",
+    "example": "Think of specificity like a score:\n\n```txt\nInline styles:\nVery strong\n\nID selectors:\nStrong\n\nClass, attribute, pseudo-class selectors:\nMedium\n\nElement and pseudo-element selectors:\nLow\n```\n\nThis is why deeply specific CSS can become hard to override.\n\n```css\n.app .sidebar nav ul li a.active {\n  color: red;\n}\n```\n\nLater, someone tries:\n\n```css\n.active {\n  color: blue;\n}\n```\n\nThe second rule may come later, but it is less specific. The red rule can still win.\n\nThat is why good CSS often uses low, predictable specificity.",
+    "commonMistakes": "A common mistake is adding `!important` instead of understanding why a rule lost. That may fix one bug and create the next one.\n\nAnother mistake is increasing `z-index` forever. If the element is inside a lower stacking context, a bigger number may not help.\n\nA third mistake is writing selectors that are too specific. They make future overrides harder and make the stylesheet fragile."
+  },
+  {
     "id": "fe-data-fetching-cache-invalidation",
     "track": "Frontend",
     "category": "React",
@@ -294,6 +347,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.\n\nThis creates an obvious question: if JavaScript runs one thing at a time, how can a page handle clicks, timers, network responses, animations, and promise callbacks?\n\nThe answer is the event loop.\n\nThe event loop is the browser's scheduling system for deciding what work JavaScript should run next. It coordinates the call stack, task queue, microtask queue, rendering, and browser APIs.\n\nStart with the call stack. The call stack is where currently running functions live. When you call a function, it goes on the stack. When it returns, it leaves the stack. JavaScript keeps running until the stack is empty.\n\nAsynchronous browser features like timers, events, and network requests do not magically run inside your current function. The browser tracks them outside the call stack. When they are ready, their callbacks are queued to run later.",
     "example": "Look at this code:\n\n```js\nconsole.log(\"A\");\n\nsetTimeout(() => {\n  console.log(\"B\");\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log(\"C\");\n});\n\nconsole.log(\"D\");\n```\n\nThe output is:\n\n```txt\nA\nD\nC\nB\n```\n\nHere is the beginner-friendly version of what happened.\n\nFirst, JavaScript runs the current script from top to bottom. `console.log(\"A\")` runs immediately. `setTimeout` asks the browser to run a callback later, even though the delay is `0`. That callback does not run immediately because the current script is still running. `Promise.resolve().then(...)` queues a microtask. Then `console.log(\"D\")` runs.\n\nNow the call stack is empty. Before the browser picks the next regular task, JavaScript drains the microtask queue. Promise callbacks are microtasks, so `C` logs next.\n\nAfter microtasks are done, the event loop can pick a task from the task queue. The timer callback is a task, so `B` logs last.\n\nThis is why `setTimeout(fn, 0)` does not mean \"run now.\" It means \"run after the current JavaScript finishes and after microtasks that are already waiting.\"",
     "commonMistakes": "A common mistake is saying JavaScript is asynchronous because it runs multiple callbacks at the same time. That is not the usual browser model. JavaScript callbacks are scheduled asynchronously, but the main thread still runs one piece of JavaScript at a time.\n\nAnother mistake is forgetting the difference between tasks and microtasks. Promise callbacks usually run before timers that are waiting in the task queue.\n\nA third mistake is ignoring rendering. The user does not care only about callback order. They care whether the page can paint, animate, and respond while your code is running."
+  },
+  {
+    "id": "fe-event-propagation-delegation",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Foundational",
+    "question": "Explain event propagation and event delegation in the browser.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.\n\nImagine this HTML:\n\n```html\n<section id=\"panel\">\n  <button id=\"save\">Save</button>\n</section>\n```\n\nIf you click the button, the click happened on the button, but the button is inside the section, and the section is inside the page. The browser gives different ancestors a chance to respond.\n\nThe usual mental model has three phases:\n\n```txt\nCapture phase:\nThe event travels down from the window toward the target.\n\nTarget phase:\nThe event reaches the element that was actually clicked.\n\nBubbling phase:\nThe event travels back up through parent elements.\n```\n\nMost everyday event listeners run during bubbling unless you opt into capture."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Here is a small example:\n\n```html\n<div id=\"card\">\n  <button id=\"buy\">Buy</button>\n</div>\n```\n\n```js\ndocument.querySelector(\"#card\").addEventListener(\"click\", () => {\n  console.log(\"card clicked\");\n});\n\ndocument.querySelector(\"#buy\").addEventListener(\"click\", () => {\n  console.log(\"button clicked\");\n});\n```\n\nWhen the user clicks the button, the button handler runs, then the card handler can also run because the click bubbles up.\n\nThat is why clicking a button inside a clickable card can accidentally trigger both actions.\n\nIf the button action should not also trigger the card action, you might stop propagation:\n\n```js\ndocument.querySelector(\"#buy\").addEventListener(\"click\", (event) => {\n  event.stopPropagation();\n  console.log(\"button clicked only\");\n});\n```\n\nUse that carefully. Stopping propagation can also prevent useful parent behavior, analytics, menus, or accessibility-related handlers if overused."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Event delegation uses bubbling on purpose.\n\nInstead of putting a listener on every item in a list, you put one listener on the parent and inspect what was clicked.\n\n```html\n<ul id=\"todo-list\">\n  <li><button data-id=\"1\">Complete</button> Learn closures</li>\n  <li><button data-id=\"2\">Complete</button> Practice CSS</li>\n  <li><button data-id=\"3\">Complete</button> Review React</li>\n</ul>\n```\n\n```js\ndocument.querySelector(\"#todo-list\").addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-id]\");\n\n  if (!button) return;\n\n  const id = button.dataset.id;\n  console.log(`Complete todo ${id}`);\n});\n```\n\nThis works even if more todo items are added later, because the parent listener still receives bubbled clicks.\n\nThis is useful for dynamic lists, tables, menus, and any UI where adding a listener to every child would be noisy."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is confusing `event.target` and `event.currentTarget`. `target` is where the event started. `currentTarget` is the element whose listener is currently running.\n\nAnother mistake is using `stopPropagation()` as a default fix. It can hide problems and break parent-level behavior.\n\nA third mistake is assuming every event bubbles. Many common events do, but not all events behave the same way."
+      }
+    ],
+    "answer": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.",
+    "reasoning": "Event delegation uses bubbling on purpose.\n\nInstead of putting a listener on every item in a list, you put one listener on the parent and inspect what was clicked.\n\n```html\n<ul id=\"todo-list\">\n  <li><button data-id=\"1\">Complete</button> Learn closures</li>\n  <li><button data-id=\"2\">Complete</button> Practice CSS</li>\n  <li><button data-id=\"3\">Complete</button> Review React</li>\n</ul>\n```\n\n```js\ndocument.querySelector(\"#todo-list\").addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-id]\");\n\n  if (!button) return;\n\n  const id = button.dataset.id;\n  console.log(`Complete todo ${id}`);\n});\n```\n\nThis works even if more todo items are added later, because the parent listener still receives bubbled clicks.\n\nThis is useful for dynamic lists, tables, menus, and any UI where adding a listener to every child would be noisy.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does it mean for an event to bubble?",
+      "Why can a button click trigger a parent card handler?",
+      "What is event delegation?",
+      "What is the difference between `target` and `currentTarget`?",
+      "Why should `stopPropagation()` be used carefully?"
+    ],
+    "interviewAnswer": "Event propagation is the path an event takes through the DOM: capture down, target, then bubble up. Event delegation uses bubbling by placing one listener on a parent and checking which child triggered the event.\n\nA strong answer should mention bubbling, capture, target, `event.target`, `event.currentTarget`, `stopPropagation()`, and why delegation is useful for dynamic lists.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Event bubbling",
+        "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling"
+      },
+      {
+        "label": "MDN: EventTarget addEventListener",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"
+      }
+    ],
+    "beginnerExplanation": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.\n\nImagine this HTML:\n\n```html\n<section id=\"panel\">\n  <button id=\"save\">Save</button>\n</section>\n```\n\nIf you click the button, the click happened on the button, but the button is inside the section, and the section is inside the page. The browser gives different ancestors a chance to respond.\n\nThe usual mental model has three phases:\n\n```txt\nCapture phase:\nThe event travels down from the window toward the target.\n\nTarget phase:\nThe event reaches the element that was actually clicked.\n\nBubbling phase:\nThe event travels back up through parent elements.\n```\n\nMost everyday event listeners run during bubbling unless you opt into capture.",
+    "example": "Here is a small example:\n\n```html\n<div id=\"card\">\n  <button id=\"buy\">Buy</button>\n</div>\n```\n\n```js\ndocument.querySelector(\"#card\").addEventListener(\"click\", () => {\n  console.log(\"card clicked\");\n});\n\ndocument.querySelector(\"#buy\").addEventListener(\"click\", () => {\n  console.log(\"button clicked\");\n});\n```\n\nWhen the user clicks the button, the button handler runs, then the card handler can also run because the click bubbles up.\n\nThat is why clicking a button inside a clickable card can accidentally trigger both actions.\n\nIf the button action should not also trigger the card action, you might stop propagation:\n\n```js\ndocument.querySelector(\"#buy\").addEventListener(\"click\", (event) => {\n  event.stopPropagation();\n  console.log(\"button clicked only\");\n});\n```\n\nUse that carefully. Stopping propagation can also prevent useful parent behavior, analytics, menus, or accessibility-related handlers if overused.",
+    "commonMistakes": "A common mistake is confusing `event.target` and `event.currentTarget`. `target` is where the event started. `currentTarget` is the element whose listener is currently running.\n\nAnother mistake is using `stopPropagation()` as a default fix. It can hide problems and break parent-level behavior.\n\nA third mistake is assuming every event bubbles. Many common events do, but not all events behave the same way."
   },
   {
     "id": "fe-flexbox-grid",
@@ -982,6 +1084,153 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is hiding compliance requirements until the end of the flow. Users feel tricked when they invest effort and then hit an unexplained wall.\n\nAnother mistake is asking every user for the maximum amount of information immediately. That may satisfy a checklist, but it can destroy trust and conversion.\n\nA third mistake is treating vendor approval as the full product state. The product still needs to explain what happened, what the user can do next, what support can see, and how the business handles edge cases."
   },
   {
+    "id": "tpm-dependency-risk",
+    "track": "TPM",
+    "category": "Execution & Delivery",
+    "level": "Intermediate",
+    "question": "How would you manage dependency risk across multiple teams?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A dependency is work that one team needs from another team before it can finish its own work.\n\nThe beginner mistake is discovering dependencies late. Late dependency discovery is painful because the other team may already have a full roadmap, a different priority, or a technical constraint nobody planned for.\n\nDependency risk is not only \"Team B is late.\" It can also mean the dependency is unclear, unowned, too large, technically risky, or not actually committed by the team expected to deliver it.\n\nThe mental model is:\n\n```txt\nDependency = \"We need something from someone else.\"\nDependency risk = \"That something may not arrive in the right shape, quality, or time.\"\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine the product team is launching business accounts.\n\nYour team owns the user experience. But the launch depends on:\n\n```txt\nIdentity team:\nBusiness verification API\n\nPlatform team:\nOrganization and role model\n\nData team:\nBusiness account reporting tables\n\nCompliance team:\nPolicy approval and review rules\n\nSupport operations:\nMacros and investigation flow\n```\n\nA weak plan says, \"We need these teams.\" A strong plan names the exact contract.\n\n```txt\nDependency register\n\nDependency:\nBusiness verification API\n\nOwner:\nIdentity team\n\nNeeded by:\nMarch 12 for integration testing\n\nDefinition of done:\n- Create verification request\n- Return pending, approved, rejected, needs_more_info\n- Include reason code for support\n- Sandbox supports approved and rejected test businesses\n\nRisk:\nIdentity team has not committed to reason codes.\n\nMitigation:\nEscalate by Feb 16 or reduce launch scope to approved/pending only.\n```\n\nThis makes the dependency visible enough to manage."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would manage dependency risk in four passes.\n\nFirst, discover dependencies early. Ask engineering what systems, teams, data, approvals, migrations, or operational changes are needed.\n\nSecond, define the contract. A dependency should have an owner, expected date, definition of done, integration point, test plan, and fallback.\n\nThird, track health. Not all dependencies need the same attention. Red ones need active management.\n\nFourth, communicate impact. If a dependency slips, say what customer, launch, compliance, or revenue outcome is affected.\n\n```txt\nDependency health model\n\nGreen:\nOwner confirmed, scope clear, date realistic, no blocker.\n\nYellow:\nOwner confirmed, but scope/date/risk still uncertain.\n\nRed:\nNo owner, no commitment, late delivery, or missing launch-critical behavior.\n```\n\nThe TPM should not only ask, \"Is it on track?\" A better question is, \"What evidence tells us it is on track?\""
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is tracking dependencies as vague bullets. \"Need data team\" is not a manageable dependency.\n\nAnother mistake is assuming another team's roadmap commitment exists because someone said \"sounds good\" in a meeting.\n\nA third mistake is escalating too late. Escalation is not drama. It is making a risk visible while there is still time to change the plan."
+      }
+    ],
+    "answer": "A dependency is work that one team needs from another team before it can finish its own work.",
+    "reasoning": "I would manage dependency risk in four passes.\n\nFirst, discover dependencies early. Ask engineering what systems, teams, data, approvals, migrations, or operational changes are needed.\n\nSecond, define the contract. A dependency should have an owner, expected date, definition of done, integration point, test plan, and fallback.\n\nThird, track health. Not all dependencies need the same attention. Red ones need active management.\n\nFourth, communicate impact. If a dependency slips, say what customer, launch, compliance, or revenue outcome is affected.\n\n```txt\nDependency health model\n\nGreen:\nOwner confirmed, scope clear, date realistic, no blocker.\n\nYellow:\nOwner confirmed, but scope/date/risk still uncertain.\n\nRed:\nNo owner, no commitment, late delivery, or missing launch-critical behavior.\n```\n\nThe TPM should not only ask, \"Is it on track?\" A better question is, \"What evidence tells us it is on track?\"",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What information should a dependency have before it is manageable?",
+      "Why is \"owner confirmed\" different from \"someone agreed in a meeting\"?",
+      "What makes a dependency red instead of yellow?",
+      "Why should dependencies include a definition of done?",
+      "What should a TPM communicate when a dependency slips?"
+    ],
+    "interviewAnswer": "I would manage dependency risk by discovering dependencies early, assigning owners, defining the contract and definition of done, tracking health, creating fallbacks, and communicating impact when risk changes.\n\nA strong TPM answer shows that dependencies are not just project-management labels. They are cross-team commitments that need evidence, ownership, and active risk management.",
+    "sourceLinks": [
+      {
+        "label": "Atlassian: Advanced Roadmaps dependencies",
+        "url": "https://www.atlassian.com/software/jira/guides/advanced-roadmaps/overview"
+      },
+      {
+        "label": "Atlassian Support: Manage dependencies in plans",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/view-and-manage-dependencies-in-advanced-roadmaps/"
+      }
+    ],
+    "beginnerExplanation": "A dependency is work that one team needs from another team before it can finish its own work.\n\nThe beginner mistake is discovering dependencies late. Late dependency discovery is painful because the other team may already have a full roadmap, a different priority, or a technical constraint nobody planned for.\n\nDependency risk is not only \"Team B is late.\" It can also mean the dependency is unclear, unowned, too large, technically risky, or not actually committed by the team expected to deliver it.\n\nThe mental model is:\n\n```txt\nDependency = \"We need something from someone else.\"\nDependency risk = \"That something may not arrive in the right shape, quality, or time.\"\n```",
+    "example": "Imagine the product team is launching business accounts.\n\nYour team owns the user experience. But the launch depends on:\n\n```txt\nIdentity team:\nBusiness verification API\n\nPlatform team:\nOrganization and role model\n\nData team:\nBusiness account reporting tables\n\nCompliance team:\nPolicy approval and review rules\n\nSupport operations:\nMacros and investigation flow\n```\n\nA weak plan says, \"We need these teams.\" A strong plan names the exact contract.\n\n```txt\nDependency register\n\nDependency:\nBusiness verification API\n\nOwner:\nIdentity team\n\nNeeded by:\nMarch 12 for integration testing\n\nDefinition of done:\n- Create verification request\n- Return pending, approved, rejected, needs_more_info\n- Include reason code for support\n- Sandbox supports approved and rejected test businesses\n\nRisk:\nIdentity team has not committed to reason codes.\n\nMitigation:\nEscalate by Feb 16 or reduce launch scope to approved/pending only.\n```\n\nThis makes the dependency visible enough to manage.",
+    "commonMistakes": "A common mistake is tracking dependencies as vague bullets. \"Need data team\" is not a manageable dependency.\n\nAnother mistake is assuming another team's roadmap commitment exists because someone said \"sounds good\" in a meeting.\n\nA third mistake is escalating too late. Escalation is not drama. It is making a risk visible while there is still time to change the plan."
+  },
+  {
+    "id": "tpm-experiment-design-risk",
+    "track": "TPM",
+    "category": "Metrics & Experimentation",
+    "level": "Intermediate",
+    "question": "How would you design an experiment when the product area has compliance or user-risk constraints?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An experiment is a way to learn whether a change improves an outcome. In many product areas, you can run an A/B test. But not every product decision should be tested by casually exposing users to risk.\n\nThe beginner mistake is thinking \"experiment\" always means \"ship two versions and see which wins.\" In regulated, financial, health, safety, privacy, or trust-sensitive products, some experiments can harm users, create unfair treatment, or violate policy.\n\nThe TPM still needs learning, but the learning method must match the risk.\n\nThe mental model is:\n\n```txt\nLow-risk change:\nUse normal A/B test if measurement is clean.\n\nMedium-risk change:\nUse limited rollout, guardrails, and monitoring.\n\nHigh-risk change:\nUse research, simulation, backtesting, expert review, or staged release before live exposure.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a remittance app wants to reduce identity-verification drop-off.\n\nThe growth idea is: \"Ask fewer questions upfront.\"\n\nThat might improve conversion. But it may also allow risky users to move further into the product before required checks happen.\n\nA weak experiment plan says:\n\n```txt\nVariant A: current onboarding\nVariant B: shorter onboarding\nPrimary metric: signup completion\nShip to 50 percent of users\n```\n\nThat ignores compliance and risk.\n\nA stronger experiment plan says:\n\n```txt\nHypothesis:\nMoving low-risk profile questions later will improve signup completion without increasing risky account progression.\n\nEligible users:\nOnly users in low-risk corridors and low transaction limits.\n\nPrimary metric:\nVerified signup completion.\n\nGuardrail metrics:\n- Manual review rate\n- Suspicious activity flags\n- Failed verification rate\n- Support contacts about missing information\n- Time to compliance decision\n\nRollout:\n5 percent for 48 hours, then 20 percent if guardrails stay healthy.\n\nStop condition:\nPause if manual review rate or suspicious flags exceed threshold.\n```\n\nNow the experiment has a learning goal and a safety model."
+      },
+      {
+        "title": "Make it practical",
+        "body": "If live experimentation is too risky, I would choose another learning method.\n\n```txt\nAlternatives to a risky A/B test\n\nUser research:\nWatch users complete the flow and identify confusion.\n\nPrototype test:\nTest comprehension before changing production behavior.\n\nBacktesting:\nRun proposed risk rules against historical data.\n\nShadow mode:\nCompute the new decision in the background without affecting users.\n\nLimited beta:\nExpose a small, low-risk group with active monitoring.\n\nPolicy review:\nConfirm the experiment does not violate compliance requirements.\n```\n\nThe TPM should also decide what \"success\" means before the experiment starts. If signup completion improves but manual review doubles, that may not be a win."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is optimizing the primary metric while ignoring harm. More signups are not useful if the product creates more fraud, support burden, or compliance exposure.\n\nAnother mistake is using an experiment where research would answer the question faster and more safely.\n\nA third mistake is failing to define stop conditions. If the team has no pause rule, it may argue while users are already being affected."
+      }
+    ],
+    "answer": "An experiment is a way to learn whether a change improves an outcome. In many product areas, you can run an A/B test. But not every product decision should be tested by casually exposing users to risk.",
+    "reasoning": "If live experimentation is too risky, I would choose another learning method.\n\n```txt\nAlternatives to a risky A/B test\n\nUser research:\nWatch users complete the flow and identify confusion.\n\nPrototype test:\nTest comprehension before changing production behavior.\n\nBacktesting:\nRun proposed risk rules against historical data.\n\nShadow mode:\nCompute the new decision in the background without affecting users.\n\nLimited beta:\nExpose a small, low-risk group with active monitoring.\n\nPolicy review:\nConfirm the experiment does not violate compliance requirements.\n```\n\nThe TPM should also decide what \"success\" means before the experiment starts. If signup completion improves but manual review doubles, that may not be a win.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is an A/B test not always the right experiment?",
+      "What is a guardrail metric?",
+      "Why might signup completion be a misleading success metric?",
+      "What is shadow mode?",
+      "When would user research be better than a live experiment?"
+    ],
+    "interviewAnswer": "I would design the experiment by defining the hypothesis, eligible population, primary metric, guardrail metrics, rollout size, stop conditions, monitoring plan, and compliance review. If live exposure is too risky, I would use research, prototype testing, backtesting, shadow mode, or a small controlled beta.\n\nA strong TPM answer shows that experimentation is about learning responsibly, not just moving a metric.",
+    "sourceLinks": [
+      {
+        "label": "Microsoft Research: Trustworthy experimentation",
+        "url": "https://www.microsoft.com/en-us/research/group/experimentation-platform-exp/articles/patterns-of-trustworthy-experimentation-during-experiment-stage/"
+      },
+      {
+        "label": "GOV.UK Service Manual: Plan user research",
+        "url": "https://www.gov.uk/service-manual/user-research/plan-user-research-for-your-service"
+      }
+    ],
+    "beginnerExplanation": "An experiment is a way to learn whether a change improves an outcome. In many product areas, you can run an A/B test. But not every product decision should be tested by casually exposing users to risk.\n\nThe beginner mistake is thinking \"experiment\" always means \"ship two versions and see which wins.\" In regulated, financial, health, safety, privacy, or trust-sensitive products, some experiments can harm users, create unfair treatment, or violate policy.\n\nThe TPM still needs learning, but the learning method must match the risk.\n\nThe mental model is:\n\n```txt\nLow-risk change:\nUse normal A/B test if measurement is clean.\n\nMedium-risk change:\nUse limited rollout, guardrails, and monitoring.\n\nHigh-risk change:\nUse research, simulation, backtesting, expert review, or staged release before live exposure.\n```",
+    "example": "Imagine a remittance app wants to reduce identity-verification drop-off.\n\nThe growth idea is: \"Ask fewer questions upfront.\"\n\nThat might improve conversion. But it may also allow risky users to move further into the product before required checks happen.\n\nA weak experiment plan says:\n\n```txt\nVariant A: current onboarding\nVariant B: shorter onboarding\nPrimary metric: signup completion\nShip to 50 percent of users\n```\n\nThat ignores compliance and risk.\n\nA stronger experiment plan says:\n\n```txt\nHypothesis:\nMoving low-risk profile questions later will improve signup completion without increasing risky account progression.\n\nEligible users:\nOnly users in low-risk corridors and low transaction limits.\n\nPrimary metric:\nVerified signup completion.\n\nGuardrail metrics:\n- Manual review rate\n- Suspicious activity flags\n- Failed verification rate\n- Support contacts about missing information\n- Time to compliance decision\n\nRollout:\n5 percent for 48 hours, then 20 percent if guardrails stay healthy.\n\nStop condition:\nPause if manual review rate or suspicious flags exceed threshold.\n```\n\nNow the experiment has a learning goal and a safety model.",
+    "commonMistakes": "A common mistake is optimizing the primary metric while ignoring harm. More signups are not useful if the product creates more fraud, support burden, or compliance exposure.\n\nAnother mistake is using an experiment where research would answer the question faster and more safely.\n\nA third mistake is failing to define stop conditions. If the team has no pause rule, it may argue while users are already being affected."
+  },
+  {
+    "id": "tpm-fraud-compliance-tradeoffs",
+    "track": "TPM",
+    "category": "Risk & Compliance",
+    "level": "Intermediate",
+    "question": "How would you balance fraud prevention, compliance, and user experience?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Fraud prevention, compliance, and user experience often pull against each other.\n\nFraud teams want to block bad actors. Compliance teams want required checks and audit evidence. Product teams want legitimate users to complete their jobs without unnecessary friction. The hard part is that all three goals are valid.\n\nThe beginner mistake is treating this as a simple slider:\n\n```txt\nMore checks = safer.\nFewer checks = better UX.\n```\n\nReality is more nuanced. Bad checks can block good users and still miss risky ones. Good controls use risk signals to apply the right amount of friction to the right users at the right time.\n\nThe mental model is:\n\n```txt\nDo not ask every user for everything.\nDo not let every user do everything.\nUse risk to decide what is allowed, what is reviewed, and what needs more proof.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a remittance app sees rising fraud on new accounts.\n\nA blunt solution is:\n\n```txt\nRequire every new user to upload ID, proof of address, selfie, source of funds, and manual review before sending any amount.\n```\n\nThat may reduce some fraud, but it will also hurt many legitimate users. It may overwhelm operations and increase abandonment.\n\nA better solution is risk-based:\n\n```txt\nLow-risk user:\n- Can create account.\n- Can verify basic identity.\n- Gets low initial limits.\n\nMedium-risk user:\n- Needs document verification before sending.\n- May have lower transaction limits.\n- May trigger extra review for unusual behavior.\n\nHigh-risk user:\n- Cannot send until manual review.\n- May need extra documents.\n- May be blocked if risk is unacceptable.\n```\n\nThe product goal is not \"zero friction.\" The goal is appropriate friction."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would define the decision system with compliance, fraud, operations, and engineering.\n\n```txt\nRisk decision table\n\nSignal:\nNew device + high amount + risky corridor\n\nDecision:\nStep-up verification before payment submission\n\nUser experience:\nExplain that extra verification is needed to protect the account and transfer.\n\nOperations:\nRoute to manual review if automatic checks fail.\n\nMetric:\nFraud rate, false-positive rate, completion rate, review time, support contacts.\n```\n\nThe TPM needs to track both protection and harm.\n\n```txt\nProtection metrics:\n- Fraud loss\n- Dispute rate\n- Suspicious activity flags\n- Confirmed bad accounts blocked\n\nUser harm metrics:\n- False positives\n- Legitimate users blocked\n- Verification drop-off\n- Manual review wait time\n- Support complaints\n```\n\nIf fraud decreases but false positives explode, the product may be safer on paper but worse in practice."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is optimizing only for conversion. In regulated or fraud-heavy products, unsafe growth can create major losses.\n\nAnother mistake is optimizing only for blocking. Blocking many good users is also product harm.\n\nA third mistake is hiding decisions from users. You may not be able to reveal fraud logic, but users still need clear, safe explanations and next steps."
+      }
+    ],
+    "answer": "Fraud prevention, compliance, and user experience often pull against each other.",
+    "reasoning": "I would define the decision system with compliance, fraud, operations, and engineering.\n\n```txt\nRisk decision table\n\nSignal:\nNew device + high amount + risky corridor\n\nDecision:\nStep-up verification before payment submission\n\nUser experience:\nExplain that extra verification is needed to protect the account and transfer.\n\nOperations:\nRoute to manual review if automatic checks fail.\n\nMetric:\nFraud rate, false-positive rate, completion rate, review time, support contacts.\n```\n\nThe TPM needs to track both protection and harm.\n\n```txt\nProtection metrics:\n- Fraud loss\n- Dispute rate\n- Suspicious activity flags\n- Confirmed bad accounts blocked\n\nUser harm metrics:\n- False positives\n- Legitimate users blocked\n- Verification drop-off\n- Manual review wait time\n- Support complaints\n```\n\nIf fraud decreases but false positives explode, the product may be safer on paper but worse in practice.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is \"more checks\" not always the best answer?",
+      "What is a false positive in fraud prevention?",
+      "Why should risk controls be tiered?",
+      "What metrics show whether controls are too strict?",
+      "How can product copy help without exposing fraud logic?"
+    ],
+    "interviewAnswer": "I would balance fraud, compliance, and UX by using a risk-based model. Low-risk users get lower friction, higher-risk users get step-up checks or review, and unacceptable-risk users are blocked. I would measure fraud loss, dispute rate, false positives, conversion, review time, and support contacts.\n\nA strong TPM answer shows that safety and UX are not enemies. The job is to apply the right control at the right moment and measure both protection and user harm.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Docs: Fraud prevention rules",
+        "url": "https://docs.stripe.com/radar/rules"
+      },
+      {
+        "label": "Federal Reserve: Risk-based customer due diligence",
+        "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2205.htm"
+      }
+    ],
+    "beginnerExplanation": "Fraud prevention, compliance, and user experience often pull against each other.\n\nFraud teams want to block bad actors. Compliance teams want required checks and audit evidence. Product teams want legitimate users to complete their jobs without unnecessary friction. The hard part is that all three goals are valid.\n\nThe beginner mistake is treating this as a simple slider:\n\n```txt\nMore checks = safer.\nFewer checks = better UX.\n```\n\nReality is more nuanced. Bad checks can block good users and still miss risky ones. Good controls use risk signals to apply the right amount of friction to the right users at the right time.\n\nThe mental model is:\n\n```txt\nDo not ask every user for everything.\nDo not let every user do everything.\nUse risk to decide what is allowed, what is reviewed, and what needs more proof.\n```",
+    "example": "Imagine a remittance app sees rising fraud on new accounts.\n\nA blunt solution is:\n\n```txt\nRequire every new user to upload ID, proof of address, selfie, source of funds, and manual review before sending any amount.\n```\n\nThat may reduce some fraud, but it will also hurt many legitimate users. It may overwhelm operations and increase abandonment.\n\nA better solution is risk-based:\n\n```txt\nLow-risk user:\n- Can create account.\n- Can verify basic identity.\n- Gets low initial limits.\n\nMedium-risk user:\n- Needs document verification before sending.\n- May have lower transaction limits.\n- May trigger extra review for unusual behavior.\n\nHigh-risk user:\n- Cannot send until manual review.\n- May need extra documents.\n- May be blocked if risk is unacceptable.\n```\n\nThe product goal is not \"zero friction.\" The goal is appropriate friction.",
+    "commonMistakes": "A common mistake is optimizing only for conversion. In regulated or fraud-heavy products, unsafe growth can create major losses.\n\nAnother mistake is optimizing only for blocking. Blocking many good users is also product harm.\n\nA third mistake is hiding decisions from users. You may not be able to reveal fraud logic, but users still need clear, safe explanations and next steps."
+  },
+  {
     "id": "tpm-incident-management",
     "track": "TPM",
     "category": "Operations",
@@ -1029,6 +1278,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A production incident is when the product is not behaving in a way customers, the business, or internal teams can safely rely on. It might be an outage, broken checkout, delayed payments, incorrect pricing, missing notifications, a data issue, or a third-party partner failure.\n\nFor a Technical Product Manager, the goal is not to personally debug every system. The goal is to help the team protect customers, restore service, coordinate decisions, communicate clearly, and learn after the incident.\n\nA good incident response has two modes.\n\nDuring the incident, focus on containment and recovery. What is broken? Who is affected? How severe is it? What can we do now to reduce harm?\n\nAfter the incident, focus on learning and prevention. Why did it happen? Why did our defenses not catch it earlier? What changes would reduce the chance or impact next time?",
     "example": "Imagine users cannot complete card payments.\n\nThe first thing to establish is severity and scope. Is it all users or one region? All payment methods or one provider? New payments only or refunds too? Is money being captured but the UI showing failure? Is there risk of duplicate charges?\n\nThen establish roles. Engineering investigates technical cause. Support gathers customer reports. Operations may pause affected workflows. Product helps decide customer impact, acceptable workarounds, communication, and priority tradeoffs. Leadership may need updates if the incident is severe.\n\nThe team needs a single source of truth. That could be an incident channel, status doc, or incident tool. Decisions should be written down: what changed, what was tried, what was rolled back, what customers were told, and what remains unknown.\n\nThe TPM should keep asking customer-centered questions: Which users are affected? What can they still do? Do we need to disable a feature to prevent harm? What message should support use? Is there a regulatory or financial exposure?",
     "commonMistakes": "A common mistake is optimizing for silence. Teams sometimes avoid declaring incidents because it feels dramatic. That delays coordination.\n\nAnother mistake is communicating certainty too early. It is better to say what is known, what is unknown, and when the next update will come.\n\nA third mistake is calling the incident done when the service recovers but customers are still affected. Payment reversals, stuck orders, missing notifications, or support tickets may continue after the technical fix."
+  },
+  {
+    "id": "tpm-internal-tools",
+    "track": "TPM",
+    "category": "Internal Tools",
+    "level": "Foundational",
+    "question": "How would you prioritize and build an internal tool for operations or support teams?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An internal tool is still a product. Its users may be support agents, compliance reviewers, operations specialists, sales teams, finance teams, or engineers.\n\nThe beginner mistake is treating internal users as if their pain matters less because they are employees. But internal tool problems can become customer problems. If support cannot investigate a failed payout, the customer waits. If compliance reviewers lack context, safe users may be blocked. If operations relies on spreadsheets, mistakes become expensive.\n\nThe mental model is:\n\n```txt\nExternal product:\nHelps customers complete jobs.\n\nInternal tool:\nHelps the company complete the work needed to serve customers.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine support agents need a tool to investigate payment failures.\n\nA weak requirement says:\n\n```txt\nBuild support dashboard.\n```\n\nThat is too vague. A useful TPM asks what job the agent is trying to do.\n\n```txt\nSupport agent job:\nWhen a customer says \"my payment failed,\" the agent needs to identify the payment, understand the current status, know whether money moved, see the reason for failure, choose the right next action, and explain it clearly to the customer.\n```\n\nNow the product shape is clearer.\n\n```txt\nMinimum useful internal tool\n\nSearch:\n- Customer email\n- Transaction ID\n- Recipient phone\n- Partner reference\n\nPayment view:\n- Current status\n- Status history\n- Failure reason\n- Partner response\n- Retry eligibility\n- Refund or reversal state\n\nAgent guidance:\n- What this status means\n- What action is allowed\n- What the agent should tell the customer\n- When to escalate\n```\n\nThis is much better than a generic admin table."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would prioritize internal tool work by looking at volume, severity, risk, time saved, customer impact, and error reduction.\n\n```txt\nInternal tool prioritization table\n\nProblem:\nAgents cannot see partner failure reason.\n\nEvidence:\n32 percent of payment tickets require engineering help.\n\nImpact:\nCustomers wait longer. Engineers get interrupted. Agents give vague answers.\n\nSolution:\nShow normalized failure reason and recommended support macro.\n\nSuccess metric:\nReduce payment-ticket escalation to engineering from 32 percent to 12 percent.\n\nRisk:\nReason codes may expose sensitive fraud information.\n\nMitigation:\nRole-based visibility and safe customer-facing explanation.\n```\n\nThe TPM also needs to think about permissions, audit logs, training, and operational ownership. Internal tools often touch sensitive data."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is copying database fields into a UI and calling it a tool. Internal users need workflow support, not raw data dumps.\n\nAnother mistake is skipping research because the users are coworkers. Watching five agents do the job can reveal more than a week of guessing.\n\nA third mistake is ignoring governance. Internal tools need permissions, audit logs, and clear rules about who can take risky actions."
+      }
+    ],
+    "answer": "An internal tool is still a product. Its users may be support agents, compliance reviewers, operations specialists, sales teams, finance teams, or engineers.",
+    "reasoning": "I would prioritize internal tool work by looking at volume, severity, risk, time saved, customer impact, and error reduction.\n\n```txt\nInternal tool prioritization table\n\nProblem:\nAgents cannot see partner failure reason.\n\nEvidence:\n32 percent of payment tickets require engineering help.\n\nImpact:\nCustomers wait longer. Engineers get interrupted. Agents give vague answers.\n\nSolution:\nShow normalized failure reason and recommended support macro.\n\nSuccess metric:\nReduce payment-ticket escalation to engineering from 32 percent to 12 percent.\n\nRisk:\nReason codes may expose sensitive fraud information.\n\nMitigation:\nRole-based visibility and safe customer-facing explanation.\n```\n\nThe TPM also needs to think about permissions, audit logs, training, and operational ownership. Internal tools often touch sensitive data.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is an internal tool still a product?",
+      "How can internal tool problems hurt customers?",
+      "What is the difference between raw data and workflow support?",
+      "Why do permissions matter in internal tools?",
+      "What metrics could prove an internal tool is working?"
+    ],
+    "interviewAnswer": "I would build an internal tool by studying the user's workflow, defining the job to be done, prioritizing high-volume or high-risk pain points, designing for speed and accuracy, and measuring outcomes like resolution time, escalation rate, error rate, and customer impact.\n\nA strong answer treats internal teams as real users and connects internal efficiency to customer outcomes and business risk.",
+    "sourceLinks": [
+      {
+        "label": "GOV.UK Service Manual: User needs",
+        "url": "https://www.gov.uk/service-manual/user-centred-design/user-needs"
+      },
+      {
+        "label": "Atlassian: IT service management",
+        "url": "https://www.atlassian.com/itsm"
+      }
+    ],
+    "beginnerExplanation": "An internal tool is still a product. Its users may be support agents, compliance reviewers, operations specialists, sales teams, finance teams, or engineers.\n\nThe beginner mistake is treating internal users as if their pain matters less because they are employees. But internal tool problems can become customer problems. If support cannot investigate a failed payout, the customer waits. If compliance reviewers lack context, safe users may be blocked. If operations relies on spreadsheets, mistakes become expensive.\n\nThe mental model is:\n\n```txt\nExternal product:\nHelps customers complete jobs.\n\nInternal tool:\nHelps the company complete the work needed to serve customers.\n```",
+    "example": "Imagine support agents need a tool to investigate payment failures.\n\nA weak requirement says:\n\n```txt\nBuild support dashboard.\n```\n\nThat is too vague. A useful TPM asks what job the agent is trying to do.\n\n```txt\nSupport agent job:\nWhen a customer says \"my payment failed,\" the agent needs to identify the payment, understand the current status, know whether money moved, see the reason for failure, choose the right next action, and explain it clearly to the customer.\n```\n\nNow the product shape is clearer.\n\n```txt\nMinimum useful internal tool\n\nSearch:\n- Customer email\n- Transaction ID\n- Recipient phone\n- Partner reference\n\nPayment view:\n- Current status\n- Status history\n- Failure reason\n- Partner response\n- Retry eligibility\n- Refund or reversal state\n\nAgent guidance:\n- What this status means\n- What action is allowed\n- What the agent should tell the customer\n- When to escalate\n```\n\nThis is much better than a generic admin table.",
+    "commonMistakes": "A common mistake is copying database fields into a UI and calling it a tool. Internal users need workflow support, not raw data dumps.\n\nAnother mistake is skipping research because the users are coworkers. Watching five agents do the job can reveal more than a week of guessing.\n\nA third mistake is ignoring governance. Internal tools need permissions, audit logs, and clear rules about who can take risky actions."
   },
   {
     "id": "tpm-migration-planning",
@@ -1227,6 +1525,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is treating payment status as a single success or failure. Real money movement often has pending, uncertain, reversed, and manually reviewed states.\n\nAnother mistake is ignoring idempotency. Retrying money movement without duplicate protection is dangerous.\n\nA third mistake is forgetting support and reconciliation. If customers ask where their money is, the company needs evidence."
   },
   {
+    "id": "tpm-platform-product-sense",
+    "track": "TPM",
+    "category": "Platform Product",
+    "level": "Intermediate",
+    "question": "How would you show product sense for a platform or developer product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Product sense for a consumer app often means understanding user motivation, workflow, usability, and business value. Product sense for a platform product means all of that, plus understanding that your \"user\" may be another builder.\n\nFor a platform, the user might be a developer, partner, internal team, data analyst, operations team, or third-party app. They do not only care whether the product exists. They care whether it is understandable, reliable, stable, documented, testable, and safe to build on.\n\nThe beginner mistake is judging a platform only by visible features. A platform can have few screens and still be a major product. The experience may live in APIs, SDKs, logs, docs, sandbox behavior, uptime, permissions, and support.\n\nThe mental model is:\n\n```txt\nConsumer product:\nCan the user complete the task?\n\nPlatform product:\nCan another team or developer reliably build their own task on top of this?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a company offers a payments API.\n\nA shallow product-sense answer says:\n\n```txt\nMake the API fast and easy to use.\n```\n\nThat is true but too vague.\n\nA stronger answer names the platform experience:\n\n```txt\nDeveloper needs:\n- Understand the API quickly.\n- Test without moving real money.\n- Create payments safely.\n- Retry without duplicate charges.\n- Receive status updates.\n- Debug failures.\n- Trust versioning and change management.\n- Get help when production is broken.\n\nBusiness needs:\n- More successful integrations.\n- Lower support burden.\n- Higher payment volume.\n- Better partner trust.\n- Safer operations.\n```\n\nNow product sense becomes specific. The TPM might prioritize idempotency, sandbox data, webhook logs, clearer errors, or better onboarding before adding new endpoints."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would evaluate a platform product with a developer journey.\n\n```txt\nDeveloper journey for API product\n\n1. Discovery\nCan the developer understand what the product does?\n\n2. Access\nCan they get credentials and permissions?\n\n3. First success\nCan they make the first working request quickly?\n\n4. Real integration\nCan they handle auth, errors, retries, webhooks, and test data?\n\n5. Production\nCan they monitor usage, debug failures, and trust uptime?\n\n6. Change\nCan they survive version changes without surprise breakage?\n```\n\nThen I would pick metrics for each stage.\n\n```txt\nPlatform metrics\n\nActivation:\nTime to first successful API call\n\nIntegration health:\nWebhook delivery success, error rate, retry rate\n\nDeveloper experience:\nDocs search success, support tickets per integration\n\nBusiness:\nActive integrations, transaction volume, partner retention\n\nReliability:\nLatency, uptime, incident count, failed requests by endpoint\n```\n\nGood platform product sense means you can see the invisible user experience."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating documentation as separate from the product. For developer products, docs are part of the product surface.\n\nAnother mistake is ignoring failure paths. Developers judge platforms by what happens when things go wrong.\n\nA third mistake is shipping breaking changes casually. Platform users build businesses and workflows on top of your contracts."
+      }
+    ],
+    "answer": "Product sense for a consumer app often means understanding user motivation, workflow, usability, and business value. Product sense for a platform product means all of that, plus understanding that your \"user\" may be another builder.",
+    "reasoning": "I would evaluate a platform product with a developer journey.\n\n```txt\nDeveloper journey for API product\n\n1. Discovery\nCan the developer understand what the product does?\n\n2. Access\nCan they get credentials and permissions?\n\n3. First success\nCan they make the first working request quickly?\n\n4. Real integration\nCan they handle auth, errors, retries, webhooks, and test data?\n\n5. Production\nCan they monitor usage, debug failures, and trust uptime?\n\n6. Change\nCan they survive version changes without surprise breakage?\n```\n\nThen I would pick metrics for each stage.\n\n```txt\nPlatform metrics\n\nActivation:\nTime to first successful API call\n\nIntegration health:\nWebhook delivery success, error rate, retry rate\n\nDeveloper experience:\nDocs search success, support tickets per integration\n\nBusiness:\nActive integrations, transaction volume, partner retention\n\nReliability:\nLatency, uptime, incident count, failed requests by endpoint\n```\n\nGood platform product sense means you can see the invisible user experience.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Who are the users of a platform product?",
+      "Why are docs part of the product experience?",
+      "What is \"time to first successful API call\" measuring?",
+      "Why do webhooks and logs matter for developer experience?",
+      "How is platform product sense different from consumer product sense?"
+    ],
+    "interviewAnswer": "I would show platform product sense by focusing on the builder journey: discovery, access, first success, real integration, production operations, and change management. I would care about docs, sandbox, auth, errors, retries, webhooks, observability, reliability, versioning, and support.\n\nA strong answer shows that a platform product is not only endpoints. It is the full experience of building safely and confidently on top of the product.",
+    "sourceLinks": [
+      {
+        "label": "OpenAPI Initiative: OpenAPI specification",
+        "url": "https://learn.openapis.org/specification/"
+      },
+      {
+        "label": "Google Cloud: API design guide",
+        "url": "https://cloud.google.com/apis/design"
+      }
+    ],
+    "beginnerExplanation": "Product sense for a consumer app often means understanding user motivation, workflow, usability, and business value. Product sense for a platform product means all of that, plus understanding that your \"user\" may be another builder.\n\nFor a platform, the user might be a developer, partner, internal team, data analyst, operations team, or third-party app. They do not only care whether the product exists. They care whether it is understandable, reliable, stable, documented, testable, and safe to build on.\n\nThe beginner mistake is judging a platform only by visible features. A platform can have few screens and still be a major product. The experience may live in APIs, SDKs, logs, docs, sandbox behavior, uptime, permissions, and support.\n\nThe mental model is:\n\n```txt\nConsumer product:\nCan the user complete the task?\n\nPlatform product:\nCan another team or developer reliably build their own task on top of this?\n```",
+    "example": "Imagine a company offers a payments API.\n\nA shallow product-sense answer says:\n\n```txt\nMake the API fast and easy to use.\n```\n\nThat is true but too vague.\n\nA stronger answer names the platform experience:\n\n```txt\nDeveloper needs:\n- Understand the API quickly.\n- Test without moving real money.\n- Create payments safely.\n- Retry without duplicate charges.\n- Receive status updates.\n- Debug failures.\n- Trust versioning and change management.\n- Get help when production is broken.\n\nBusiness needs:\n- More successful integrations.\n- Lower support burden.\n- Higher payment volume.\n- Better partner trust.\n- Safer operations.\n```\n\nNow product sense becomes specific. The TPM might prioritize idempotency, sandbox data, webhook logs, clearer errors, or better onboarding before adding new endpoints.",
+    "commonMistakes": "A common mistake is treating documentation as separate from the product. For developer products, docs are part of the product surface.\n\nAnother mistake is ignoring failure paths. Developers judge platforms by what happens when things go wrong.\n\nA third mistake is shipping breaking changes casually. Platform users build businesses and workflows on top of your contracts."
+  },
+  {
     "id": "tpm-prd",
     "track": "TPM",
     "category": "Product Requirements",
@@ -1374,6 +1721,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is treating readiness as a meeting where everyone gives vague approval. Readiness should be evidence-based.\n\nAnother mistake is forgetting rollback. Some features are easy to turn off. Others involve migrations, customer states, partner calls, or money movement. Rollback must be designed before launch.\n\nA third mistake is not defining success until after launch. If you do not know what healthy looks like, you will not know whether launch is going well."
   },
   {
+    "id": "tpm-roadmap-cross-functional-pressure",
+    "track": "TPM",
+    "category": "Roadmap & Prioritization",
+    "level": "Intermediate",
+    "question": "How would you build a roadmap when engineering, compliance, sales, and leadership all want different things?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A roadmap is not a wish list. It is a communication tool that explains the most important outcomes the team is pursuing and the order in which the team intends to pursue them.\n\nThe beginner mistake is trying to satisfy every stakeholder by putting every request on the roadmap. That creates a roadmap that looks aligned in a meeting but fails in real life because the team cannot actually execute it.\n\nWhen engineering, compliance, sales, and leadership disagree, the TPM's job is not to pick the loudest stakeholder. The job is to translate requests into outcomes, constraints, risks, and sequencing.\n\nThe simple mental model is:\n\n```txt\nStakeholder request: \"Build this.\"\nTPM translation: \"What outcome, risk, obligation, or dependency does this represent?\"\nRoadmap decision: \"Given our goals and constraints, what should happen now, next, or later?\"\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a fintech product team has four pressures:\n\n```txt\nSales:\n\"Enterprise client needs team permissions this quarter.\"\n\nCompliance:\n\"We need stronger transaction monitoring before volume increases.\"\n\nEngineering:\n\"The payout system is hard to change and needs refactoring.\"\n\nLeadership:\n\"We promised a new corridor launch.\"\n```\n\nA weak TPM turns this into a fight over whose item gets priority.\n\nA strong TPM clarifies what each request means:\n\n```txt\nTeam permissions:\nOutcome: unlock enterprise deals.\nRisk: poor permissions could expose sensitive financial data.\n\nTransaction monitoring:\nOutcome: reduce regulatory and fraud risk.\nRisk: launching more volume before controls may create compliance exposure.\n\nPayout refactor:\nOutcome: make future corridor launches faster and safer.\nRisk: invisible work may be hard to justify unless tied to launch reliability.\n\nNew corridor:\nOutcome: revenue growth and market expansion.\nRisk: launch fails if operations, compliance, and partner readiness are weak.\n```\n\nNow the roadmap conversation changes. It is no longer \"sales versus engineering.\" It becomes \"what sequence gets us revenue without creating unacceptable risk?\""
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would create a roadmap view that separates outcomes from work items.\n\n```txt\nQuarter goal:\nExpand higher-value business payments safely.\n\nNow:\n- Complete transaction monitoring controls for higher-volume users.\n- Ship basic team roles: owner and finance user.\n- Refactor payout retry logic needed for corridor reliability.\n\nNext:\n- Launch corridor beta to limited customers.\n- Add audit log for business accounts.\n- Expand team permissions after usage data.\n\nLater:\n- Advanced approval workflows.\n- More corridors.\n- Bulk payout import.\n```\n\nThen I would explain tradeoffs plainly.\n\n```txt\nDecision:\nWe will not launch the corridor to all users this quarter.\n\nReason:\nThe compliance and retry-control work is required to make the launch safe.\n\nCompromise:\nWe will run a limited beta with selected customers after readiness checks pass.\n\nEvidence:\nSales still gets a customer-facing path, leadership gets progress, compliance gets controls, and engineering removes a key reliability risk.\n```\n\nThis is what strong TPM roadmap work often looks like. It does not make everyone perfectly happy, but it makes the reasoning clear."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is ranking stakeholder requests without translating them into outcomes and risks.\n\nAnother mistake is treating roadmap dates as promises before dependencies are understood.\n\nA third mistake is hiding the reason for tradeoffs. If stakeholders only hear \"not now,\" they may assume their request was ignored."
+      }
+    ],
+    "answer": "A roadmap is not a wish list. It is a communication tool that explains the most important outcomes the team is pursuing and the order in which the team intends to pursue them.",
+    "reasoning": "I would create a roadmap view that separates outcomes from work items.\n\n```txt\nQuarter goal:\nExpand higher-value business payments safely.\n\nNow:\n- Complete transaction monitoring controls for higher-volume users.\n- Ship basic team roles: owner and finance user.\n- Refactor payout retry logic needed for corridor reliability.\n\nNext:\n- Launch corridor beta to limited customers.\n- Add audit log for business accounts.\n- Expand team permissions after usage data.\n\nLater:\n- Advanced approval workflows.\n- More corridors.\n- Bulk payout import.\n```\n\nThen I would explain tradeoffs plainly.\n\n```txt\nDecision:\nWe will not launch the corridor to all users this quarter.\n\nReason:\nThe compliance and retry-control work is required to make the launch safe.\n\nCompromise:\nWe will run a limited beta with selected customers after readiness checks pass.\n\nEvidence:\nSales still gets a customer-facing path, leadership gets progress, compliance gets controls, and engineering removes a key reliability risk.\n```\n\nThis is what strong TPM roadmap work often looks like. It does not make everyone perfectly happy, but it makes the reasoning clear.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a roadmap different from a backlog?",
+      "How can two stakeholder requests both be valid but still not both fit now?",
+      "Why should roadmap items connect to outcomes?",
+      "What is the danger of promising dates before dependency discovery?",
+      "How can a TPM communicate a deferral without making it sound dismissive?"
+    ],
+    "interviewAnswer": "I would build the roadmap by translating each stakeholder request into the outcome, risk, constraint, and dependency behind it. Then I would sequence work around the company goal, customer impact, regulatory risk, technical dependencies, and delivery capacity.\n\nA strong answer shows that the TPM can create alignment without pretending every request can be done immediately.",
+    "sourceLinks": [
+      {
+        "label": "Atlassian: Product roadmaps",
+        "url": "https://www.atlassian.com/agile/product-management/product-roadmaps"
+      },
+      {
+        "label": "ProductPlan: Product management frameworks",
+        "url": "https://www.productplan.com/learn/product-management-frameworks"
+      }
+    ],
+    "beginnerExplanation": "A roadmap is not a wish list. It is a communication tool that explains the most important outcomes the team is pursuing and the order in which the team intends to pursue them.\n\nThe beginner mistake is trying to satisfy every stakeholder by putting every request on the roadmap. That creates a roadmap that looks aligned in a meeting but fails in real life because the team cannot actually execute it.\n\nWhen engineering, compliance, sales, and leadership disagree, the TPM's job is not to pick the loudest stakeholder. The job is to translate requests into outcomes, constraints, risks, and sequencing.\n\nThe simple mental model is:\n\n```txt\nStakeholder request: \"Build this.\"\nTPM translation: \"What outcome, risk, obligation, or dependency does this represent?\"\nRoadmap decision: \"Given our goals and constraints, what should happen now, next, or later?\"\n```",
+    "example": "Imagine a fintech product team has four pressures:\n\n```txt\nSales:\n\"Enterprise client needs team permissions this quarter.\"\n\nCompliance:\n\"We need stronger transaction monitoring before volume increases.\"\n\nEngineering:\n\"The payout system is hard to change and needs refactoring.\"\n\nLeadership:\n\"We promised a new corridor launch.\"\n```\n\nA weak TPM turns this into a fight over whose item gets priority.\n\nA strong TPM clarifies what each request means:\n\n```txt\nTeam permissions:\nOutcome: unlock enterprise deals.\nRisk: poor permissions could expose sensitive financial data.\n\nTransaction monitoring:\nOutcome: reduce regulatory and fraud risk.\nRisk: launching more volume before controls may create compliance exposure.\n\nPayout refactor:\nOutcome: make future corridor launches faster and safer.\nRisk: invisible work may be hard to justify unless tied to launch reliability.\n\nNew corridor:\nOutcome: revenue growth and market expansion.\nRisk: launch fails if operations, compliance, and partner readiness are weak.\n```\n\nNow the roadmap conversation changes. It is no longer \"sales versus engineering.\" It becomes \"what sequence gets us revenue without creating unacceptable risk?\"",
+    "commonMistakes": "A common mistake is ranking stakeholder requests without translating them into outcomes and risks.\n\nAnother mistake is treating roadmap dates as promises before dependencies are understood.\n\nA third mistake is hiding the reason for tradeoffs. If stakeholders only hear \"not now,\" they may assume their request was ignored."
+  },
+  {
     "id": "tpm-stakeholder-alignment",
     "track": "TPM",
     "category": "Stakeholder Management",
@@ -1472,6 +1868,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is calling an output a success metric. \"Feature launched\" is a delivery milestone, not proof of user value.\n\nAnother mistake is using vanity metrics. A click can be curiosity, confusion, or success. You need context.\n\nA third mistake is choosing too many metrics. If everything is important, the team may not know what to optimize."
   },
   {
+    "id": "tpm-support-feedback-loop",
+    "track": "TPM",
+    "category": "Discovery & Feedback",
+    "level": "Foundational",
+    "question": "How would you turn support tickets and customer feedback into product decisions?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Support tickets are not automatically product insight. They are raw signals. A TPM has to turn those signals into patterns, user needs, product problems, and decisions.\n\nThe beginner mistake is reacting to the latest loud complaint. One angry ticket may reveal a real issue, but it may also be an edge case. A thousand vague tickets may hide several different problems. The TPM needs a feedback loop that separates noise from evidence.\n\nThe mental model is:\n\n```txt\nTicket:\n\"I cannot send money.\"\n\nSignal:\nThe user got stuck.\n\nInsight:\nUsers do not understand pending verification.\n\nProduct decision:\nImprove status explanation, support visibility, and recovery path.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine support receives many tickets saying:\n\n```txt\n\"My transfer is stuck.\"\n\"Why is this taking so long?\"\n\"Did my money disappear?\"\n\"Cancel this now.\"\n```\n\nA weak product response is: \"Add a tooltip saying transfers can take time.\"\n\nA stronger TPM asks:\n\n```txt\nWhat exact status are these users in?\nWhich corridors are affected?\nHow long have they waited?\nWhat did the UI say?\nCould support see the real status?\nDid the partner send delayed webhooks?\nDid users have any action they could take?\n```\n\nAfter tagging and analysis, the TPM might find three different issues:\n\n```txt\nPattern 1:\nUsers in \"processing\" status do not know what it means.\n\nPattern 2:\nPartner delays are concentrated in one corridor.\n\nPattern 3:\nSupport cannot see whether the payout is retrying or waiting for partner confirmation.\n```\n\nEach pattern needs a different solution."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would create a feedback loop with clear steps.\n\n```txt\nSupport-to-product loop\n\n1. Capture\nCollect tickets, chat logs, call notes, app feedback, sales notes, and support tags.\n\n2. Normalize\nGroup feedback by user job, product area, status, segment, and severity.\n\n3. Quantify\nCount frequency, affected revenue, affected customer segment, and repeat contacts.\n\n4. Qualify\nRead real examples so the team understands the user pain.\n\n5. Diagnose\nSeparate symptom from root cause.\n\n6. Decide\nCreate product fixes, operational fixes, documentation updates, or monitoring improvements.\n\n7. Close the loop\nTell support what changed and how to explain it.\n```\n\nA good product decision is not always a new feature. Sometimes the fix is better copy, a status page, clearer error codes, support tooling, partner escalation, or a policy change."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is counting tickets without reading them. Volume matters, but language and context reveal why users are confused.\n\nAnother mistake is letting support become a one-way inbox. Product should tell support what changed, what is coming, and what evidence is still needed.\n\nA third mistake is treating every request as a feature request. Many tickets are symptoms of unclear status, broken expectations, poor onboarding, or missing operational visibility."
+      }
+    ],
+    "answer": "Support tickets are not automatically product insight. They are raw signals. A TPM has to turn those signals into patterns, user needs, product problems, and decisions.",
+    "reasoning": "I would create a feedback loop with clear steps.\n\n```txt\nSupport-to-product loop\n\n1. Capture\nCollect tickets, chat logs, call notes, app feedback, sales notes, and support tags.\n\n2. Normalize\nGroup feedback by user job, product area, status, segment, and severity.\n\n3. Quantify\nCount frequency, affected revenue, affected customer segment, and repeat contacts.\n\n4. Qualify\nRead real examples so the team understands the user pain.\n\n5. Diagnose\nSeparate symptom from root cause.\n\n6. Decide\nCreate product fixes, operational fixes, documentation updates, or monitoring improvements.\n\n7. Close the loop\nTell support what changed and how to explain it.\n```\n\nA good product decision is not always a new feature. Sometimes the fix is better copy, a status page, clearer error codes, support tooling, partner escalation, or a policy change.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a ticket not automatically an insight?",
+      "What is the difference between symptom and root cause?",
+      "Why should feedback be grouped by product state or user job?",
+      "How can support feedback improve internal tools?",
+      "What does it mean to close the loop with support?"
+    ],
+    "interviewAnswer": "I would turn support feedback into product decisions by capturing signals, grouping them into patterns, quantifying impact, reading examples, diagnosing root cause, deciding the right type of fix, and closing the loop with support.\n\nA strong TPM answer shows that feedback is evidence, not instructions. The TPM must convert raw complaints into product understanding and better decisions.",
+    "sourceLinks": [
+      {
+        "label": "Productboard: Customer insights",
+        "url": "https://www.productboard.com/use-cases/customer-insights/"
+      },
+      {
+        "label": "GOV.UK Service Manual: User needs",
+        "url": "https://www.gov.uk/service-manual/user-centred-design/user-needs"
+      }
+    ],
+    "beginnerExplanation": "Support tickets are not automatically product insight. They are raw signals. A TPM has to turn those signals into patterns, user needs, product problems, and decisions.\n\nThe beginner mistake is reacting to the latest loud complaint. One angry ticket may reveal a real issue, but it may also be an edge case. A thousand vague tickets may hide several different problems. The TPM needs a feedback loop that separates noise from evidence.\n\nThe mental model is:\n\n```txt\nTicket:\n\"I cannot send money.\"\n\nSignal:\nThe user got stuck.\n\nInsight:\nUsers do not understand pending verification.\n\nProduct decision:\nImprove status explanation, support visibility, and recovery path.\n```",
+    "example": "Imagine support receives many tickets saying:\n\n```txt\n\"My transfer is stuck.\"\n\"Why is this taking so long?\"\n\"Did my money disappear?\"\n\"Cancel this now.\"\n```\n\nA weak product response is: \"Add a tooltip saying transfers can take time.\"\n\nA stronger TPM asks:\n\n```txt\nWhat exact status are these users in?\nWhich corridors are affected?\nHow long have they waited?\nWhat did the UI say?\nCould support see the real status?\nDid the partner send delayed webhooks?\nDid users have any action they could take?\n```\n\nAfter tagging and analysis, the TPM might find three different issues:\n\n```txt\nPattern 1:\nUsers in \"processing\" status do not know what it means.\n\nPattern 2:\nPartner delays are concentrated in one corridor.\n\nPattern 3:\nSupport cannot see whether the payout is retrying or waiting for partner confirmation.\n```\n\nEach pattern needs a different solution.",
+    "commonMistakes": "A common mistake is counting tickets without reading them. Volume matters, but language and context reveal why users are confused.\n\nAnother mistake is letting support become a one-way inbox. Product should tell support what changed, what is coming, and what evidence is still needed.\n\nA third mistake is treating every request as a feature request. Many tickets are symptoms of unclear status, broken expectations, poor onboarding, or missing operational visibility."
+  },
+  {
     "id": "tpm-technical-debt",
     "track": "TPM",
     "category": "Technical Strategy",
@@ -1519,6 +1964,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Technical debt is the future cost created by technical choices that make the system harder to change, operate, understand, or trust. Sometimes debt is taken deliberately to learn quickly. Sometimes it appears accidentally through rushed work, old assumptions, missing tests, weak architecture, or repeated patches.\n\nFor a TPM, the key is to translate technical debt into product and business impact.\n\nEngineering may say, \"This service is hard to maintain.\" That matters, but stakeholders may not know how to compare it against customer-facing work. The TPM can help express the debt as delivery delay, incident risk, support cost, performance issues, onboarding difficulty, compliance risk, or inability to launch future features.\n\nThe question is not \"Should we ever pay down debt?\" Of course. The real question is \"Which debt matters now, and how much should we invest?\"",
     "example": "Imagine the team wants to launch a new payout method, but the payments code has grown messy. Every change creates regressions. Engineers are afraid to touch it. Testing is manual. Status mapping is duplicated across services.\n\nOne option is to build the new payout method on top of the messy system. That might be faster this month but riskier later.\n\nAnother option is to refactor first. That may delay the feature but reduce future delivery risk.\n\nA TPM should make the tradeoff visible:\n\n- How many planned features depend on this area?\n- How often does this area cause incidents or bugs?\n- How much engineering time is lost to rework?\n- What customer or compliance risk exists?\n- Can the debt be reduced incrementally?\n- What is the cost of delaying the user-facing feature?\n\nNow the decision becomes grounded instead of emotional.",
     "commonMistakes": "A common mistake is treating all debt as equal. Some debt is annoying but harmless. Some debt blocks strategy or creates real risk.\n\nAnother mistake is making debt invisible in planning. If the roadmap assumes full feature capacity while the team is constantly paying hidden maintenance costs, the plan is fake.\n\nA third mistake is framing debt as engineering preference instead of business impact. The TPM should help explain why the investment matters in outcomes stakeholders understand."
+  },
+  {
+    "id": "tpm-technical-product-strategy",
+    "track": "TPM",
+    "category": "Technical Strategy",
+    "level": "Intermediate",
+    "question": "How would you create a technical product strategy?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A technical product strategy explains where the product should go, why that direction matters, and what technical bets are needed to get there.\n\nThe beginner mistake is thinking strategy means \"a list of features.\" A feature list says what the team might build. A strategy explains the logic behind the choices. It says which customer problem matters most, which market or business goal the product supports, what the product must become technically, and what the team will deliberately not do.\n\nFor a TPM, the technical part matters because the best product idea may depend on platform readiness, data quality, API reliability, compliance controls, scalability, security, or migration work. If the strategy ignores those realities, the roadmap becomes fantasy.\n\nThe simple mental model is:\n\n```txt\nProduct strategy = where we are going and why.\nTechnical strategy = what capabilities must exist for that direction to be real.\nRoadmap = the sequence of work that moves us there.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a remittance company wants to serve small businesses, not only individual senders.\n\nA shallow strategy says:\n\n```txt\nBuild business accounts.\nAdd bulk payments.\nAdd team permissions.\nAdd invoices.\n```\n\nThat is not enough. It does not explain why these things matter, which customer segment comes first, or what platform work is required.\n\nA stronger strategy says:\n\n```txt\nGoal:\nHelp small import/export businesses pay suppliers faster and with clearer tracking.\n\nTarget customer:\nBusinesses sending recurring payments to a known set of suppliers.\n\nWinning promise:\nReliable cross-border payouts, predictable fees, payment status visibility, and audit-friendly records.\n\nTechnical bets:\n- Business identity verification, not only individual KYC.\n- Recipient directory with reusable supplier profiles.\n- Bulk payout workflow with idempotent creation.\n- Role-based access for owner, finance user, and viewer.\n- Reconciliation reports for accounting.\n- Monitoring for payout delays and failed corridors.\n\nNon-goals for now:\n- Full invoicing product.\n- Payroll.\n- Card issuing.\n```\n\nNow the team can make better tradeoffs. If engineering says bulk payouts require a new payout orchestration layer, that is not \"backend work nobody sees.\" It is a strategic capability."
+      },
+      {
+        "title": "Make it practical",
+        "body": "I would create the strategy in layers.\n\nFirst, define the product goal. What outcome should change for customers or the business?\n\nSecond, define the customer and use case. Strategy gets weak when it tries to serve everyone.\n\nThird, define the product promise. What should the customer trust us to do better than alternatives?\n\nFourth, map the technical capabilities needed to keep that promise.\n\nFifth, turn those capabilities into sequencing. Some capabilities unlock others. For example, team permissions may need an organization model first.\n\nHere is a practical artifact:\n\n```txt\nTechnical product strategy brief\n\nCustomer problem:\nSmall businesses need repeatable supplier payments with reliable status and records.\n\nBusiness goal:\nGrow business transaction volume while keeping compliance and operations cost under control.\n\nProduct bet:\nBusiness customers value reliability, repeatability, and auditability more than a long menu of features.\n\nRequired capabilities:\n1. Business verification\n2. Organization and roles model\n3. Recipient directory\n4. Bulk payout creation\n5. Reconciliation export\n6. Corridor health monitoring\n\nMain risks:\n- Compliance review takes longer than planned.\n- Bulk retries create duplicate payouts.\n- Support cannot investigate business account issues.\n\nFirst milestone:\nBusiness profile + saved recipients + single payout with business audit trail.\n```\n\nThis artifact is useful because it connects user value, business value, and technical work in one place."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is writing strategy as a slogan. \"Be the best API platform\" is not strategy unless it says which users, which advantage, and which capabilities matter.\n\nAnother mistake is hiding technical foundation work. If the roadmap only shows visible features, leadership may not understand why platform work is required.\n\nA third mistake is ignoring tradeoffs. A strategy should make choices. If every customer segment and every feature is equally important, the team has no strategy."
+      }
+    ],
+    "answer": "A technical product strategy explains where the product should go, why that direction matters, and what technical bets are needed to get there.",
+    "reasoning": "I would create the strategy in layers.\n\nFirst, define the product goal. What outcome should change for customers or the business?\n\nSecond, define the customer and use case. Strategy gets weak when it tries to serve everyone.\n\nThird, define the product promise. What should the customer trust us to do better than alternatives?\n\nFourth, map the technical capabilities needed to keep that promise.\n\nFifth, turn those capabilities into sequencing. Some capabilities unlock others. For example, team permissions may need an organization model first.\n\nHere is a practical artifact:\n\n```txt\nTechnical product strategy brief\n\nCustomer problem:\nSmall businesses need repeatable supplier payments with reliable status and records.\n\nBusiness goal:\nGrow business transaction volume while keeping compliance and operations cost under control.\n\nProduct bet:\nBusiness customers value reliability, repeatability, and auditability more than a long menu of features.\n\nRequired capabilities:\n1. Business verification\n2. Organization and roles model\n3. Recipient directory\n4. Bulk payout creation\n5. Reconciliation export\n6. Corridor health monitoring\n\nMain risks:\n- Compliance review takes longer than planned.\n- Bulk retries create duplicate payouts.\n- Support cannot investigate business account issues.\n\nFirst milestone:\nBusiness profile + saved recipients + single payout with business audit trail.\n```\n\nThis artifact is useful because it connects user value, business value, and technical work in one place.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between strategy and roadmap?",
+      "Why does a TPM need to connect product goals to technical capabilities?",
+      "What makes a technical capability strategic instead of just implementation detail?",
+      "Why should a strategy include non-goals?",
+      "What would make a strategy too vague to guide decisions?"
+    ],
+    "interviewAnswer": "I would create a technical product strategy by defining the customer, the product promise, the business goal, the technical capabilities needed to deliver that promise, the sequencing of those capabilities, the risks, and the explicit non-goals.\n\nA strong TPM answer shows that strategy is not a feature list. It is the reasoning that helps the team choose what to build, what to defer, and which technical investments are necessary for the product direction to work.",
+    "sourceLinks": [
+      {
+        "label": "ProductPlan: Product strategy",
+        "url": "https://www.productplan.com/learn/product-strategy/"
+      },
+      {
+        "label": "Atlassian: Agile roadmaps",
+        "url": "https://www.atlassian.com/agile/product-management/roadmaps"
+      }
+    ],
+    "beginnerExplanation": "A technical product strategy explains where the product should go, why that direction matters, and what technical bets are needed to get there.\n\nThe beginner mistake is thinking strategy means \"a list of features.\" A feature list says what the team might build. A strategy explains the logic behind the choices. It says which customer problem matters most, which market or business goal the product supports, what the product must become technically, and what the team will deliberately not do.\n\nFor a TPM, the technical part matters because the best product idea may depend on platform readiness, data quality, API reliability, compliance controls, scalability, security, or migration work. If the strategy ignores those realities, the roadmap becomes fantasy.\n\nThe simple mental model is:\n\n```txt\nProduct strategy = where we are going and why.\nTechnical strategy = what capabilities must exist for that direction to be real.\nRoadmap = the sequence of work that moves us there.\n```",
+    "example": "Imagine a remittance company wants to serve small businesses, not only individual senders.\n\nA shallow strategy says:\n\n```txt\nBuild business accounts.\nAdd bulk payments.\nAdd team permissions.\nAdd invoices.\n```\n\nThat is not enough. It does not explain why these things matter, which customer segment comes first, or what platform work is required.\n\nA stronger strategy says:\n\n```txt\nGoal:\nHelp small import/export businesses pay suppliers faster and with clearer tracking.\n\nTarget customer:\nBusinesses sending recurring payments to a known set of suppliers.\n\nWinning promise:\nReliable cross-border payouts, predictable fees, payment status visibility, and audit-friendly records.\n\nTechnical bets:\n- Business identity verification, not only individual KYC.\n- Recipient directory with reusable supplier profiles.\n- Bulk payout workflow with idempotent creation.\n- Role-based access for owner, finance user, and viewer.\n- Reconciliation reports for accounting.\n- Monitoring for payout delays and failed corridors.\n\nNon-goals for now:\n- Full invoicing product.\n- Payroll.\n- Card issuing.\n```\n\nNow the team can make better tradeoffs. If engineering says bulk payouts require a new payout orchestration layer, that is not \"backend work nobody sees.\" It is a strategic capability.",
+    "commonMistakes": "A common mistake is writing strategy as a slogan. \"Be the best API platform\" is not strategy unless it says which users, which advantage, and which capabilities matter.\n\nAnother mistake is hiding technical foundation work. If the roadmap only shows visible features, leadership may not understand why platform work is required.\n\nA third mistake is ignoring tradeoffs. A strategy should make choices. If every customer segment and every feature is equally important, the team has no strategy."
   },
   {
     "id": "tpm-technical-tradeoffs",

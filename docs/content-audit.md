@@ -10,13 +10,13 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 34 total lessons.
-- 15 Frontend lessons.
-- 19 TPM lessons.
-- 19,542 lesson words, excluding fenced code.
-- 96 fenced code blocks.
-- 68 source links.
-- 68 source links reachable after cleanup and the latest batch.
+- 44 total lessons.
+- 17 Frontend lessons.
+- 27 TPM lessons.
+- 23,434 lesson words, excluding fenced code.
+- 149 fenced code blocks.
+- 89 source links.
+- 89 source links reachable after cleanup and the latest batch.
 - 0 source links failing after cleanup and the latest batch.
 
 ## Scoring Rubric
@@ -71,7 +71,7 @@ These source URLs failed or were blocked during the initial audit and have been 
 | `tpm-vendor-evaluation` | `https://owasp.org/www-project-vendor-security-questionnaire/` | 404 | Replaced with Google VSAQ source. |
 | `tpm-vendor-evaluation` | `https://www.atlassian.com/team-playbook/plays/trade-off-sliders` | 404 | Replaced with current Atlassian trade-offs source. |
 
-All 48 source links passed the latest reachability check.
+All 89 source links passed the latest reachability check.
 
 ## Priority Rewrite List
 
@@ -134,40 +134,28 @@ These do not need rewrites, but they should gain more practical examples:
 
 ### Frontend Topics To Add Next
 
-High-value interview topics not yet covered:
+High-value interview topics not yet covered or not yet deeply expanded:
 
-1. React rendering and rerenders.
-2. Memoization: `useMemo`, `useCallback`, `React.memo`.
-3. State management: local state, context, server state, global stores.
-4. Data fetching: loading, caching, invalidation, optimistic updates.
-5. Browser rendering pipeline: DOM, CSSOM, layout, paint, compositing.
-6. Event delegation and event propagation.
-7. Debounce and throttle.
-8. Accessibility: focus management, keyboard navigation, accessible names.
-9. CSS specificity, cascade, and stacking context.
-10. TypeScript in frontend apps.
-11. Build tooling: bundling, code splitting, tree shaking.
-12. HTTP, caching, cookies, CORS, and auth basics.
+1. Memoization: `useMemo`, `useCallback`, `React.memo`.
+2. State management: local state, context, server state, global stores.
+3. Browser rendering pipeline: DOM, CSSOM, layout, paint, compositing.
+4. Accessibility: focus management, keyboard navigation, accessible names.
+5. TypeScript in frontend apps.
+6. Build tooling: bundling, code splitting, tree shaking.
+7. HTTP, caching, cookies, CORS, and auth basics.
 
 ### TPM Topics To Add Next
 
-Prioritize TPM first because the client has interviews lined up:
+Prioritize TPM first because the client has interviews lined up. The first two expansion batches now cover the original highest-priority TPM list. Remaining TPM gaps to add or deepen:
 
-1. Design an API product from scratch.
-2. Define requirements for a payments or remittance feature.
-3. Build versus buy decision.
-4. Metrics for onboarding, activation, retention, and risk.
-5. Product sense for technical products.
-6. Data migration or platform migration planning.
-7. Compliance and fraud tradeoffs in fintech.
-8. Partner API outage and fallback strategy.
-9. Roadmap planning across engineering, compliance, and commercial needs.
-10. Writing a technical product strategy.
-11. Managing dependency risk across teams.
-12. Experiment design when risk or compliance limits A/B testing.
-13. API versioning and backwards compatibility.
-14. Internal tools and operations product management.
-15. Customer support feedback loops for technical products.
+1. Product requirements for data products and reporting.
+2. Marketplace or supply-demand product tradeoffs.
+3. Enterprise permissions, roles, and auditability.
+4. Pricing, packaging, and usage-based billing for technical products.
+5. Migration communications and customer change management.
+6. Post-launch monitoring and product operations.
+7. Security review and privacy-by-design for product managers.
+8. Working with ambiguous executive asks.
 
 ## Content Standard Going Forward
 
@@ -204,7 +192,7 @@ Every new lesson should include:
 
 ## Recommended Next Batch
 
-Completed on 2026-05-14: the next content batch added 10 lessons, weighted toward TPM:
+Completed on 2026-05-14: the first expansion batch added 10 lessons, weighted toward TPM:
 
 1. TPM: Design an API product from scratch.
 2. TPM: Build versus buy.
@@ -217,13 +205,26 @@ Completed on 2026-05-14: the next content batch added 10 lessons, weighted towar
 9. Frontend: Data fetching and cache invalidation.
 10. Frontend: Debounce and throttle.
 
+Completed on 2026-05-14: the second expansion batch added 10 more lessons:
+
+1. TPM: Technical product strategy.
+2. TPM: Roadmaps under cross-functional pressure.
+3. TPM: Dependency risk across teams.
+4. TPM: Experiment design with compliance or user-risk constraints.
+5. TPM: Internal tools for operations and support.
+6. TPM: Support feedback loops.
+7. TPM: Fraud, compliance, and UX tradeoffs.
+8. TPM: Platform product sense.
+9. Frontend: Event propagation and delegation.
+10. Frontend: CSS cascade, specificity, and stacking context.
+
 ## Immediate Next Step
 
-Source cleanup, Priority 1 TPM enrichment, and the first 10-lesson expansion batch are now complete.
+Source cleanup, Priority 1 TPM enrichment, and two 10-lesson expansion batches are now complete.
 
 Recommended order:
 
 1. Review the new TPM lessons in the app with the client in mind.
-2. Pick the next TPM-heavy batch from the remaining topic map.
-3. Keep adding artifacts: sample memos, decision tables, metric trees, rollout plans, and checklists.
-4. Run source validation and browser spot-checks after every batch.
+2. Commit the second expansion batch after review.
+3. Add the next TPM batch around enterprise, pricing, security/privacy, data products, and post-launch operations.
+4. Keep running source validation and browser spot-checks after every batch.
