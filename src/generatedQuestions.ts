@@ -2,843 +2,6 @@ import type { Question } from "./questionTypes";
 
 export const generatedQuestions: Question[] = [
   {
-    "id": "fe-closures",
-    "track": "Frontend",
-    "category": "JavaScript",
-    "level": "Foundational",
-    "question": "Explain closures in JavaScript.",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "A closure is one of those JavaScript ideas that sounds abstract until you connect it to something very simple: where variables live, and which functions can still reach them.\n\nStart with scope. Scope means the area of code where a variable is available. If you create a variable inside a function, that variable belongs to that function's local scope. Code outside the function cannot normally reach it directly. This is useful because it keeps temporary details private.\n\nNow add nested functions. In JavaScript, an inner function can use variables from the outer function where it was written. This is called lexical scoping. Lexical means JavaScript decides variable access from the physical structure of the code, not from where the function is eventually called.\n\nHere is the first step:\n\n```js\nfunction init() {\n  const name = \"Ada\";\n\n  function displayName() {\n    console.log(name);\n  }\n\n  displayName();\n}\n\ninit();\n```\n\n`displayName` does not have its own `name` variable. JavaScript looks around the function and finds `name` in the outer `init` scope. That part is lexical scoping.\n\nA closure appears when the inner function keeps access to that outer scope even after the outer function has finished running. That is the part that surprises people."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Look at this version carefully:\n\n```js\nfunction makeGreeter() {\n  const name = \"Ada\";\n\n  function greet() {\n    return `Hello, ${name}`;\n  }\n\n  return greet;\n}\n\nconst sayHello = makeGreeter();\n\nsayHello(); // \"Hello, Ada\"\n```\n\nWhen `makeGreeter()` runs, it creates `name` and creates the `greet` function. Then it returns `greet`. After that, `makeGreeter()` is finished.\n\nIf you are new to closures, you may expect `name` to disappear at that point. But `sayHello` is now holding the returned `greet` function, and `greet` still refers to `name`. So JavaScript keeps the needed lexical environment alive. That combination, the function plus the variables it can still access, is the closure.\n\nAnother example makes the idea more obvious:\n\n```js\nfunction makeAdder(x) {\n  return function add(y) {\n    return x + y;\n  };\n}\n\nconst add5 = makeAdder(5);\nconst add10 = makeAdder(10);\n\nadd5(2); // 7\nadd10(2); // 12\n```\n\nBoth returned functions use the same code shape, but they remember different environments. `add5` remembers an environment where `x` is `5`. `add10` remembers an environment where `x` is `10`.\n\nThis is the key: a closure does not just remember a function body. It remembers the surrounding variables the function needs."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Closures are common in frontend code because frontend code is event-based. You often define behavior now and run it later when the user clicks, types, focuses an input, or when a timer fires.\n\nFor example:\n\n```js\nfunction makeSizer(size) {\n  return function resizeBody() {\n    document.body.style.fontSize = `${size}px`;\n  };\n}\n\nconst size12 = makeSizer(12);\nconst size16 = makeSizer(16);\n\ndocument.getElementById(\"small\").onclick = size12;\ndocument.getElementById(\"large\").onclick = size16;\n```\n\nThe click handler runs later, but it still knows which `size` it was created with. That is closure doing useful work.\n\nClosures also explain private state:\n\n```js\nfunction createCounter() {\n  let count = 0;\n\n  return {\n    increment() {\n      count += 1;\n    },\n    value() {\n      return count;\n    },\n  };\n}\n\nconst counter = createCounter();\n\ncounter.increment();\ncounter.value(); // 1\n```\n\nNothing outside `createCounter` can directly touch `count`, but the returned methods can. They share access to the same hidden variable.\n\nOnce this clicks, closure bugs also become easier to understand. If a callback runs later and sees an old value, you are probably dealing with a stale closure. If a long-lived listener keeps a large object alive, closure lifetime may be part of the memory problem."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common beginner mistake is thinking a closure copies a value once and freezes it forever. That is not quite right. A closure keeps access to a variable environment. If multiple functions share that environment, they can see changes made through that same environment.\n\nAnother common mistake happens with old `var` loop code. `var` is function-scoped, so callbacks created inside the loop can accidentally share the same changing variable. Modern `let` and `const` create block-scoped bindings, which usually avoids that problem.\n\nDo not treat closures as rare advanced syntax. If a function uses a variable from outside itself, you are already using closure behavior."
-      }
-    ],
-    "answer": "A closure is one of those JavaScript ideas that sounds abstract until you connect it to something very simple: where variables live, and which functions can still reach them.",
-    "reasoning": "Closures are common in frontend code because frontend code is event-based. You often define behavior now and run it later when the user clicks, types, focuses an input, or when a timer fires.\n\nFor example:\n\n```js\nfunction makeSizer(size) {\n  return function resizeBody() {\n    document.body.style.fontSize = `${size}px`;\n  };\n}\n\nconst size12 = makeSizer(12);\nconst size16 = makeSizer(16);\n\ndocument.getElementById(\"small\").onclick = size12;\ndocument.getElementById(\"large\").onclick = size16;\n```\n\nThe click handler runs later, but it still knows which `size` it was created with. That is closure doing useful work.\n\nClosures also explain private state:\n\n```js\nfunction createCounter() {\n  let count = 0;\n\n  return {\n    increment() {\n      count += 1;\n    },\n    value() {\n      return count;\n    },\n  };\n}\n\nconst counter = createCounter();\n\ncounter.increment();\ncounter.value(); // 1\n```\n\nNothing outside `createCounter` can directly touch `count`, but the returned methods can. They share access to the same hidden variable.\n\nOnce this clicks, closure bugs also become easier to understand. If a callback runs later and sees an old value, you are probably dealing with a stale closure. If a long-lived listener keeps a large object alive, closure lifetime may be part of the memory problem.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What is the difference between lexical scoping and closure?",
-      "Why does `sayHello()` still know the value of `name` after `makeGreeter()` finishes?",
-      "Why do `add5` and `add10` remember different values of `x`?",
-      "How can closures help create private state?",
-      "What kind of bug might happen when a callback remembers an old value?"
-    ],
-    "interviewAnswer": "A closure is a function together with references to the lexical environment where it was created. In plain terms, a function can keep access to variables from an outer scope even after that outer function has finished running.\n\nClosures matter in frontend code because callbacks, event handlers, timers, debounced functions, and hooks often run later while still depending on variables from the place where they were created. A strong answer should mention lexical scope, lifetime, practical uses like private state or event callbacks, and common risks like stale values or retained memory.",
-    "sourceLinks": [
-      {
-        "label": "MDN: Closures",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures"
-      },
-      {
-        "label": "Front End Interview Handbook: JavaScript questions",
-        "url": "https://www.frontendinterviewhandbook.com/javascript-questions/"
-      }
-    ],
-    "beginnerExplanation": "A closure is one of those JavaScript ideas that sounds abstract until you connect it to something very simple: where variables live, and which functions can still reach them.\n\nStart with scope. Scope means the area of code where a variable is available. If you create a variable inside a function, that variable belongs to that function's local scope. Code outside the function cannot normally reach it directly. This is useful because it keeps temporary details private.\n\nNow add nested functions. In JavaScript, an inner function can use variables from the outer function where it was written. This is called lexical scoping. Lexical means JavaScript decides variable access from the physical structure of the code, not from where the function is eventually called.\n\nHere is the first step:\n\n```js\nfunction init() {\n  const name = \"Ada\";\n\n  function displayName() {\n    console.log(name);\n  }\n\n  displayName();\n}\n\ninit();\n```\n\n`displayName` does not have its own `name` variable. JavaScript looks around the function and finds `name` in the outer `init` scope. That part is lexical scoping.\n\nA closure appears when the inner function keeps access to that outer scope even after the outer function has finished running. That is the part that surprises people.",
-    "example": "Look at this version carefully:\n\n```js\nfunction makeGreeter() {\n  const name = \"Ada\";\n\n  function greet() {\n    return `Hello, ${name}`;\n  }\n\n  return greet;\n}\n\nconst sayHello = makeGreeter();\n\nsayHello(); // \"Hello, Ada\"\n```\n\nWhen `makeGreeter()` runs, it creates `name` and creates the `greet` function. Then it returns `greet`. After that, `makeGreeter()` is finished.\n\nIf you are new to closures, you may expect `name` to disappear at that point. But `sayHello` is now holding the returned `greet` function, and `greet` still refers to `name`. So JavaScript keeps the needed lexical environment alive. That combination, the function plus the variables it can still access, is the closure.\n\nAnother example makes the idea more obvious:\n\n```js\nfunction makeAdder(x) {\n  return function add(y) {\n    return x + y;\n  };\n}\n\nconst add5 = makeAdder(5);\nconst add10 = makeAdder(10);\n\nadd5(2); // 7\nadd10(2); // 12\n```\n\nBoth returned functions use the same code shape, but they remember different environments. `add5` remembers an environment where `x` is `5`. `add10` remembers an environment where `x` is `10`.\n\nThis is the key: a closure does not just remember a function body. It remembers the surrounding variables the function needs.",
-    "commonMistakes": "A common beginner mistake is thinking a closure copies a value once and freezes it forever. That is not quite right. A closure keeps access to a variable environment. If multiple functions share that environment, they can see changes made through that same environment.\n\nAnother common mistake happens with old `var` loop code. `var` is function-scoped, so callbacks created inside the loop can accidentally share the same changing variable. Modern `let` and `const` create block-scoped bindings, which usually avoids that problem.\n\nDo not treat closures as rare advanced syntax. If a function uses a variable from outside itself, you are already using closure behavior."
-  },
-  {
-    "id": "fe-controlled-components",
-    "track": "Frontend",
-    "category": "React",
-    "level": "Foundational",
-    "question": "What is the difference between controlled and uncontrolled components in React?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "When people talk about controlled and uncontrolled components, they are usually talking about form inputs. The question is simple: who is currently in charge of the input's value?\n\nIn a controlled component, React state is the source of truth. The input shows whatever value React gives it, and every user change goes through React.\n\n```jsx\nfunction SearchBox() {\n  const [query, setQuery] = useState(\"\");\n\n  return (\n    <input\n      value={query}\n      onChange={(event) => setQuery(event.target.value)}\n    />\n  );\n}\n```\n\nHere, the browser does not get to quietly keep its own final answer. The input displays `query`. When the user types, `onChange` updates `query`. React renders again, and the input displays the new value.\n\nIn an uncontrolled component, the browser keeps the current value inside the DOM input. React may set an initial value, but React does not update state on every keystroke.\n\n```jsx\nfunction SearchBox() {\n  const inputRef = useRef(null);\n\n  function handleSubmit() {\n    console.log(inputRef.current.value);\n  }\n\n  return <input ref={inputRef} defaultValue=\"\" />;\n}\n```\n\nThe mental model is: controlled means React owns the value. Uncontrolled means the DOM owns the value, and React reads it when needed."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Imagine a signup form with an email field.\n\nIf the field is controlled, the app can react immediately as the user types. It can disable the submit button until the email looks valid. It can show an error. It can transform text. It can keep multiple fields in sync. It can reset the field by setting state back to an empty string.\n\n```jsx\nfunction SignupForm() {\n  const [email, setEmail] = useState(\"\");\n  const isValid = email.includes(\"@\");\n\n  return (\n    <form>\n      <input value={email} onChange={(event) => setEmail(event.target.value)} />\n      <button disabled={!isValid}>Create account</button>\n    </form>\n  );\n}\n```\n\nIf the field is uncontrolled, React does less work during typing. This can be fine when you only need the value at submit time.\n\n```jsx\nfunction SignupForm() {\n  const emailRef = useRef(null);\n\n  function handleSubmit(event) {\n    event.preventDefault();\n    const email = emailRef.current.value;\n    console.log(email);\n  }\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <input ref={emailRef} name=\"email\" />\n      <button>Create account</button>\n    </form>\n  );\n}\n```\n\nNeither approach is automatically better. Controlled inputs give you direct product control. Uncontrolled inputs can be simpler when the browser can manage the field and you only need to read the value later."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Use controlled inputs when the UI depends on the current value. Examples include live validation, dependent fields, formatting, search as you type, disabling buttons, preview panes, and forms that need to be reset from app state.\n\nUse uncontrolled inputs when you only need a value at the end, especially for small forms, file inputs, or cases where a form library handles the DOM details for you.\n\nThe most important rule is consistency. An input should not switch between controlled and uncontrolled during its lifetime. This often happens when a controlled `value` starts as `undefined` and later becomes a string.\n\n```jsx\n// Risky because name might be undefined at first.\n<input value={name} onChange={handleChange} />\n\n// Safer because the input is always controlled with a string.\n<input value={name ?? \"\"} onChange={handleChange} />\n```\n\nThat tiny detail matters because React needs to know who owns the input. If ownership changes halfway through, bugs become confusing."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is using `value` without `onChange`. That makes the input controlled but impossible to edit, because React keeps forcing the same value back into the field.\n\nAnother mistake is using `defaultValue` and expecting it to update later when props change. `defaultValue` only sets the initial DOM value. If the value needs to follow React state, use `value`.\n\nA third mistake is assuming controlled components are only about forms. The deeper idea is ownership. The same product question appears everywhere: should this thing manage itself locally, or should the parent/app own the state because other parts of the UI depend on it?"
-      }
-    ],
-    "answer": "When people talk about controlled and uncontrolled components, they are usually talking about form inputs. The question is simple: who is currently in charge of the input's value?",
-    "reasoning": "Use controlled inputs when the UI depends on the current value. Examples include live validation, dependent fields, formatting, search as you type, disabling buttons, preview panes, and forms that need to be reset from app state.\n\nUse uncontrolled inputs when you only need a value at the end, especially for small forms, file inputs, or cases where a form library handles the DOM details for you.\n\nThe most important rule is consistency. An input should not switch between controlled and uncontrolled during its lifetime. This often happens when a controlled `value` starts as `undefined` and later becomes a string.\n\n```jsx\n// Risky because name might be undefined at first.\n<input value={name} onChange={handleChange} />\n\n// Safer because the input is always controlled with a string.\n<input value={name ?? \"\"} onChange={handleChange} />\n```\n\nThat tiny detail matters because React needs to know who owns the input. If ownership changes halfway through, bugs become confusing.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "Who owns the value in a controlled input?",
-      "Why does a controlled input need `onChange`?",
-      "What is `defaultValue` for?",
-      "When might an uncontrolled input be enough?",
-      "Why is switching between controlled and uncontrolled input state a problem?"
-    ],
-    "interviewAnswer": "A controlled component gets its value from React state and reports changes back through an event handler. An uncontrolled component keeps its current value in the DOM, usually accessed with a ref or form submission.\n\nControlled inputs are best when the UI needs to respond to the value immediately, such as validation, previews, dependent fields, resets, or submit-button state. Uncontrolled inputs are useful when the browser can own the field until submit time. A good answer should mention source of truth, `value` versus `defaultValue`, `onChange`, refs, and the warning caused by switching ownership during the component's lifetime.",
-    "sourceLinks": [
-      {
-        "label": "React: input component",
-        "url": "https://react.dev/reference/react-dom/components/input"
-      },
-      {
-        "label": "React: Sharing state between components",
-        "url": "https://react.dev/learn/sharing-state-between-components"
-      }
-    ],
-    "beginnerExplanation": "When people talk about controlled and uncontrolled components, they are usually talking about form inputs. The question is simple: who is currently in charge of the input's value?\n\nIn a controlled component, React state is the source of truth. The input shows whatever value React gives it, and every user change goes through React.\n\n```jsx\nfunction SearchBox() {\n  const [query, setQuery] = useState(\"\");\n\n  return (\n    <input\n      value={query}\n      onChange={(event) => setQuery(event.target.value)}\n    />\n  );\n}\n```\n\nHere, the browser does not get to quietly keep its own final answer. The input displays `query`. When the user types, `onChange` updates `query`. React renders again, and the input displays the new value.\n\nIn an uncontrolled component, the browser keeps the current value inside the DOM input. React may set an initial value, but React does not update state on every keystroke.\n\n```jsx\nfunction SearchBox() {\n  const inputRef = useRef(null);\n\n  function handleSubmit() {\n    console.log(inputRef.current.value);\n  }\n\n  return <input ref={inputRef} defaultValue=\"\" />;\n}\n```\n\nThe mental model is: controlled means React owns the value. Uncontrolled means the DOM owns the value, and React reads it when needed.",
-    "example": "Imagine a signup form with an email field.\n\nIf the field is controlled, the app can react immediately as the user types. It can disable the submit button until the email looks valid. It can show an error. It can transform text. It can keep multiple fields in sync. It can reset the field by setting state back to an empty string.\n\n```jsx\nfunction SignupForm() {\n  const [email, setEmail] = useState(\"\");\n  const isValid = email.includes(\"@\");\n\n  return (\n    <form>\n      <input value={email} onChange={(event) => setEmail(event.target.value)} />\n      <button disabled={!isValid}>Create account</button>\n    </form>\n  );\n}\n```\n\nIf the field is uncontrolled, React does less work during typing. This can be fine when you only need the value at submit time.\n\n```jsx\nfunction SignupForm() {\n  const emailRef = useRef(null);\n\n  function handleSubmit(event) {\n    event.preventDefault();\n    const email = emailRef.current.value;\n    console.log(email);\n  }\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <input ref={emailRef} name=\"email\" />\n      <button>Create account</button>\n    </form>\n  );\n}\n```\n\nNeither approach is automatically better. Controlled inputs give you direct product control. Uncontrolled inputs can be simpler when the browser can manage the field and you only need to read the value later.",
-    "commonMistakes": "A common mistake is using `value` without `onChange`. That makes the input controlled but impossible to edit, because React keeps forcing the same value back into the field.\n\nAnother mistake is using `defaultValue` and expecting it to update later when props change. `defaultValue` only sets the initial DOM value. If the value needs to follow React state, use `value`.\n\nA third mistake is assuming controlled components are only about forms. The deeper idea is ownership. The same product question appears everywhere: should this thing manage itself locally, or should the parent/app own the state because other parts of the UI depend on it?"
-  },
-  {
-    "id": "fe-core-web-vitals",
-    "track": "Frontend",
-    "category": "Performance",
-    "level": "Intermediate",
-    "question": "What are Core Web Vitals, and how would you improve them?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Core Web Vitals are a small set of user-experience performance metrics. They are useful because they describe what the page feels like to a real person, not just how fast a server responded.\n\nThe three main Core Web Vitals are:\n\n- Largest Contentful Paint, or LCP: how long it takes for the main visible content to load.\n- Interaction to Next Paint, or INP: how responsive the page feels when the user interacts.\n- Cumulative Layout Shift, or CLS: how much the layout unexpectedly moves around.\n\nThink of them as three beginner-friendly questions.\n\nDid the important content show up quickly? That is LCP.\n\nDid the page respond quickly when I clicked or typed? That is INP.\n\nDid the page stay visually stable, or did things jump around? That is CLS.\n\nThese metrics matter because users do not experience a page as one technical number. A page can have a fast API but still feel slow if JavaScript blocks the main thread. A page can load content quickly but still feel broken if buttons jump just as the user taps them."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "LCP is often affected by the largest hero image, product image, heading, or content block near the top of the page. If the browser discovers the important image late, downloads a huge file, waits on render-blocking CSS, or waits for JavaScript before showing content, LCP gets worse.\n\nINP is about interaction responsiveness. When a user clicks a filter button, opens a menu, types in a search box, or submits a form, the browser needs time to run JavaScript, update state, calculate layout, paint the result, and show feedback. If the main thread is busy doing expensive work, the user feels delay.\n\nCLS happens when visible elements move after the page starts loading. A common example is an image without width and height. The browser first lays out the page without knowing the image size. Then the image loads, takes space, and pushes text or buttons down. Ads, late-loading banners, injected fonts, and dynamic content can cause the same problem.\n\nThe key is that each metric points to a different kind of user frustration. LCP is waiting. INP is lag. CLS is surprise movement."
-      },
-      {
-        "title": "Make it practical",
-        "body": "To improve LCP, start by identifying the main content element. Then make it easy for the browser to load and render it. Use properly sized images, modern formats, priority loading for the most important image, server-rendered or static content when appropriate, less render-blocking CSS, and avoid making the user wait for unnecessary JavaScript before content appears.\n\nTo improve INP, reduce expensive work during interactions. Break long tasks into smaller chunks, avoid re-rendering large parts of the page unnecessarily, debounce work that does not need to run on every keystroke, virtualize huge lists, move heavy computation away from the main interaction path, and show immediate feedback.\n\nTo improve CLS, reserve space before content arrives. Set image dimensions, avoid inserting banners above existing content, use stable skeletons, load fonts in a way that avoids dramatic text shifts, and keep dynamic UI from pushing important controls around unexpectedly.\n\nA useful workflow is:\n\n1. Measure in the field if possible, because lab tests can miss real device and network conditions.\n2. Find which metric is bad.\n3. Identify the page element or interaction causing it.\n4. Make one targeted change.\n5. Measure again.\n\nPerformance work becomes much less mysterious when you connect each metric to a visible user pain."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is treating performance as only bundle size. Bundle size matters, but a small bundle can still create poor INP if one interaction does too much synchronous work.\n\nAnother mistake is optimizing the wrong page. The homepage might be fine while the dashboard, product detail page, or checkout flow performs badly.\n\nA third mistake is chasing scores without understanding the user journey. A TPM, designer, or frontend engineer should ask which slow moment hurts the user or business most, then improve that moment first."
-      }
-    ],
-    "answer": "Core Web Vitals are a small set of user-experience performance metrics. They are useful because they describe what the page feels like to a real person, not just how fast a server responded.",
-    "reasoning": "To improve LCP, start by identifying the main content element. Then make it easy for the browser to load and render it. Use properly sized images, modern formats, priority loading for the most important image, server-rendered or static content when appropriate, less render-blocking CSS, and avoid making the user wait for unnecessary JavaScript before content appears.\n\nTo improve INP, reduce expensive work during interactions. Break long tasks into smaller chunks, avoid re-rendering large parts of the page unnecessarily, debounce work that does not need to run on every keystroke, virtualize huge lists, move heavy computation away from the main interaction path, and show immediate feedback.\n\nTo improve CLS, reserve space before content arrives. Set image dimensions, avoid inserting banners above existing content, use stable skeletons, load fonts in a way that avoids dramatic text shifts, and keep dynamic UI from pushing important controls around unexpectedly.\n\nA useful workflow is:\n\n1. Measure in the field if possible, because lab tests can miss real device and network conditions.\n2. Find which metric is bad.\n3. Identify the page element or interaction causing it.\n4. Make one targeted change.\n5. Measure again.\n\nPerformance work becomes much less mysterious when you connect each metric to a visible user pain.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "Which Core Web Vital is about the main content appearing?",
-      "Which one is about interaction responsiveness?",
-      "Which one is about unexpected layout movement?",
-      "Why can a page have a fast API but still poor INP?",
-      "What would you check first if the hero image is the LCP element?"
-    ],
-    "interviewAnswer": "Core Web Vitals measure loading, responsiveness, and visual stability through LCP, INP, and CLS. I would improve them by first measuring the affected pages and identifying the exact element or interaction causing the poor score.\n\nFor LCP, I would optimize the main content path. For INP, I would reduce main-thread work during interactions. For CLS, I would reserve space and avoid late layout changes. The strongest answer ties each metric back to what the user feels: waiting, lag, or unexpected movement.",
-    "sourceLinks": [
-      {
-        "label": "web.dev: Core Web Vitals",
-        "url": "https://web.dev/articles/vitals"
-      },
-      {
-        "label": "web.dev: Optimize Interaction to Next Paint",
-        "url": "https://web.dev/articles/optimize-inp"
-      }
-    ],
-    "beginnerExplanation": "Core Web Vitals are a small set of user-experience performance metrics. They are useful because they describe what the page feels like to a real person, not just how fast a server responded.\n\nThe three main Core Web Vitals are:\n\n- Largest Contentful Paint, or LCP: how long it takes for the main visible content to load.\n- Interaction to Next Paint, or INP: how responsive the page feels when the user interacts.\n- Cumulative Layout Shift, or CLS: how much the layout unexpectedly moves around.\n\nThink of them as three beginner-friendly questions.\n\nDid the important content show up quickly? That is LCP.\n\nDid the page respond quickly when I clicked or typed? That is INP.\n\nDid the page stay visually stable, or did things jump around? That is CLS.\n\nThese metrics matter because users do not experience a page as one technical number. A page can have a fast API but still feel slow if JavaScript blocks the main thread. A page can load content quickly but still feel broken if buttons jump just as the user taps them.",
-    "example": "LCP is often affected by the largest hero image, product image, heading, or content block near the top of the page. If the browser discovers the important image late, downloads a huge file, waits on render-blocking CSS, or waits for JavaScript before showing content, LCP gets worse.\n\nINP is about interaction responsiveness. When a user clicks a filter button, opens a menu, types in a search box, or submits a form, the browser needs time to run JavaScript, update state, calculate layout, paint the result, and show feedback. If the main thread is busy doing expensive work, the user feels delay.\n\nCLS happens when visible elements move after the page starts loading. A common example is an image without width and height. The browser first lays out the page without knowing the image size. Then the image loads, takes space, and pushes text or buttons down. Ads, late-loading banners, injected fonts, and dynamic content can cause the same problem.\n\nThe key is that each metric points to a different kind of user frustration. LCP is waiting. INP is lag. CLS is surprise movement.",
-    "commonMistakes": "A common mistake is treating performance as only bundle size. Bundle size matters, but a small bundle can still create poor INP if one interaction does too much synchronous work.\n\nAnother mistake is optimizing the wrong page. The homepage might be fine while the dashboard, product detail page, or checkout flow performs badly.\n\nA third mistake is chasing scores without understanding the user journey. A TPM, designer, or frontend engineer should ask which slow moment hurts the user or business most, then improve that moment first."
-  },
-  {
-    "id": "fe-css-cascade-specificity-stacking",
-    "track": "Frontend",
-    "category": "CSS",
-    "level": "Intermediate",
-    "question": "Explain the CSS cascade, specificity, and stacking context.",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.\n\nThe cascade is that decision system. It considers where styles came from, importance, cascade layers, specificity, order, and inheritance.\n\nThe beginner mistake is thinking CSS is only \"last rule wins.\" Order matters, but only after other rules are considered.\n\nSpecificity is one part of the cascade. It is the weight of a selector.\n\n```css\nbutton {\n  color: black;\n}\n\n.primary {\n  color: blue;\n}\n\n#checkout {\n  color: red;\n}\n```\n\nIf the same button has `id=\"checkout\"` and `class=\"primary\"`, the ID selector is more specific, so red wins over blue and black."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Think of specificity like a score:\n\n```txt\nInline styles:\nVery strong\n\nID selectors:\nStrong\n\nClass, attribute, pseudo-class selectors:\nMedium\n\nElement and pseudo-element selectors:\nLow\n```\n\nThis is why deeply specific CSS can become hard to override.\n\n```css\n.app .sidebar nav ul li a.active {\n  color: red;\n}\n```\n\nLater, someone tries:\n\n```css\n.active {\n  color: blue;\n}\n```\n\nThe second rule may come later, but it is less specific. The red rule can still win.\n\nThat is why good CSS often uses low, predictable specificity."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Stacking context is a different but related source of confusion. It affects which things appear in front of other things.\n\nA common beginner belief is:\n\n```txt\nThe biggest z-index always appears on top.\n```\n\nThat is not always true. `z-index` is compared inside stacking contexts. A child can be trapped inside its parent's stacking context.\n\n```html\n<div class=\"modal-shell\">\n  <div class=\"tooltip\">Tooltip</div>\n</div>\n\n<header class=\"site-header\">Header</header>\n```\n\n```css\n.modal-shell {\n  position: relative;\n  z-index: 1;\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 9999;\n}\n\n.site-header {\n  position: relative;\n  z-index: 10;\n}\n```\n\nEven though the tooltip has `z-index: 9999`, it may still appear behind the header because it lives inside `.modal-shell`, and `.modal-shell` is below the header in the parent stacking order.\n\nTo fix stacking bugs, inspect the parent contexts, not only the element with the big `z-index`.\n\n```txt\nDebug checklist\n\n1. Which rule is winning in DevTools?\n2. Is the losing rule less specific?\n3. Is `!important` involved?\n4. Is the element inside a stacking context?\n5. Is a parent setting position, z-index, transform, opacity, filter, or isolation?\n6. Can the CSS be simplified instead of raising z-index again?\n```"
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is adding `!important` instead of understanding why a rule lost. That may fix one bug and create the next one.\n\nAnother mistake is increasing `z-index` forever. If the element is inside a lower stacking context, a bigger number may not help.\n\nA third mistake is writing selectors that are too specific. They make future overrides harder and make the stylesheet fragile."
-      }
-    ],
-    "answer": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.",
-    "reasoning": "Stacking context is a different but related source of confusion. It affects which things appear in front of other things.\n\nA common beginner belief is:\n\n```txt\nThe biggest z-index always appears on top.\n```\n\nThat is not always true. `z-index` is compared inside stacking contexts. A child can be trapped inside its parent's stacking context.\n\n```html\n<div class=\"modal-shell\">\n  <div class=\"tooltip\">Tooltip</div>\n</div>\n\n<header class=\"site-header\">Header</header>\n```\n\n```css\n.modal-shell {\n  position: relative;\n  z-index: 1;\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 9999;\n}\n\n.site-header {\n  position: relative;\n  z-index: 10;\n}\n```\n\nEven though the tooltip has `z-index: 9999`, it may still appear behind the header because it lives inside `.modal-shell`, and `.modal-shell` is below the header in the parent stacking order.\n\nTo fix stacking bugs, inspect the parent contexts, not only the element with the big `z-index`.\n\n```txt\nDebug checklist\n\n1. Which rule is winning in DevTools?\n2. Is the losing rule less specific?\n3. Is `!important` involved?\n4. Is the element inside a stacking context?\n5. Is a parent setting position, z-index, transform, opacity, filter, or isolation?\n6. Can the CSS be simplified instead of raising z-index again?\n```",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "Why is CSS not simply \"last rule wins\"?",
-      "What is specificity?",
-      "Why can an ID selector beat a class selector?",
-      "What is a stacking context?",
-      "Why might `z-index: 9999` still appear behind another element?"
-    ],
-    "interviewAnswer": "The cascade is the browser's process for deciding which CSS declaration wins. Specificity is the selector weight used when competing rules apply in the same cascade layer and origin. Stacking context controls how elements are layered on the z-axis, and `z-index` is compared within those contexts.\n\nA strong answer should mention cascade order, specificity, source order, avoiding unnecessary `!important`, and debugging stacking bugs by checking parent stacking contexts.",
-    "sourceLinks": [
-      {
-        "label": "MDN: CSS cascade",
-        "url": "https://developer.mozilla.org/docs/Web/CSS/CSS_cascade/Cascade"
-      },
-      {
-        "label": "MDN: CSS specificity",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascade/Specificity"
-      },
-      {
-        "label": "MDN: Stacking context",
-        "url": "https://developer.mozilla.org/docs/Web/CSS/Guides/Positioned_layout/Stacking_context"
-      }
-    ],
-    "beginnerExplanation": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.\n\nThe cascade is that decision system. It considers where styles came from, importance, cascade layers, specificity, order, and inheritance.\n\nThe beginner mistake is thinking CSS is only \"last rule wins.\" Order matters, but only after other rules are considered.\n\nSpecificity is one part of the cascade. It is the weight of a selector.\n\n```css\nbutton {\n  color: black;\n}\n\n.primary {\n  color: blue;\n}\n\n#checkout {\n  color: red;\n}\n```\n\nIf the same button has `id=\"checkout\"` and `class=\"primary\"`, the ID selector is more specific, so red wins over blue and black.",
-    "example": "Think of specificity like a score:\n\n```txt\nInline styles:\nVery strong\n\nID selectors:\nStrong\n\nClass, attribute, pseudo-class selectors:\nMedium\n\nElement and pseudo-element selectors:\nLow\n```\n\nThis is why deeply specific CSS can become hard to override.\n\n```css\n.app .sidebar nav ul li a.active {\n  color: red;\n}\n```\n\nLater, someone tries:\n\n```css\n.active {\n  color: blue;\n}\n```\n\nThe second rule may come later, but it is less specific. The red rule can still win.\n\nThat is why good CSS often uses low, predictable specificity.",
-    "commonMistakes": "A common mistake is adding `!important` instead of understanding why a rule lost. That may fix one bug and create the next one.\n\nAnother mistake is increasing `z-index` forever. If the element is inside a lower stacking context, a bigger number may not help.\n\nA third mistake is writing selectors that are too specific. They make future overrides harder and make the stylesheet fragile."
-  },
-  {
-    "id": "fe-data-fetching-cache-invalidation",
-    "track": "Frontend",
-    "category": "React",
-    "level": "Intermediate",
-    "question": "How should frontend apps handle data fetching and cache invalidation?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.\n\nThe beginner mistake is thinking the problem ends after `fetch()` returns. Real apps need loading states, error states, retries, stale data, background refresh, mutations, and consistency after the user changes something.\n\nServer data is different from local UI state. A dropdown open state belongs to the browser session. A list of invoices belongs to the server. The frontend can cache it, but the server is the real source of truth."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Imagine an issues page.\n\n```jsx\nconst queryKey = [\"issues\", { status, owner }];\n```\n\nThat key means: \"the issues list for this status and owner.\" If the user changes the filter, the key changes and the app needs a different data set.\n\nNow imagine the user closes an issue. The old list may be wrong because one item changed status. Cache invalidation tells the app: \"the issues query may be stale, refetch it.\"\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: closeIssue,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: [\"issues\"] });\n  },\n});\n```\n\nThe key idea is that fetching is not just making requests. It is managing the relationship between UI state, server state, and time."
-      },
-      {
-        "title": "Make it practical",
-        "body": "A good data-fetching plan answers:\n\n1. What is the query key?\n2. What loading UI appears?\n3. What error UI appears?\n4. When is cached data considered stale?\n5. What mutations change this data?\n6. Which queries should be invalidated after mutation?\n7. Should the UI update optimistically?\n8. How does pagination or filtering affect the cache?\n\nHere is a simple optimistic update shape:\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onMutate: async (nextTodo) => {\n    await queryClient.cancelQueries({ queryKey: [\"todos\"] });\n    const previousTodos = queryClient.getQueryData([\"todos\"]);\n\n    queryClient.setQueryData([\"todos\"], (todos) =>\n      todos.map((todo) => todo.id === nextTodo.id ? nextTodo : todo)\n    );\n\n    return { previousTodos };\n  },\n  onError: (_error, _nextTodo, context) => {\n    queryClient.setQueryData([\"todos\"], context.previousTodos);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: [\"todos\"] });\n  },\n});\n```\n\nThis shows the tradeoff. Optimistic updates feel fast, but the app must recover if the server rejects the change."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is using one generic key for data that actually depends on filters or user ID. That mixes unrelated data.\n\nAnother mistake is refetching everything after every mutation. That works at small scale but becomes slow and noisy.\n\nA third mistake is forgetting error and stale states. Users need to know whether data is loading, failed, refreshing, or possibly outdated."
-      }
-    ],
-    "answer": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.",
-    "reasoning": "A good data-fetching plan answers:\n\n1. What is the query key?\n2. What loading UI appears?\n3. What error UI appears?\n4. When is cached data considered stale?\n5. What mutations change this data?\n6. Which queries should be invalidated after mutation?\n7. Should the UI update optimistically?\n8. How does pagination or filtering affect the cache?\n\nHere is a simple optimistic update shape:\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onMutate: async (nextTodo) => {\n    await queryClient.cancelQueries({ queryKey: [\"todos\"] });\n    const previousTodos = queryClient.getQueryData([\"todos\"]);\n\n    queryClient.setQueryData([\"todos\"], (todos) =>\n      todos.map((todo) => todo.id === nextTodo.id ? nextTodo : todo)\n    );\n\n    return { previousTodos };\n  },\n  onError: (_error, _nextTodo, context) => {\n    queryClient.setQueryData([\"todos\"], context.previousTodos);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: [\"todos\"] });\n  },\n});\n```\n\nThis shows the tradeoff. Optimistic updates feel fast, but the app must recover if the server rejects the change.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "Why is server data different from local UI state?",
-      "What is a query key?",
-      "What does invalidation mean?",
-      "When might optimistic updates be useful?",
-      "What can go wrong if cache keys are too vague?"
-    ],
-    "interviewAnswer": "Frontend data fetching should treat server data as cached, asynchronous state. I would define query keys, loading and error states, stale timing, mutation behavior, invalidation rules, and optimistic update recovery.\n\nA strong answer shows that the hard part is not calling `fetch`. The hard part is keeping the UI honest when data changes, requests fail, filters change, or cached data becomes stale.",
-    "sourceLinks": [
-      {
-        "label": "TanStack Query: Query invalidation",
-        "url": "https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation"
-      },
-      {
-        "label": "React: Fetching data with Effects",
-        "url": "https://react.dev/reference/react/useEffect#fetching-data-with-effects"
-      }
-    ],
-    "beginnerExplanation": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.\n\nThe beginner mistake is thinking the problem ends after `fetch()` returns. Real apps need loading states, error states, retries, stale data, background refresh, mutations, and consistency after the user changes something.\n\nServer data is different from local UI state. A dropdown open state belongs to the browser session. A list of invoices belongs to the server. The frontend can cache it, but the server is the real source of truth.",
-    "example": "Imagine an issues page.\n\n```jsx\nconst queryKey = [\"issues\", { status, owner }];\n```\n\nThat key means: \"the issues list for this status and owner.\" If the user changes the filter, the key changes and the app needs a different data set.\n\nNow imagine the user closes an issue. The old list may be wrong because one item changed status. Cache invalidation tells the app: \"the issues query may be stale, refetch it.\"\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: closeIssue,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: [\"issues\"] });\n  },\n});\n```\n\nThe key idea is that fetching is not just making requests. It is managing the relationship between UI state, server state, and time.",
-    "commonMistakes": "A common mistake is using one generic key for data that actually depends on filters or user ID. That mixes unrelated data.\n\nAnother mistake is refetching everything after every mutation. That works at small scale but becomes slow and noisy.\n\nA third mistake is forgetting error and stale states. Users need to know whether data is loading, failed, refreshing, or possibly outdated."
-  },
-  {
-    "id": "fe-debounce-throttle",
-    "track": "Frontend",
-    "category": "JavaScript",
-    "level": "Foundational",
-    "question": "What is the difference between debounce and throttle?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Debounce and throttle are techniques for controlling how often a function runs.\n\nThey matter because frontend events can fire very quickly. Typing, scrolling, resizing, mouse movement, and input changes can trigger many calls per second. If every event runs expensive work, the UI can feel slow or the server can receive too many requests.\n\nDebounce waits until activity pauses. Throttle runs at most once in a fixed time window.\n\nUse debounce when you care about the final value after the user stops. Use throttle when you want regular updates while activity continues."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Search input is a debounce example. If a user types `react`, you usually do not want to call the API for `r`, `re`, `rea`, `reac`, and `react`. You can wait until the user pauses typing.\n\n```js\nfunction debounce(callback, delay) {\n  let timerId;\n\n  return function debounced(...args) {\n    clearTimeout(timerId);\n\n    timerId = setTimeout(() => {\n      callback(...args);\n    }, delay);\n  };\n}\n```\n\nScroll tracking is often a throttle example. If a user scrolls continuously, you may want to update position at most every 100ms.\n\n```js\nfunction throttle(callback, delay) {\n  let waiting = false;\n\n  return function throttled(...args) {\n    if (waiting) return;\n\n    callback(...args);\n    waiting = true;\n\n    setTimeout(() => {\n      waiting = false;\n    }, delay);\n  };\n}\n```\n\nThe difference is timing. Debounce resets the timer each time. Throttle allows periodic execution."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Use debounce for:\n\n- Search suggestions.\n- Auto-save after typing pauses.\n- Validation after input pauses.\n- Resizing work after the resize stops.\n\nUse throttle for:\n\n- Scroll position updates.\n- Infinite-scroll checks.\n- Drag movement.\n- Mouse movement tracking.\n- Sending periodic analytics during continuous activity.\n\nIn React, be careful that the debounced or throttled function has stable identity. If you recreate it on every render, it may lose its timer state.\n\n```jsx\nfunction SearchBox({ onSearch }) {\n  const debouncedSearch = useMemo(\n    () => debounce(onSearch, 300),\n    [onSearch]\n  );\n\n  return (\n    <input onChange={(event) => debouncedSearch(event.target.value)} />\n  );\n}\n```\n\nIn production, you also need cleanup if a component unmounts while a timer is waiting."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is using debounce when the user expects continuous feedback. Scroll position should not wait until scrolling fully stops.\n\nAnother mistake is using throttle for search and still sending intermediate values the user did not mean to submit.\n\nA third mistake is forgetting stale closures. A delayed callback may use old props or state if you do not design it carefully."
-      }
-    ],
-    "answer": "Debounce and throttle are techniques for controlling how often a function runs.",
-    "reasoning": "Use debounce for:\n\n- Search suggestions.\n- Auto-save after typing pauses.\n- Validation after input pauses.\n- Resizing work after the resize stops.\n\nUse throttle for:\n\n- Scroll position updates.\n- Infinite-scroll checks.\n- Drag movement.\n- Mouse movement tracking.\n- Sending periodic analytics during continuous activity.\n\nIn React, be careful that the debounced or throttled function has stable identity. If you recreate it on every render, it may lose its timer state.\n\n```jsx\nfunction SearchBox({ onSearch }) {\n  const debouncedSearch = useMemo(\n    () => debounce(onSearch, 300),\n    [onSearch]\n  );\n\n  return (\n    <input onChange={(event) => debouncedSearch(event.target.value)} />\n  );\n}\n```\n\nIn production, you also need cleanup if a component unmounts while a timer is waiting.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What does debounce wait for?",
-      "What does throttle limit?",
-      "Why is search usually debounced?",
-      "Why is scroll usually throttled?",
-      "What React bug can happen if a debounced function is recreated every render?"
-    ],
-    "interviewAnswer": "Debounce delays a function until activity has stopped for a period of time. Throttle allows a function to run at most once per time interval while activity continues.\n\nI would use debounce for search, validation, and autosave after typing pauses. I would use throttle for scroll, resize, drag, or pointer updates where periodic feedback matters. A strong answer mentions performance, user intent, timers, cleanup, and stale closures.",
-    "sourceLinks": [
-      {
-        "label": "MDN: Debounce",
-        "url": "https://developer.mozilla.org/en-US/docs/Glossary/Debounce"
-      },
-      {
-        "label": "MDN: Throttle",
-        "url": "https://developer.mozilla.org/en-US/docs/Glossary/Throttle"
-      }
-    ],
-    "beginnerExplanation": "Debounce and throttle are techniques for controlling how often a function runs.\n\nThey matter because frontend events can fire very quickly. Typing, scrolling, resizing, mouse movement, and input changes can trigger many calls per second. If every event runs expensive work, the UI can feel slow or the server can receive too many requests.\n\nDebounce waits until activity pauses. Throttle runs at most once in a fixed time window.\n\nUse debounce when you care about the final value after the user stops. Use throttle when you want regular updates while activity continues.",
-    "example": "Search input is a debounce example. If a user types `react`, you usually do not want to call the API for `r`, `re`, `rea`, `reac`, and `react`. You can wait until the user pauses typing.\n\n```js\nfunction debounce(callback, delay) {\n  let timerId;\n\n  return function debounced(...args) {\n    clearTimeout(timerId);\n\n    timerId = setTimeout(() => {\n      callback(...args);\n    }, delay);\n  };\n}\n```\n\nScroll tracking is often a throttle example. If a user scrolls continuously, you may want to update position at most every 100ms.\n\n```js\nfunction throttle(callback, delay) {\n  let waiting = false;\n\n  return function throttled(...args) {\n    if (waiting) return;\n\n    callback(...args);\n    waiting = true;\n\n    setTimeout(() => {\n      waiting = false;\n    }, delay);\n  };\n}\n```\n\nThe difference is timing. Debounce resets the timer each time. Throttle allows periodic execution.",
-    "commonMistakes": "A common mistake is using debounce when the user expects continuous feedback. Scroll position should not wait until scrolling fully stops.\n\nAnother mistake is using throttle for search and still sending intermediate values the user did not mean to submit.\n\nA third mistake is forgetting stale closures. A delayed callback may use old props or state if you do not design it carefully."
-  },
-  {
-    "id": "fe-event-loop",
-    "track": "Frontend",
-    "category": "JavaScript",
-    "level": "Intermediate",
-    "question": "Explain the JavaScript event loop.",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.\n\nThis creates an obvious question: if JavaScript runs one thing at a time, how can a page handle clicks, timers, network responses, animations, and promise callbacks?\n\nThe answer is the event loop.\n\nThe event loop is the browser's scheduling system for deciding what work JavaScript should run next. It coordinates the call stack, task queue, microtask queue, rendering, and browser APIs.\n\nStart with the call stack. The call stack is where currently running functions live. When you call a function, it goes on the stack. When it returns, it leaves the stack. JavaScript keeps running until the stack is empty.\n\nAsynchronous browser features like timers, events, and network requests do not magically run inside your current function. The browser tracks them outside the call stack. When they are ready, their callbacks are queued to run later."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Look at this code:\n\n```js\nconsole.log(\"A\");\n\nsetTimeout(() => {\n  console.log(\"B\");\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log(\"C\");\n});\n\nconsole.log(\"D\");\n```\n\nThe output is:\n\n```txt\nA\nD\nC\nB\n```\n\nHere is the beginner-friendly version of what happened.\n\nFirst, JavaScript runs the current script from top to bottom. `console.log(\"A\")` runs immediately. `setTimeout` asks the browser to run a callback later, even though the delay is `0`. That callback does not run immediately because the current script is still running. `Promise.resolve().then(...)` queues a microtask. Then `console.log(\"D\")` runs.\n\nNow the call stack is empty. Before the browser picks the next regular task, JavaScript drains the microtask queue. Promise callbacks are microtasks, so `C` logs next.\n\nAfter microtasks are done, the event loop can pick a task from the task queue. The timer callback is a task, so `B` logs last.\n\nThis is why `setTimeout(fn, 0)` does not mean \"run now.\" It means \"run after the current JavaScript finishes and after microtasks that are already waiting.\""
-      },
-      {
-        "title": "Make it practical",
-        "body": "The event loop matters because frontend apps must stay responsive. If you run a huge synchronous loop, the browser cannot handle clicks, paint updates, or run other callbacks until that work finishes.\n\n```js\nbutton.addEventListener(\"click\", () => {\n  for (let i = 0; i < 1_000_000_000; i += 1) {\n    // expensive work\n  }\n\n  console.log(\"done\");\n});\n```\n\nWhile that loop runs, the page may freeze. The click handler owns the main thread until it returns.\n\nA better approach is to break expensive work into smaller chunks, move heavy computation to a Web Worker when appropriate, or avoid doing the expensive work during the user's interaction path.\n\nThe event loop also explains why UI updates may not appear immediately. If you set loading state and then immediately run expensive synchronous code, the browser may not get a chance to paint the loading state until after the expensive code finishes.\n\n```js\nsetLoading(true);\ndoVeryExpensiveWork();\n```\n\nReact can schedule a state update, but the browser still needs a chance to paint. If JavaScript keeps the main thread busy, the user will not see the intermediate feedback when you expect."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is saying JavaScript is asynchronous because it runs multiple callbacks at the same time. That is not the usual browser model. JavaScript callbacks are scheduled asynchronously, but the main thread still runs one piece of JavaScript at a time.\n\nAnother mistake is forgetting the difference between tasks and microtasks. Promise callbacks usually run before timers that are waiting in the task queue.\n\nA third mistake is ignoring rendering. The user does not care only about callback order. They care whether the page can paint, animate, and respond while your code is running."
-      }
-    ],
-    "answer": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.",
-    "reasoning": "The event loop matters because frontend apps must stay responsive. If you run a huge synchronous loop, the browser cannot handle clicks, paint updates, or run other callbacks until that work finishes.\n\n```js\nbutton.addEventListener(\"click\", () => {\n  for (let i = 0; i < 1_000_000_000; i += 1) {\n    // expensive work\n  }\n\n  console.log(\"done\");\n});\n```\n\nWhile that loop runs, the page may freeze. The click handler owns the main thread until it returns.\n\nA better approach is to break expensive work into smaller chunks, move heavy computation to a Web Worker when appropriate, or avoid doing the expensive work during the user's interaction path.\n\nThe event loop also explains why UI updates may not appear immediately. If you set loading state and then immediately run expensive synchronous code, the browser may not get a chance to paint the loading state until after the expensive code finishes.\n\n```js\nsetLoading(true);\ndoVeryExpensiveWork();\n```\n\nReact can schedule a state update, but the browser still needs a chance to paint. If JavaScript keeps the main thread busy, the user will not see the intermediate feedback when you expect.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What is the call stack?",
-      "Why does `setTimeout(fn, 0)` not run immediately?",
-      "Why do Promise callbacks often run before timer callbacks?",
-      "What happens to user clicks while JavaScript is doing a long synchronous task?",
-      "How can you make expensive frontend work less blocking?"
-    ],
-    "interviewAnswer": "The event loop is the mechanism that lets JavaScript coordinate synchronous execution with asynchronous browser work. JavaScript runs functions on the call stack one at a time. Browser APIs queue callbacks as tasks or microtasks, and the event loop decides what runs after the stack is empty.\n\nA strong answer should mention the call stack, task queue, microtask queue, Promise callbacks, timers, and rendering. The practical point is that long synchronous work blocks the main thread, which makes the UI feel frozen even if the code is technically correct.",
-    "sourceLinks": [
-      {
-        "label": "MDN: JavaScript execution model",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop"
-      },
-      {
-        "label": "JavaScript.info: Event loop",
-        "url": "https://javascript.info/event-loop"
-      }
-    ],
-    "beginnerExplanation": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.\n\nThis creates an obvious question: if JavaScript runs one thing at a time, how can a page handle clicks, timers, network responses, animations, and promise callbacks?\n\nThe answer is the event loop.\n\nThe event loop is the browser's scheduling system for deciding what work JavaScript should run next. It coordinates the call stack, task queue, microtask queue, rendering, and browser APIs.\n\nStart with the call stack. The call stack is where currently running functions live. When you call a function, it goes on the stack. When it returns, it leaves the stack. JavaScript keeps running until the stack is empty.\n\nAsynchronous browser features like timers, events, and network requests do not magically run inside your current function. The browser tracks them outside the call stack. When they are ready, their callbacks are queued to run later.",
-    "example": "Look at this code:\n\n```js\nconsole.log(\"A\");\n\nsetTimeout(() => {\n  console.log(\"B\");\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log(\"C\");\n});\n\nconsole.log(\"D\");\n```\n\nThe output is:\n\n```txt\nA\nD\nC\nB\n```\n\nHere is the beginner-friendly version of what happened.\n\nFirst, JavaScript runs the current script from top to bottom. `console.log(\"A\")` runs immediately. `setTimeout` asks the browser to run a callback later, even though the delay is `0`. That callback does not run immediately because the current script is still running. `Promise.resolve().then(...)` queues a microtask. Then `console.log(\"D\")` runs.\n\nNow the call stack is empty. Before the browser picks the next regular task, JavaScript drains the microtask queue. Promise callbacks are microtasks, so `C` logs next.\n\nAfter microtasks are done, the event loop can pick a task from the task queue. The timer callback is a task, so `B` logs last.\n\nThis is why `setTimeout(fn, 0)` does not mean \"run now.\" It means \"run after the current JavaScript finishes and after microtasks that are already waiting.\"",
-    "commonMistakes": "A common mistake is saying JavaScript is asynchronous because it runs multiple callbacks at the same time. That is not the usual browser model. JavaScript callbacks are scheduled asynchronously, but the main thread still runs one piece of JavaScript at a time.\n\nAnother mistake is forgetting the difference between tasks and microtasks. Promise callbacks usually run before timers that are waiting in the task queue.\n\nA third mistake is ignoring rendering. The user does not care only about callback order. They care whether the page can paint, animate, and respond while your code is running."
-  },
-  {
-    "id": "fe-event-propagation-delegation",
-    "track": "Frontend",
-    "category": "JavaScript",
-    "level": "Foundational",
-    "question": "Explain event propagation and event delegation in the browser.",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.\n\nImagine this HTML:\n\n```html\n<section id=\"panel\">\n  <button id=\"save\">Save</button>\n</section>\n```\n\nIf you click the button, the click happened on the button, but the button is inside the section, and the section is inside the page. The browser gives different ancestors a chance to respond.\n\nThe usual mental model has three phases:\n\n```txt\nCapture phase:\nThe event travels down from the window toward the target.\n\nTarget phase:\nThe event reaches the element that was actually clicked.\n\nBubbling phase:\nThe event travels back up through parent elements.\n```\n\nMost everyday event listeners run during bubbling unless you opt into capture."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Here is a small example:\n\n```html\n<div id=\"card\">\n  <button id=\"buy\">Buy</button>\n</div>\n```\n\n```js\ndocument.querySelector(\"#card\").addEventListener(\"click\", () => {\n  console.log(\"card clicked\");\n});\n\ndocument.querySelector(\"#buy\").addEventListener(\"click\", () => {\n  console.log(\"button clicked\");\n});\n```\n\nWhen the user clicks the button, the button handler runs, then the card handler can also run because the click bubbles up.\n\nThat is why clicking a button inside a clickable card can accidentally trigger both actions.\n\nIf the button action should not also trigger the card action, you might stop propagation:\n\n```js\ndocument.querySelector(\"#buy\").addEventListener(\"click\", (event) => {\n  event.stopPropagation();\n  console.log(\"button clicked only\");\n});\n```\n\nUse that carefully. Stopping propagation can also prevent useful parent behavior, analytics, menus, or accessibility-related handlers if overused."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Event delegation uses bubbling on purpose.\n\nInstead of putting a listener on every item in a list, you put one listener on the parent and inspect what was clicked.\n\n```html\n<ul id=\"todo-list\">\n  <li><button data-id=\"1\">Complete</button> Learn closures</li>\n  <li><button data-id=\"2\">Complete</button> Practice CSS</li>\n  <li><button data-id=\"3\">Complete</button> Review React</li>\n</ul>\n```\n\n```js\ndocument.querySelector(\"#todo-list\").addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-id]\");\n\n  if (!button) return;\n\n  const id = button.dataset.id;\n  console.log(`Complete todo ${id}`);\n});\n```\n\nThis works even if more todo items are added later, because the parent listener still receives bubbled clicks.\n\nThis is useful for dynamic lists, tables, menus, and any UI where adding a listener to every child would be noisy."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is confusing `event.target` and `event.currentTarget`. `target` is where the event started. `currentTarget` is the element whose listener is currently running.\n\nAnother mistake is using `stopPropagation()` as a default fix. It can hide problems and break parent-level behavior.\n\nA third mistake is assuming every event bubbles. Many common events do, but not all events behave the same way."
-      }
-    ],
-    "answer": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.",
-    "reasoning": "Event delegation uses bubbling on purpose.\n\nInstead of putting a listener on every item in a list, you put one listener on the parent and inspect what was clicked.\n\n```html\n<ul id=\"todo-list\">\n  <li><button data-id=\"1\">Complete</button> Learn closures</li>\n  <li><button data-id=\"2\">Complete</button> Practice CSS</li>\n  <li><button data-id=\"3\">Complete</button> Review React</li>\n</ul>\n```\n\n```js\ndocument.querySelector(\"#todo-list\").addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-id]\");\n\n  if (!button) return;\n\n  const id = button.dataset.id;\n  console.log(`Complete todo ${id}`);\n});\n```\n\nThis works even if more todo items are added later, because the parent listener still receives bubbled clicks.\n\nThis is useful for dynamic lists, tables, menus, and any UI where adding a listener to every child would be noisy.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What does it mean for an event to bubble?",
-      "Why can a button click trigger a parent card handler?",
-      "What is event delegation?",
-      "What is the difference between `target` and `currentTarget`?",
-      "Why should `stopPropagation()` be used carefully?"
-    ],
-    "interviewAnswer": "Event propagation is the path an event takes through the DOM: capture down, target, then bubble up. Event delegation uses bubbling by placing one listener on a parent and checking which child triggered the event.\n\nA strong answer should mention bubbling, capture, target, `event.target`, `event.currentTarget`, `stopPropagation()`, and why delegation is useful for dynamic lists.",
-    "sourceLinks": [
-      {
-        "label": "MDN: Event bubbling",
-        "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling"
-      },
-      {
-        "label": "MDN: EventTarget addEventListener",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"
-      }
-    ],
-    "beginnerExplanation": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.\n\nImagine this HTML:\n\n```html\n<section id=\"panel\">\n  <button id=\"save\">Save</button>\n</section>\n```\n\nIf you click the button, the click happened on the button, but the button is inside the section, and the section is inside the page. The browser gives different ancestors a chance to respond.\n\nThe usual mental model has three phases:\n\n```txt\nCapture phase:\nThe event travels down from the window toward the target.\n\nTarget phase:\nThe event reaches the element that was actually clicked.\n\nBubbling phase:\nThe event travels back up through parent elements.\n```\n\nMost everyday event listeners run during bubbling unless you opt into capture.",
-    "example": "Here is a small example:\n\n```html\n<div id=\"card\">\n  <button id=\"buy\">Buy</button>\n</div>\n```\n\n```js\ndocument.querySelector(\"#card\").addEventListener(\"click\", () => {\n  console.log(\"card clicked\");\n});\n\ndocument.querySelector(\"#buy\").addEventListener(\"click\", () => {\n  console.log(\"button clicked\");\n});\n```\n\nWhen the user clicks the button, the button handler runs, then the card handler can also run because the click bubbles up.\n\nThat is why clicking a button inside a clickable card can accidentally trigger both actions.\n\nIf the button action should not also trigger the card action, you might stop propagation:\n\n```js\ndocument.querySelector(\"#buy\").addEventListener(\"click\", (event) => {\n  event.stopPropagation();\n  console.log(\"button clicked only\");\n});\n```\n\nUse that carefully. Stopping propagation can also prevent useful parent behavior, analytics, menus, or accessibility-related handlers if overused.",
-    "commonMistakes": "A common mistake is confusing `event.target` and `event.currentTarget`. `target` is where the event started. `currentTarget` is the element whose listener is currently running.\n\nAnother mistake is using `stopPropagation()` as a default fix. It can hide problems and break parent-level behavior.\n\nA third mistake is assuming every event bubbles. Many common events do, but not all events behave the same way."
-  },
-  {
-    "id": "fe-flexbox-grid",
-    "track": "Frontend",
-    "category": "CSS",
-    "level": "Foundational",
-    "question": "When would you use Flexbox versus CSS Grid?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Flexbox and Grid are both layout systems in CSS, but they are built for different layout problems.\n\nFlexbox is mainly for one-dimensional layout. That means you are arranging items in a row or a column. You can wrap to multiple lines, but the core thinking is still one direction at a time.\n\nGrid is mainly for two-dimensional layout. That means you are arranging items across rows and columns at the same time.\n\nA simple way to remember it:\n\n- Use Flexbox when the content itself should decide how space is shared along one direction.\n- Use Grid when the page or component needs a deliberate row-and-column structure.\n\nFor example, a button group, navigation bar, toolbar, avatar plus text row, or centered modal content is usually a Flexbox problem.\n\nA dashboard, pricing table, gallery, card layout, calendar, or page shell with named areas is often a Grid problem."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Here is a Flexbox row:\n\n```css\n.toolbar {\n  display: flex;\n  align-items: center;\n  gap: 0.75rem;\n}\n\n.toolbar .search {\n  flex: 1;\n}\n```\n\nThis says: place the toolbar items in a row, align them vertically, leave a gap, and let the search field take remaining space. The exact width of each item can adapt to the content and available space.\n\nHere is a Grid layout:\n\n```css\n.dashboard {\n  display: grid;\n  grid-template-columns: 16rem 1fr;\n  grid-template-areas:\n    \"sidebar header\"\n    \"sidebar main\";\n}\n\n.sidebar {\n  grid-area: sidebar;\n}\n```\n\nThis says: create a defined page structure with columns and rows. The sidebar occupies a named area. The main content has a predictable position.\n\nThe difference is not about which syntax looks nicer. It is about the job. Flexbox is great when items flow along an axis. Grid is great when you are designing a layout map."
-      },
-      {
-        "title": "Make it practical",
-        "body": "A good frontend engineer often uses both together.\n\nImagine a product dashboard. The outer page might use Grid because the app has a sidebar, header, and main content area. Inside the header, Flexbox might align the title, search field, and account menu. Inside a card, Flexbox might align an icon and label. Inside the main area, Grid might arrange analytic tiles.\n\n```css\n.app-shell {\n  display: grid;\n  grid-template-columns: 15rem minmax(0, 1fr);\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.metrics {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));\n  gap: 1rem;\n}\n```\n\nThis combination is normal. You do not need to pick one layout system for the entire app.\n\nWhen deciding, ask: am I aligning items in one direction, or am I defining a structure across both rows and columns? That question usually gets you to the right tool."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is using Flexbox for a layout that really needs columns to line up across rows. Flexbox can wrap, but each line behaves independently. If you need consistent tracks across rows, Grid is usually cleaner.\n\nAnother mistake is using Grid for tiny one-axis alignment. A row with an icon, label, spacer, and button is often easier with Flexbox.\n\nAlso remember that layout should protect content. Avoid fixed widths unless you really need them. Use `minmax(0, 1fr)`, `auto-fit`, `min()`, `max()`, and responsive constraints so text and controls have room to behave on small screens."
-      }
-    ],
-    "answer": "Flexbox and Grid are both layout systems in CSS, but they are built for different layout problems.",
-    "reasoning": "A good frontend engineer often uses both together.\n\nImagine a product dashboard. The outer page might use Grid because the app has a sidebar, header, and main content area. Inside the header, Flexbox might align the title, search field, and account menu. Inside a card, Flexbox might align an icon and label. Inside the main area, Grid might arrange analytic tiles.\n\n```css\n.app-shell {\n  display: grid;\n  grid-template-columns: 15rem minmax(0, 1fr);\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.metrics {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));\n  gap: 1rem;\n}\n```\n\nThis combination is normal. You do not need to pick one layout system for the entire app.\n\nWhen deciding, ask: am I aligning items in one direction, or am I defining a structure across both rows and columns? That question usually gets you to the right tool.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What does one-dimensional layout mean?",
-      "What does two-dimensional layout mean?",
-      "Why is a toolbar usually a Flexbox problem?",
-      "Why is a dashboard shell usually a Grid problem?",
-      "Can Flexbox and Grid be used together in the same component tree?"
-    ],
-    "interviewAnswer": "Flexbox is best for one-dimensional layout, where items are arranged along a row or column and space is distributed along that axis. Grid is best for two-dimensional layout, where rows and columns need to be controlled together.\n\nI would use Flexbox for nav bars, toolbars, centering, and small alignment patterns. I would use Grid for dashboards, galleries, page shells, calendars, and layouts where items must line up across both axes. In real apps, I often combine them.",
-    "sourceLinks": [
-      {
-        "label": "MDN: Basic concepts of flexbox",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox"
-      },
-      {
-        "label": "MDN: Basic concepts of grid layout",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Basic_concepts_of_grid_layout"
-      }
-    ],
-    "beginnerExplanation": "Flexbox and Grid are both layout systems in CSS, but they are built for different layout problems.\n\nFlexbox is mainly for one-dimensional layout. That means you are arranging items in a row or a column. You can wrap to multiple lines, but the core thinking is still one direction at a time.\n\nGrid is mainly for two-dimensional layout. That means you are arranging items across rows and columns at the same time.\n\nA simple way to remember it:\n\n- Use Flexbox when the content itself should decide how space is shared along one direction.\n- Use Grid when the page or component needs a deliberate row-and-column structure.\n\nFor example, a button group, navigation bar, toolbar, avatar plus text row, or centered modal content is usually a Flexbox problem.\n\nA dashboard, pricing table, gallery, card layout, calendar, or page shell with named areas is often a Grid problem.",
-    "example": "Here is a Flexbox row:\n\n```css\n.toolbar {\n  display: flex;\n  align-items: center;\n  gap: 0.75rem;\n}\n\n.toolbar .search {\n  flex: 1;\n}\n```\n\nThis says: place the toolbar items in a row, align them vertically, leave a gap, and let the search field take remaining space. The exact width of each item can adapt to the content and available space.\n\nHere is a Grid layout:\n\n```css\n.dashboard {\n  display: grid;\n  grid-template-columns: 16rem 1fr;\n  grid-template-areas:\n    \"sidebar header\"\n    \"sidebar main\";\n}\n\n.sidebar {\n  grid-area: sidebar;\n}\n```\n\nThis says: create a defined page structure with columns and rows. The sidebar occupies a named area. The main content has a predictable position.\n\nThe difference is not about which syntax looks nicer. It is about the job. Flexbox is great when items flow along an axis. Grid is great when you are designing a layout map.",
-    "commonMistakes": "A common mistake is using Flexbox for a layout that really needs columns to line up across rows. Flexbox can wrap, but each line behaves independently. If you need consistent tracks across rows, Grid is usually cleaner.\n\nAnother mistake is using Grid for tiny one-axis alignment. A row with an icon, label, spacer, and button is often easier with Flexbox.\n\nAlso remember that layout should protect content. Avoid fixed widths unless you really need them. Use `minmax(0, 1fr)`, `auto-fit`, `min()`, `max()`, and responsive constraints so text and controls have room to behave on small screens."
-  },
-  {
-    "id": "fe-promises-async-await",
-    "track": "Frontend",
-    "category": "JavaScript",
-    "level": "Foundational",
-    "question": "Explain Promises and async/await in JavaScript.",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.\n\nThis is useful because frontend apps are full of waiting: waiting for a network request, waiting for a file to load, waiting for permission, waiting for an animation, or waiting for a database response from an API.\n\nA Promise has three states:\n\n- Pending: the work is still in progress.\n- Fulfilled: the work succeeded and produced a value.\n- Rejected: the work failed and produced an error reason.\n\nHere is a basic Promise chain:\n\n```js\nfetch(\"/api/user\")\n  .then((response) => response.json())\n  .then((user) => {\n    console.log(user.name);\n  })\n  .catch((error) => {\n    console.error(error);\n  });\n```\n\n`async` and `await` do not replace Promises. They give you a more readable way to work with Promises.\n\n```js\nasync function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n    const user = await response.json();\n    console.log(user.name);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```\n\nThe important idea is: `await` pauses the async function until the Promise settles, but it does not freeze the whole browser."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Suppose a user opens a profile page. The app asks the server for profile data.\n\n```js\nasync function getProfile(userId) {\n  const response = await fetch(`/api/users/${userId}`);\n\n  if (!response.ok) {\n    throw new Error(\"Could not load profile\");\n  }\n\n  return response.json();\n}\n```\n\nWhen JavaScript reaches `await fetch(...)`, the async function waits for that Promise. Other browser work can continue. The user can still move the mouse. Other events can still be scheduled. JavaScript is not sitting in a blocking loop.\n\nIf the request succeeds, execution continues and `response` is available. If the Promise rejects, control jumps to the nearest `catch`.\n\n```js\nasync function showProfile(userId) {\n  try {\n    const profile = await getProfile(userId);\n    renderProfile(profile);\n  } catch (error) {\n    renderError(\"We could not load this profile.\");\n  }\n}\n```\n\nThis reads like normal step-by-step code, but it is still Promise-based underneath."
-      },
-      {
-        "title": "Make it practical",
-        "body": "The main frontend skill is not just knowing syntax. It is knowing what should happen in each state.\n\nWhen loading data, the UI usually needs:\n\n1. A loading state while the Promise is pending.\n2. A success state when data arrives.\n3. An error state when the request fails.\n4. A retry or recovery path if the user can try again.\n\n```jsx\nfunction Profile({ userId }) {\n  const [state, setState] = useState({ status: \"loading\" });\n\n  useEffect(() => {\n    let ignore = false;\n\n    async function load() {\n      try {\n        const profile = await getProfile(userId);\n        if (!ignore) setState({ status: \"success\", profile });\n      } catch (error) {\n        if (!ignore) setState({ status: \"error\" });\n      }\n    }\n\n    load();\n\n    return () => {\n      ignore = true;\n    };\n  }, [userId]);\n\n  if (state.status === \"loading\") return <p>Loading...</p>;\n  if (state.status === \"error\") return <p>Could not load profile.</p>;\n  return <h1>{state.profile.name}</h1>;\n}\n```\n\nThis example also shows a real bug to avoid: stale async results. If `userId` changes before the first request finishes, you do not want the old request to overwrite the new page state."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is forgetting to return or await a Promise. If you call an async function without awaiting it, the surrounding code continues immediately.\n\nAnother mistake is using `try/catch` but only wrapping synchronous code. Errors from awaited Promises are caught by `try/catch`, but errors from Promises you do not await may escape that block.\n\nA third mistake is accidentally running async work one at a time when it could run in parallel.\n\n```js\nconst user = await fetchUser();\nconst teams = await fetchTeams();\n```\n\nIf those two requests do not depend on each other, this may be slower than:\n\n```js\nconst [user, teams] = await Promise.all([fetchUser(), fetchTeams()]);\n```"
-      }
-    ],
-    "answer": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.",
-    "reasoning": "The main frontend skill is not just knowing syntax. It is knowing what should happen in each state.\n\nWhen loading data, the UI usually needs:\n\n1. A loading state while the Promise is pending.\n2. A success state when data arrives.\n3. An error state when the request fails.\n4. A retry or recovery path if the user can try again.\n\n```jsx\nfunction Profile({ userId }) {\n  const [state, setState] = useState({ status: \"loading\" });\n\n  useEffect(() => {\n    let ignore = false;\n\n    async function load() {\n      try {\n        const profile = await getProfile(userId);\n        if (!ignore) setState({ status: \"success\", profile });\n      } catch (error) {\n        if (!ignore) setState({ status: \"error\" });\n      }\n    }\n\n    load();\n\n    return () => {\n      ignore = true;\n    };\n  }, [userId]);\n\n  if (state.status === \"loading\") return <p>Loading...</p>;\n  if (state.status === \"error\") return <p>Could not load profile.</p>;\n  return <h1>{state.profile.name}</h1>;\n}\n```\n\nThis example also shows a real bug to avoid: stale async results. If `userId` changes before the first request finishes, you do not want the old request to overwrite the new page state.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What are the three Promise states?",
-      "What does `await` actually wait for?",
-      "Does `await` block the whole browser?",
-      "Why does UI need loading, success, and error states?",
-      "When should you use `Promise.all`?"
-    ],
-    "interviewAnswer": "A Promise represents an asynchronous result that is pending, fulfilled, or rejected. `async/await` is syntax for writing Promise-based code in a more sequential style. `await` pauses the async function until the Promise settles, but it does not block the whole browser thread.\n\nA strong frontend answer should connect Promises to UI states: loading, success, error, retry, cancellation or stale-result handling, and parallel work with `Promise.all` when requests do not depend on each other.",
-    "sourceLinks": [
-      {
-        "label": "MDN: Promise",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
-      },
-      {
-        "label": "MDN: async function",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
-      }
-    ],
-    "beginnerExplanation": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.\n\nThis is useful because frontend apps are full of waiting: waiting for a network request, waiting for a file to load, waiting for permission, waiting for an animation, or waiting for a database response from an API.\n\nA Promise has three states:\n\n- Pending: the work is still in progress.\n- Fulfilled: the work succeeded and produced a value.\n- Rejected: the work failed and produced an error reason.\n\nHere is a basic Promise chain:\n\n```js\nfetch(\"/api/user\")\n  .then((response) => response.json())\n  .then((user) => {\n    console.log(user.name);\n  })\n  .catch((error) => {\n    console.error(error);\n  });\n```\n\n`async` and `await` do not replace Promises. They give you a more readable way to work with Promises.\n\n```js\nasync function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n    const user = await response.json();\n    console.log(user.name);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```\n\nThe important idea is: `await` pauses the async function until the Promise settles, but it does not freeze the whole browser.",
-    "example": "Suppose a user opens a profile page. The app asks the server for profile data.\n\n```js\nasync function getProfile(userId) {\n  const response = await fetch(`/api/users/${userId}`);\n\n  if (!response.ok) {\n    throw new Error(\"Could not load profile\");\n  }\n\n  return response.json();\n}\n```\n\nWhen JavaScript reaches `await fetch(...)`, the async function waits for that Promise. Other browser work can continue. The user can still move the mouse. Other events can still be scheduled. JavaScript is not sitting in a blocking loop.\n\nIf the request succeeds, execution continues and `response` is available. If the Promise rejects, control jumps to the nearest `catch`.\n\n```js\nasync function showProfile(userId) {\n  try {\n    const profile = await getProfile(userId);\n    renderProfile(profile);\n  } catch (error) {\n    renderError(\"We could not load this profile.\");\n  }\n}\n```\n\nThis reads like normal step-by-step code, but it is still Promise-based underneath.",
-    "commonMistakes": "A common mistake is forgetting to return or await a Promise. If you call an async function without awaiting it, the surrounding code continues immediately.\n\nAnother mistake is using `try/catch` but only wrapping synchronous code. Errors from awaited Promises are caught by `try/catch`, but errors from Promises you do not await may escape that block.\n\nA third mistake is accidentally running async work one at a time when it could run in parallel.\n\n```js\nconst user = await fetchUser();\nconst teams = await fetchTeams();\n```\n\nIf those two requests do not depend on each other, this may be slower than:\n\n```js\nconst [user, teams] = await Promise.all([fetchUser(), fetchTeams()]);\n```"
-  },
-  {
-    "id": "fe-props-state",
-    "track": "Frontend",
-    "category": "React",
-    "level": "Foundational",
-    "question": "What is the difference between props and state in React?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Props and state are both data that affect what a React component renders. The difference is where the data comes from and who is allowed to change it.\n\nProps are data passed into a component by its parent.\n\nState is data a component owns and can update over time.\n\nThink of a component like a function that draws UI. Props are the arguments given to the function. State is the component's own memory between renders.\n\n```jsx\nfunction Greeting({ name }) {\n  return <h1>Hello, {name}</h1>;\n}\n```\n\nIn this example, `name` is a prop. `Greeting` does not decide the name. The parent decides it.\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return <button onClick={() => setCount(count + 1)}>{count}</button>;\n}\n```\n\nIn this example, `count` is state. `Counter` owns it and updates it when the user clicks."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Imagine a shopping cart page. The parent component may fetch the user's cart and pass each item into a `CartItem` component.\n\n```jsx\nfunction CartItem({ item }) {\n  return (\n    <li>\n      {item.name} - {item.quantity}\n    </li>\n  );\n}\n```\n\n`CartItem` receives `item` as a prop. It should not secretly rewrite the parent's cart data. It can ask the parent to change something by calling a callback prop.\n\n```jsx\nfunction CartItem({ item, onIncrease }) {\n  return (\n    <li>\n      {item.name}\n      <button onClick={() => onIncrease(item.id)}>+</button>\n    </li>\n  );\n}\n```\n\nNow `CartItem` is still not the owner of the cart. It reports the user's intent upward. The parent, which owns the cart state, decides how to update it.\n\nThis is the heart of React data flow: data usually moves down as props, and events or intentions move up through callback props."
-      },
-      {
-        "title": "Make it practical",
-        "body": "A good rule is: put state in the closest component that needs to own it, but lift it up when multiple components need to share it.\n\nIf only a dropdown needs to know whether it is open, local state is fine.\n\n```jsx\nfunction Menu() {\n  const [open, setOpen] = useState(false);\n  return <button onClick={() => setOpen(!open)}>Menu</button>;\n}\n```\n\nIf the open value affects the page header, sidebar, and content, the state probably belongs higher up.\n\nProps are also how you make components reusable. A `Button` component should not hard-code every label and action. It should receive them.\n\n```jsx\nfunction Button({ children, onClick }) {\n  return <button onClick={onClick}>{children}</button>;\n}\n```\n\nThe beginner mistake is thinking state is more powerful, so everything should become state. That creates duplicated truth. If a value can be calculated from props during render, calculate it instead of storing it again."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is mutating props. Props should be treated as read-only. If a child changes an object it received from a parent, the app can become hard to reason about.\n\nAnother mistake is copying props into state without a clear reason.\n\n```jsx\nfunction Profile({ user }) {\n  const [name, setName] = useState(user.name);\n}\n```\n\nThis may look fine, but now there are two places for the name: `user.name` and `name`. If the parent passes a different user later, the local state may not update the way you expect.\n\nA better question is: is this value truly local editable state, or am I just duplicating a prop?"
-      }
-    ],
-    "answer": "Props and state are both data that affect what a React component renders. The difference is where the data comes from and who is allowed to change it.",
-    "reasoning": "A good rule is: put state in the closest component that needs to own it, but lift it up when multiple components need to share it.\n\nIf only a dropdown needs to know whether it is open, local state is fine.\n\n```jsx\nfunction Menu() {\n  const [open, setOpen] = useState(false);\n  return <button onClick={() => setOpen(!open)}>Menu</button>;\n}\n```\n\nIf the open value affects the page header, sidebar, and content, the state probably belongs higher up.\n\nProps are also how you make components reusable. A `Button` component should not hard-code every label and action. It should receive them.\n\n```jsx\nfunction Button({ children, onClick }) {\n  return <button onClick={onClick}>{children}</button>;\n}\n```\n\nThe beginner mistake is thinking state is more powerful, so everything should become state. That creates duplicated truth. If a value can be calculated from props during render, calculate it instead of storing it again.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "Who passes props into a component?",
-      "Who updates state?",
-      "Why should props be treated as read-only?",
-      "What does \"data down, actions up\" mean?",
-      "When should state be lifted to a parent component?"
-    ],
-    "interviewAnswer": "Props are inputs passed from a parent component. State is data a component owns and can update over time. Props are read-only from the child's perspective, while state changes through state setters and triggers re-rendering.\n\nThe practical React pattern is data down and actions up: parents pass props down, children call callbacks to report user intent, and state lives at the closest common owner. A strong answer should warn against mutating props or copying props into state without a real reason.",
-    "sourceLinks": [
-      {
-        "label": "React: Passing props to a component",
-        "url": "https://react.dev/learn/passing-props-to-a-component"
-      },
-      {
-        "label": "React: State as a snapshot",
-        "url": "https://react.dev/learn/state-as-a-snapshot"
-      }
-    ],
-    "beginnerExplanation": "Props and state are both data that affect what a React component renders. The difference is where the data comes from and who is allowed to change it.\n\nProps are data passed into a component by its parent.\n\nState is data a component owns and can update over time.\n\nThink of a component like a function that draws UI. Props are the arguments given to the function. State is the component's own memory between renders.\n\n```jsx\nfunction Greeting({ name }) {\n  return <h1>Hello, {name}</h1>;\n}\n```\n\nIn this example, `name` is a prop. `Greeting` does not decide the name. The parent decides it.\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return <button onClick={() => setCount(count + 1)}>{count}</button>;\n}\n```\n\nIn this example, `count` is state. `Counter` owns it and updates it when the user clicks.",
-    "example": "Imagine a shopping cart page. The parent component may fetch the user's cart and pass each item into a `CartItem` component.\n\n```jsx\nfunction CartItem({ item }) {\n  return (\n    <li>\n      {item.name} - {item.quantity}\n    </li>\n  );\n}\n```\n\n`CartItem` receives `item` as a prop. It should not secretly rewrite the parent's cart data. It can ask the parent to change something by calling a callback prop.\n\n```jsx\nfunction CartItem({ item, onIncrease }) {\n  return (\n    <li>\n      {item.name}\n      <button onClick={() => onIncrease(item.id)}>+</button>\n    </li>\n  );\n}\n```\n\nNow `CartItem` is still not the owner of the cart. It reports the user's intent upward. The parent, which owns the cart state, decides how to update it.\n\nThis is the heart of React data flow: data usually moves down as props, and events or intentions move up through callback props.",
-    "commonMistakes": "A common mistake is mutating props. Props should be treated as read-only. If a child changes an object it received from a parent, the app can become hard to reason about.\n\nAnother mistake is copying props into state without a clear reason.\n\n```jsx\nfunction Profile({ user }) {\n  const [name, setName] = useState(user.name);\n}\n```\n\nThis may look fine, but now there are two places for the name: `user.name` and `name`. If the parent passes a different user later, the local state may not update the way you expect.\n\nA better question is: is this value truly local editable state, or am I just duplicating a prop?"
-  },
-  {
-    "id": "fe-react-keys",
-    "track": "Frontend",
-    "category": "React",
-    "level": "Intermediate",
-    "question": "Why are keys important when rendering lists in React?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Keys help React understand which item is which when a list changes.\n\nWhen React renders a list, it does not only see text on the screen. It also has component instances, DOM nodes, input state, focus, and sometimes local component state attached to each item. If the list changes, React needs to match the old items to the new items.\n\nThe key is the stable identity for each item.\n\n```jsx\nconst rows = users.map((user) => (\n  <UserRow key={user.id} user={user} />\n));\n```\n\nHere, `user.id` tells React that this row belongs to this specific user. If the list is sorted, filtered, inserted into, or deleted from, React can still match each row to the same user identity.\n\nWithout good keys, React may reuse the wrong row. That can cause visual bugs, wrong input values, lost state, strange animations, or focus jumping."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Imagine a list of editable todo items.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo, index) => (\n    <TodoRow key={index} todo={todo} />\n  ));\n}\n```\n\nUsing `index` looks harmless when the list never changes. But if a new todo is inserted at the top, every old item gets a new index.\n\nBefore insert:\n\n1. Buy milk has key `0`.\n2. Pay rent has key `1`.\n\nAfter insert:\n\n1. Call bank has key `0`.\n2. Buy milk has key `1`.\n3. Pay rent has key `2`.\n\nReact sees key `0` and thinks the first row identity stayed the same, even though the actual todo changed from Buy milk to Call bank. If `TodoRow` has local state, React may preserve that state on the wrong todo.\n\nWith stable IDs, the identity stays attached to the data.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo) => (\n    <TodoRow key={todo.id} todo={todo} />\n  ));\n}\n```\n\nNow inserting, deleting, or sorting does not confuse item identity."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Use IDs from your data whenever possible: database IDs, slugs, stable UUIDs, or another value that uniquely identifies that item among its siblings.\n\nKeys only need to be unique among siblings in the same list. They do not need to be globally unique across the entire app.\n\nAvoid generating keys during render with `Math.random()` or a new UUID call. That gives React a different key every render, so React treats every item as brand new. That can destroy local state and create unnecessary DOM work.\n\n```jsx\n// Bad: a new key every render.\nitems.map((item) => <Row key={crypto.randomUUID()} item={item} />);\n\n// Good: the key comes from stable item identity.\nitems.map((item) => <Row key={item.id} item={item} />);\n```\n\nThere are rare cases where index keys are acceptable: a static list that never reorders, inserts, deletes, filters, or stores local item state. But in interview and production thinking, stable data IDs are the default answer."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is thinking keys are passed as normal props. They are not. React uses `key` internally. If the child component needs the ID, pass it separately.\n\n```jsx\n<UserRow key={user.id} userId={user.id} />\n```\n\nAnother mistake is thinking keys only affect performance. They affect correctness too. Bad keys can attach state to the wrong item.\n\nA third mistake is using the array index because it removes a warning. Removing the warning is not the goal. Giving React stable identity is the goal."
-      }
-    ],
-    "answer": "Keys help React understand which item is which when a list changes.",
-    "reasoning": "Use IDs from your data whenever possible: database IDs, slugs, stable UUIDs, or another value that uniquely identifies that item among its siblings.\n\nKeys only need to be unique among siblings in the same list. They do not need to be globally unique across the entire app.\n\nAvoid generating keys during render with `Math.random()` or a new UUID call. That gives React a different key every render, so React treats every item as brand new. That can destroy local state and create unnecessary DOM work.\n\n```jsx\n// Bad: a new key every render.\nitems.map((item) => <Row key={crypto.randomUUID()} item={item} />);\n\n// Good: the key comes from stable item identity.\nitems.map((item) => <Row key={item.id} item={item} />);\n```\n\nThere are rare cases where index keys are acceptable: a static list that never reorders, inserts, deletes, filters, or stores local item state. But in interview and production thinking, stable data IDs are the default answer.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What does a key tell React?",
-      "Why can array indexes break when items are inserted or sorted?",
-      "Why is `Math.random()` a bad key?",
-      "Do keys need to be globally unique across the app?",
-      "How do keys relate to preserving or resetting component state?"
-    ],
-    "interviewAnswer": "Keys give React stable identity for items in a list so it can match previous and next renders correctly. Good keys help React preserve the right DOM and component state when items are inserted, removed, filtered, or reordered.\n\nI would use stable IDs from the data. I would avoid indexes for dynamic lists and avoid random keys because they change every render. A strong answer should mention that keys are about correctness and identity, not only performance.",
-    "sourceLinks": [
-      {
-        "label": "React: Rendering lists",
-        "url": "https://react.dev/learn/rendering-lists"
-      },
-      {
-        "label": "React: Preserving and resetting state",
-        "url": "https://react.dev/learn/preserving-and-resetting-state"
-      }
-    ],
-    "beginnerExplanation": "Keys help React understand which item is which when a list changes.\n\nWhen React renders a list, it does not only see text on the screen. It also has component instances, DOM nodes, input state, focus, and sometimes local component state attached to each item. If the list changes, React needs to match the old items to the new items.\n\nThe key is the stable identity for each item.\n\n```jsx\nconst rows = users.map((user) => (\n  <UserRow key={user.id} user={user} />\n));\n```\n\nHere, `user.id` tells React that this row belongs to this specific user. If the list is sorted, filtered, inserted into, or deleted from, React can still match each row to the same user identity.\n\nWithout good keys, React may reuse the wrong row. That can cause visual bugs, wrong input values, lost state, strange animations, or focus jumping.",
-    "example": "Imagine a list of editable todo items.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo, index) => (\n    <TodoRow key={index} todo={todo} />\n  ));\n}\n```\n\nUsing `index` looks harmless when the list never changes. But if a new todo is inserted at the top, every old item gets a new index.\n\nBefore insert:\n\n1. Buy milk has key `0`.\n2. Pay rent has key `1`.\n\nAfter insert:\n\n1. Call bank has key `0`.\n2. Buy milk has key `1`.\n3. Pay rent has key `2`.\n\nReact sees key `0` and thinks the first row identity stayed the same, even though the actual todo changed from Buy milk to Call bank. If `TodoRow` has local state, React may preserve that state on the wrong todo.\n\nWith stable IDs, the identity stays attached to the data.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo) => (\n    <TodoRow key={todo.id} todo={todo} />\n  ));\n}\n```\n\nNow inserting, deleting, or sorting does not confuse item identity.",
-    "commonMistakes": "A common mistake is thinking keys are passed as normal props. They are not. React uses `key` internally. If the child component needs the ID, pass it separately.\n\n```jsx\n<UserRow key={user.id} userId={user.id} />\n```\n\nAnother mistake is thinking keys only affect performance. They affect correctness too. Bad keys can attach state to the wrong item.\n\nA third mistake is using the array index because it removes a warning. Removing the warning is not the goal. Giving React stable identity is the goal."
-  },
-  {
-    "id": "fe-react-rerenders",
-    "track": "Frontend",
-    "category": "React",
-    "level": "Intermediate",
-    "question": "What causes React components to re-render?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.\n\nThe beginner mistake is thinking a render always means the DOM changed. Rendering is calculation. After rendering, React compares the new result to the previous result and commits the necessary DOM changes.\n\nComponents re-render when their state changes, their parent renders, or context they use changes. Props are part of the parent render path: if a parent renders, React may call the child again with the current props."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Here is a simple example:\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  console.log(\"render\");\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      {count}\n    </button>\n  );\n}\n```\n\nClicking the button updates state. React calls `Counter` again. The new render returns UI with the new count.\n\nParent renders can also cause child renders:\n\n```jsx\nfunction Parent() {\n  const [theme, setTheme] = useState(\"light\");\n\n  return <Child />;\n}\n```\n\nIf `theme` changes, `Parent` renders again. `Child` may also be called again even if its props did not change. That is not automatically a bug. React rendering should be pure and cheap enough that normal renders are fine."
-      },
-      {
-        "title": "Make it practical",
-        "body": "The right question is not \"how do I stop all renders?\" The right question is \"which renders are expensive or causing visible problems?\"\n\nCommon tools:\n\n- Move state down so only the component that needs it re-renders.\n- Split large components into smaller components.\n- Use `React.memo` when a child receives stable props and rendering it is expensive.\n- Use `useMemo` for expensive derived calculations.\n- Use `useCallback` when function identity causes memoized children to re-render.\n- Avoid putting frequently changing values in broad context providers.\n\n```jsx\nconst UserRow = React.memo(function UserRow({ user, onSelect }) {\n  return <button onClick={() => onSelect(user.id)}>{user.name}</button>;\n});\n```\n\nMemoization is not free. It adds comparison work and complexity. Use it when there is a measured or obvious reason."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is treating every re-render as bad. Many renders are harmless.\n\nAnother mistake is memoizing everything. That can make code harder to understand without improving performance.\n\nA third mistake is mutating objects. If you mutate state in place, React may not see a meaningful change, and memoized components may behave incorrectly.\n\nAlso remember that render should be pure. Do not start network requests, change DOM manually, or write to storage during render."
-      }
-    ],
-    "answer": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.",
-    "reasoning": "The right question is not \"how do I stop all renders?\" The right question is \"which renders are expensive or causing visible problems?\"\n\nCommon tools:\n\n- Move state down so only the component that needs it re-renders.\n- Split large components into smaller components.\n- Use `React.memo` when a child receives stable props and rendering it is expensive.\n- Use `useMemo` for expensive derived calculations.\n- Use `useCallback` when function identity causes memoized children to re-render.\n- Avoid putting frequently changing values in broad context providers.\n\n```jsx\nconst UserRow = React.memo(function UserRow({ user, onSelect }) {\n  return <button onClick={() => onSelect(user.id)}>{user.name}</button>;\n});\n```\n\nMemoization is not free. It adds comparison work and complexity. Use it when there is a measured or obvious reason.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What is React doing during render?",
-      "Does every render change the DOM?",
-      "What causes a component to re-render?",
-      "Why should render logic be pure?",
-      "When is memoization useful?"
-    ],
-    "interviewAnswer": "React components re-render when state changes, a parent renders, or consumed context changes. Rendering means React calls the component to calculate the next UI; it does not always mean the DOM changed.\n\nA strong answer should explain render versus commit, purity, parent-child render behavior, and practical optimization tools like moving state down, splitting components, memoization, and avoiding overly broad context updates.",
-    "sourceLinks": [
-      {
-        "label": "React: Render and commit",
-        "url": "https://react.dev/learn/render-and-commit"
-      },
-      {
-        "label": "React: Keeping components pure",
-        "url": "https://react.dev/learn/keeping-components-pure"
-      }
-    ],
-    "beginnerExplanation": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.\n\nThe beginner mistake is thinking a render always means the DOM changed. Rendering is calculation. After rendering, React compares the new result to the previous result and commits the necessary DOM changes.\n\nComponents re-render when their state changes, their parent renders, or context they use changes. Props are part of the parent render path: if a parent renders, React may call the child again with the current props.",
-    "example": "Here is a simple example:\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  console.log(\"render\");\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      {count}\n    </button>\n  );\n}\n```\n\nClicking the button updates state. React calls `Counter` again. The new render returns UI with the new count.\n\nParent renders can also cause child renders:\n\n```jsx\nfunction Parent() {\n  const [theme, setTheme] = useState(\"light\");\n\n  return <Child />;\n}\n```\n\nIf `theme` changes, `Parent` renders again. `Child` may also be called again even if its props did not change. That is not automatically a bug. React rendering should be pure and cheap enough that normal renders are fine.",
-    "commonMistakes": "A common mistake is treating every re-render as bad. Many renders are harmless.\n\nAnother mistake is memoizing everything. That can make code harder to understand without improving performance.\n\nA third mistake is mutating objects. If you mutate state in place, React may not see a meaningful change, and memoized components may behave incorrectly.\n\nAlso remember that render should be pure. Do not start network requests, change DOM manually, or write to storage during render."
-  },
-  {
-    "id": "fe-semantic-html",
-    "track": "Frontend",
-    "category": "Accessibility",
-    "level": "Foundational",
-    "question": "Why does semantic HTML matter?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Semantic HTML means using HTML elements according to their meaning, not only their appearance.\n\nA `<button>` means an action can be triggered. An `<a>` means navigation to another location. A `<nav>` means a navigation region. A `<main>` means the main content of the page. A `<form>` means a set of controls can be submitted. A heading means a section title.\n\nThis matters because the browser, screen readers, keyboard users, search engines, password managers, form tools, and testing tools all understand meaning from HTML.\n\nIf you use the right element, you get useful behavior for free. A real button can be focused with the keyboard. It responds to Enter and Space. It communicates itself as a button to assistive technology. It can be disabled. It participates in forms.\n\nIf you use a `<div>` and make it look like a button, you have to rebuild all of that behavior yourself.\n\n```html\n<button type=\"button\">Save changes</button>\n```\n\nThis is better than:\n\n```html\n<div class=\"button\">Save changes</div>\n```\n\nThe second version may look correct visually, but it has weak meaning and weak built-in behavior."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "The most common semantic decision is button versus link.\n\nUse a link when the user is going somewhere.\n\n```html\n<a href=\"/settings\">Account settings</a>\n```\n\nUse a button when the user is doing something on the current page.\n\n```html\n<button type=\"button\">Open menu</button>\n```\n\nThis distinction helps keyboard and screen reader users understand what will happen. It also helps the browser provide the right default behavior.\n\nHeadings are another major example. Headings create a document outline. A screen reader user can jump between headings to understand the page structure, similar to how a sighted user scans large text.\n\n```html\n<main>\n  <h1>Billing</h1>\n  <section>\n    <h2>Payment method</h2>\n  </section>\n  <section>\n    <h2>Invoices</h2>\n  </section>\n</main>\n```\n\nThis is much more understandable than a page made entirely of styled `<div>` elements."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Semantic HTML does not mean ugly HTML. You can style semantic elements however the design requires. The point is to start with the correct meaning, then style it.\n\nFor forms, connect labels to inputs.\n\n```html\n<label for=\"email\">Email address</label>\n<input id=\"email\" name=\"email\" type=\"email\" />\n```\n\nFor page structure, use landmarks.\n\n```html\n<header>...</header>\n<nav>...</nav>\n<main>...</main>\n<footer>...</footer>\n```\n\nFor interactive controls, prefer native elements before reaching for ARIA. ARIA can add accessibility information, but it does not automatically add all native keyboard behavior. A custom div with `role=\"button\"` still needs keyboard handling, focus styling, disabled behavior, and careful testing.\n\nThe best practical mindset is: choose the HTML element that already means what the UI does."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is using clickable divs everywhere because they are easy to style. That creates keyboard and assistive technology problems.\n\nAnother mistake is using ARIA to cover up incorrect HTML. ARIA is powerful, but native semantic elements are usually more reliable.\n\nA third mistake is choosing elements based on visual style. A link can look like a button. A button can look like an icon. Meaning should come from behavior, not appearance."
-      }
-    ],
-    "answer": "Semantic HTML means using HTML elements according to their meaning, not only their appearance.",
-    "reasoning": "Semantic HTML does not mean ugly HTML. You can style semantic elements however the design requires. The point is to start with the correct meaning, then style it.\n\nFor forms, connect labels to inputs.\n\n```html\n<label for=\"email\">Email address</label>\n<input id=\"email\" name=\"email\" type=\"email\" />\n```\n\nFor page structure, use landmarks.\n\n```html\n<header>...</header>\n<nav>...</nav>\n<main>...</main>\n<footer>...</footer>\n```\n\nFor interactive controls, prefer native elements before reaching for ARIA. ARIA can add accessibility information, but it does not automatically add all native keyboard behavior. A custom div with `role=\"button\"` still needs keyboard handling, focus styling, disabled behavior, and careful testing.\n\nThe best practical mindset is: choose the HTML element that already means what the UI does.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What does semantic HTML mean?",
-      "When should you use a link instead of a button?",
-      "Why are headings important for navigation?",
-      "Why is a native button better than a clickable div?",
-      "Why should ARIA not be your first tool for normal controls?"
-    ],
-    "interviewAnswer": "Semantic HTML means using elements for their real meaning and behavior. It improves accessibility, keyboard support, browser behavior, maintainability, and tooling because the platform understands what the UI is.\n\nI would use links for navigation, buttons for actions, labels for inputs, headings for structure, and landmarks for page regions. A strong answer should mention that native elements give built-in behavior that custom divs and ARIA often require you to recreate manually.",
-    "sourceLinks": [
-      {
-        "label": "MDN: HTML elements reference",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements"
-      },
-      {
-        "label": "WAI-ARIA APG: Read me first",
-        "url": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/"
-      }
-    ],
-    "beginnerExplanation": "Semantic HTML means using HTML elements according to their meaning, not only their appearance.\n\nA `<button>` means an action can be triggered. An `<a>` means navigation to another location. A `<nav>` means a navigation region. A `<main>` means the main content of the page. A `<form>` means a set of controls can be submitted. A heading means a section title.\n\nThis matters because the browser, screen readers, keyboard users, search engines, password managers, form tools, and testing tools all understand meaning from HTML.\n\nIf you use the right element, you get useful behavior for free. A real button can be focused with the keyboard. It responds to Enter and Space. It communicates itself as a button to assistive technology. It can be disabled. It participates in forms.\n\nIf you use a `<div>` and make it look like a button, you have to rebuild all of that behavior yourself.\n\n```html\n<button type=\"button\">Save changes</button>\n```\n\nThis is better than:\n\n```html\n<div class=\"button\">Save changes</div>\n```\n\nThe second version may look correct visually, but it has weak meaning and weak built-in behavior.",
-    "example": "The most common semantic decision is button versus link.\n\nUse a link when the user is going somewhere.\n\n```html\n<a href=\"/settings\">Account settings</a>\n```\n\nUse a button when the user is doing something on the current page.\n\n```html\n<button type=\"button\">Open menu</button>\n```\n\nThis distinction helps keyboard and screen reader users understand what will happen. It also helps the browser provide the right default behavior.\n\nHeadings are another major example. Headings create a document outline. A screen reader user can jump between headings to understand the page structure, similar to how a sighted user scans large text.\n\n```html\n<main>\n  <h1>Billing</h1>\n  <section>\n    <h2>Payment method</h2>\n  </section>\n  <section>\n    <h2>Invoices</h2>\n  </section>\n</main>\n```\n\nThis is much more understandable than a page made entirely of styled `<div>` elements.",
-    "commonMistakes": "A common mistake is using clickable divs everywhere because they are easy to style. That creates keyboard and assistive technology problems.\n\nAnother mistake is using ARIA to cover up incorrect HTML. ARIA is powerful, but native semantic elements are usually more reliable.\n\nA third mistake is choosing elements based on visual style. A link can look like a button. A button can look like an icon. Meaning should come from behavior, not appearance."
-  },
-  {
-    "id": "fe-testing-confidence",
-    "track": "Frontend",
-    "category": "Testing",
-    "level": "Intermediate",
-    "question": "What should you test in a frontend app?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Frontend testing is not about proving every line of code exists. It is about gaining confidence that important user behavior works.\n\nA beginner often starts by asking, \"Which functions should I test?\" A better question is, \"What would hurt the user or business if it broke?\"\n\nFor a login form, the important behavior is not that a `setEmail` function was called. The important behavior is that the user can enter credentials, submit the form, see loading feedback, handle invalid credentials, and reach the next screen on success.\n\nGood frontend tests usually focus on behavior visible to the user:\n\n- What the user can see.\n- What the user can type, click, select, or submit.\n- What changes after an action.\n- What happens when the server succeeds or fails.\n- What accessibility roles and labels expose to assistive technology.\n\nThis is why Testing Library encourages tests that resemble how users interact with the app."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Imagine this login form:\n\n```jsx\nfunction LoginForm({ onSubmit }) {\n  return (\n    <form onSubmit={onSubmit}>\n      <label htmlFor=\"email\">Email</label>\n      <input id=\"email\" name=\"email\" />\n\n      <label htmlFor=\"password\">Password</label>\n      <input id=\"password\" name=\"password\" type=\"password\" />\n\n      <button>Sign in</button>\n    </form>\n  );\n}\n```\n\nA user-focused test would find elements the way a user or assistive technology would.\n\n```jsx\nconst user = userEvent.setup();\n\nrender(<LoginForm onSubmit={handleSubmit} />);\n\nawait user.type(screen.getByLabelText(/email/i), \"ada@example.com\");\nawait user.type(screen.getByLabelText(/password/i), \"secret\");\nawait user.click(screen.getByRole(\"button\", { name: /sign in/i }));\n\nexpect(handleSubmit).toHaveBeenCalled();\n```\n\nNotice the selectors: label text and role. That encourages accessible HTML. If your test cannot find the input by label, maybe the user cannot understand it either.\n\nFor data loading, you can mock the network at the request level instead of mocking every internal function. Tools like Mock Service Worker let the component behave as if it is talking to a real API, while the test controls the response."
-      },
-      {
-        "title": "Make it practical",
-        "body": "A healthy frontend test strategy has layers.\n\nUse unit tests for pure logic: formatting, validation rules, reducers, small utilities, and edge cases that are easy to isolate.\n\nUse component or integration tests for user flows inside a screen: forms, modals, filters, empty states, loading states, errors, permissions, and data rendering.\n\nUse end-to-end tests for the highest-value journeys across the app: signup, checkout, money transfer, onboarding, or any flow where many systems must work together.\n\nThe more a test resembles real user behavior, the more confidence it gives, but it may also be slower and more expensive. The trick is balance. Do not write only tiny tests that miss real behavior. Do not write only end-to-end tests that are slow and brittle.\n\nFor an interview, it is good to say what you would test and why. For example: \"I would test the successful path, the validation errors, the server failure, the loading state, and the keyboard-accessible controls because those are the states a real user depends on.\""
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is testing implementation details. If a test breaks because you renamed an internal function but the user behavior still works, the test may be too coupled to the implementation.\n\nAnother mistake is only testing the happy path. Real users see loading, empty, error, disabled, unauthenticated, and slow-network states.\n\nA third mistake is snapshotting large trees and treating the snapshot as confidence. Snapshots can catch accidental markup changes, but they often do not prove the user can complete a task."
-      }
-    ],
-    "answer": "Frontend testing is not about proving every line of code exists. It is about gaining confidence that important user behavior works.",
-    "reasoning": "A healthy frontend test strategy has layers.\n\nUse unit tests for pure logic: formatting, validation rules, reducers, small utilities, and edge cases that are easy to isolate.\n\nUse component or integration tests for user flows inside a screen: forms, modals, filters, empty states, loading states, errors, permissions, and data rendering.\n\nUse end-to-end tests for the highest-value journeys across the app: signup, checkout, money transfer, onboarding, or any flow where many systems must work together.\n\nThe more a test resembles real user behavior, the more confidence it gives, but it may also be slower and more expensive. The trick is balance. Do not write only tiny tests that miss real behavior. Do not write only end-to-end tests that are slow and brittle.\n\nFor an interview, it is good to say what you would test and why. For example: \"I would test the successful path, the validation errors, the server failure, the loading state, and the keyboard-accessible controls because those are the states a real user depends on.\"",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What is the main purpose of frontend tests?",
-      "Why are role and label queries useful?",
-      "What kinds of behavior belong in component tests?",
-      "When would an end-to-end test be worth it?",
-      "Why can implementation-detail tests become brittle?"
-    ],
-    "interviewAnswer": "I would test frontend behavior that matters to users: rendering important content, completing key interactions, validation, loading states, error states, accessibility labels and roles, and server success or failure. I would use unit tests for pure logic, component tests for screen behavior, and end-to-end tests for critical journeys.\n\nThe strongest answer is not \"test everything.\" It is \"test the things whose failure would hurt the user, and write those tests in a way that resembles how the user experiences the product.\"",
-    "sourceLinks": [
-      {
-        "label": "Testing Library: Guiding principles",
-        "url": "https://testing-library.com/docs/guiding-principles"
-      },
-      {
-        "label": "Mock Service Worker: Documentation",
-        "url": "https://mswjs.io/docs/"
-      }
-    ],
-    "beginnerExplanation": "Frontend testing is not about proving every line of code exists. It is about gaining confidence that important user behavior works.\n\nA beginner often starts by asking, \"Which functions should I test?\" A better question is, \"What would hurt the user or business if it broke?\"\n\nFor a login form, the important behavior is not that a `setEmail` function was called. The important behavior is that the user can enter credentials, submit the form, see loading feedback, handle invalid credentials, and reach the next screen on success.\n\nGood frontend tests usually focus on behavior visible to the user:\n\n- What the user can see.\n- What the user can type, click, select, or submit.\n- What changes after an action.\n- What happens when the server succeeds or fails.\n- What accessibility roles and labels expose to assistive technology.\n\nThis is why Testing Library encourages tests that resemble how users interact with the app.",
-    "example": "Imagine this login form:\n\n```jsx\nfunction LoginForm({ onSubmit }) {\n  return (\n    <form onSubmit={onSubmit}>\n      <label htmlFor=\"email\">Email</label>\n      <input id=\"email\" name=\"email\" />\n\n      <label htmlFor=\"password\">Password</label>\n      <input id=\"password\" name=\"password\" type=\"password\" />\n\n      <button>Sign in</button>\n    </form>\n  );\n}\n```\n\nA user-focused test would find elements the way a user or assistive technology would.\n\n```jsx\nconst user = userEvent.setup();\n\nrender(<LoginForm onSubmit={handleSubmit} />);\n\nawait user.type(screen.getByLabelText(/email/i), \"ada@example.com\");\nawait user.type(screen.getByLabelText(/password/i), \"secret\");\nawait user.click(screen.getByRole(\"button\", { name: /sign in/i }));\n\nexpect(handleSubmit).toHaveBeenCalled();\n```\n\nNotice the selectors: label text and role. That encourages accessible HTML. If your test cannot find the input by label, maybe the user cannot understand it either.\n\nFor data loading, you can mock the network at the request level instead of mocking every internal function. Tools like Mock Service Worker let the component behave as if it is talking to a real API, while the test controls the response.",
-    "commonMistakes": "A common mistake is testing implementation details. If a test breaks because you renamed an internal function but the user behavior still works, the test may be too coupled to the implementation.\n\nAnother mistake is only testing the happy path. Real users see loading, empty, error, disabled, unauthenticated, and slow-network states.\n\nA third mistake is snapshotting large trees and treating the snapshot as confidence. Snapshots can catch accidental markup changes, but they often do not prove the user can complete a task."
-  },
-  {
-    "id": "fe-use-effect",
-    "track": "Frontend",
-    "category": "React",
-    "level": "Intermediate",
-    "question": "What should go in useEffect?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "`useEffect` is easier to understand when you first separate three kinds of code inside a React component.\n\nFirst, there is rendering code. Rendering code calculates what the UI should look like from the current props and state. It should be pure. That means it should not change the outside world. It should not start network requests, modify DOM nodes, subscribe to services, or set timers.\n\nSecond, there are event handlers. Event handlers run because a specific user action happened: a click, a form submit, a key press, a selection. If the work is caused by a particular user action, it usually belongs in the event handler.\n\nThird, there are Effects. Effects are for synchronizing React with something outside React because the component is now on the screen or because some rendered state changed. This is why React calls Effects an escape hatch.\n\nSo the simple rule is: `useEffect` should not be your default place for logic. It should be used when React needs to coordinate with an external system after rendering."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "Imagine a video player component:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  if (isPlaying) {\n    ref.current.play();\n  } else {\n    ref.current.pause();\n  }\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nThis is wrong because render is trying to control a DOM node. During render, React is still calculating the UI. The DOM node may not even be ready yet. Rendering should describe the video element, not imperatively play or pause it.\n\nThe Effect version synchronizes after React commits the UI:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  useEffect(() => {\n    if (isPlaying) {\n      ref.current.play();\n    } else {\n      ref.current.pause();\n    }\n  }, [isPlaying]);\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nNow the component says: after this render is on screen, make the real browser video element match the React state.\n\nThat is the right mental model. An Effect is not simply code that runs after render. It is code that keeps an external system in sync with what React rendered."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Good Effect use cases include connecting to a chat server, subscribing to browser events, starting and clearing timers, controlling a non-React widget, manually interacting with a DOM API, and sometimes fetching data when a framework does not provide a better data-fetching layer.\n\nBad Effect use cases often involve derived state. If you can calculate a value from props or state during render, do that instead.\n\nAvoid this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const [fullName, setFullName] = useState(\"\");\n\n  useEffect(() => {\n    setFullName(`${firstName} ${lastName}`);\n  }, [firstName, lastName]);\n}\n```\n\nThis creates duplicated truth. React renders once with an old `fullName`, then the Effect runs, then React renders again.\n\nPrefer this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const fullName = `${firstName} ${lastName}`;\n}\n```\n\nNo Effect is needed because no external system is involved."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "The biggest mistake is using Effects to repair state that should not exist. If a value can be derived during render, storing it separately creates synchronization bugs.\n\nAnother mistake is forgetting cleanup. If an Effect subscribes, it should unsubscribe. If it starts a timer, it should clear the timer. If it starts async work, it should handle cancellation or ignore stale results.\n\nDevelopers are also surprised when Effects run twice in development Strict Mode. React does this to reveal Effects that are not resilient to being started, cleaned up, and started again."
-      }
-    ],
-    "answer": "`useEffect` is easier to understand when you first separate three kinds of code inside a React component.",
-    "reasoning": "Good Effect use cases include connecting to a chat server, subscribing to browser events, starting and clearing timers, controlling a non-React widget, manually interacting with a DOM API, and sometimes fetching data when a framework does not provide a better data-fetching layer.\n\nBad Effect use cases often involve derived state. If you can calculate a value from props or state during render, do that instead.\n\nAvoid this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const [fullName, setFullName] = useState(\"\");\n\n  useEffect(() => {\n    setFullName(`${firstName} ${lastName}`);\n  }, [firstName, lastName]);\n}\n```\n\nThis creates duplicated truth. React renders once with an old `fullName`, then the Effect runs, then React renders again.\n\nPrefer this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const fullName = `${firstName} ${lastName}`;\n}\n```\n\nNo Effect is needed because no external system is involved.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "Is this logic caused by rendering, or by a specific user event?",
-      "Is there an external system involved?",
-      "Can this value be calculated from existing props or state instead?",
-      "What cleanup should happen when inputs change or the component unmounts?",
-      "What bug appears if this Effect runs more than once in development?"
-    ],
-    "interviewAnswer": "`useEffect` should be used to synchronize React with external systems after rendering: browser APIs, network connections, subscriptions, timers, imperative widgets, or DOM APIs. It should not be the default place for deriving state or responding to direct user actions.\n\nA strong answer separates render logic, event-handler logic, and Effect logic. It also mentions dependencies, cleanup, stale closures, Strict Mode behavior, and the fact that many data-fetching problems are better handled by framework loaders or libraries than by hand-written Effects.",
-    "sourceLinks": [
-      {
-        "label": "React: Synchronizing with Effects",
-        "url": "https://react.dev/learn/synchronizing-with-effects"
-      },
-      {
-        "label": "React: You Might Not Need an Effect",
-        "url": "https://react.dev/learn/you-might-not-need-an-effect"
-      }
-    ],
-    "beginnerExplanation": "`useEffect` is easier to understand when you first separate three kinds of code inside a React component.\n\nFirst, there is rendering code. Rendering code calculates what the UI should look like from the current props and state. It should be pure. That means it should not change the outside world. It should not start network requests, modify DOM nodes, subscribe to services, or set timers.\n\nSecond, there are event handlers. Event handlers run because a specific user action happened: a click, a form submit, a key press, a selection. If the work is caused by a particular user action, it usually belongs in the event handler.\n\nThird, there are Effects. Effects are for synchronizing React with something outside React because the component is now on the screen or because some rendered state changed. This is why React calls Effects an escape hatch.\n\nSo the simple rule is: `useEffect` should not be your default place for logic. It should be used when React needs to coordinate with an external system after rendering.",
-    "example": "Imagine a video player component:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  if (isPlaying) {\n    ref.current.play();\n  } else {\n    ref.current.pause();\n  }\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nThis is wrong because render is trying to control a DOM node. During render, React is still calculating the UI. The DOM node may not even be ready yet. Rendering should describe the video element, not imperatively play or pause it.\n\nThe Effect version synchronizes after React commits the UI:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  useEffect(() => {\n    if (isPlaying) {\n      ref.current.play();\n    } else {\n      ref.current.pause();\n    }\n  }, [isPlaying]);\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nNow the component says: after this render is on screen, make the real browser video element match the React state.\n\nThat is the right mental model. An Effect is not simply code that runs after render. It is code that keeps an external system in sync with what React rendered.",
-    "commonMistakes": "The biggest mistake is using Effects to repair state that should not exist. If a value can be derived during render, storing it separately creates synchronization bugs.\n\nAnother mistake is forgetting cleanup. If an Effect subscribes, it should unsubscribe. If it starts a timer, it should clear the timer. If it starts async work, it should handle cancellation or ignore stale results.\n\nDevelopers are also surprised when Effects run twice in development Strict Mode. React does this to reveal Effects that are not resilient to being started, cleaned up, and started again."
-  },
-  {
-    "id": "fe-xss",
-    "track": "Frontend",
-    "category": "Security",
-    "level": "Intermediate",
-    "question": "What is cross-site scripting, and how do you prevent it?",
-    "lessonSections": [
-      {
-        "title": "Learn it",
-        "body": "Cross-site scripting, usually called XSS, happens when an attacker gets malicious JavaScript to run in another user's browser as if it belonged to your site.\n\nThat is dangerous because JavaScript running on your site can often read page content, make requests as the user, steal tokens if they are exposed, change what the user sees, or trick the user into taking actions.\n\nThe core problem is untrusted input becoming executable code.\n\nImagine a comment feature. A normal user writes:\n\n```txt\nGreat article.\n```\n\nAn attacker writes:\n\n```html\n<script>sendCookiesToAttacker()</script>\n```\n\nIf your app stores that comment and later renders it as real HTML, the browser may execute the attacker's script for every user who views the page.\n\nThe beginner-friendly rule is: user input should be treated as data, not as code."
-      },
-      {
-        "title": "Walkthrough",
-        "body": "In React, this is usually safe:\n\n```jsx\nfunction Comment({ text }) {\n  return <p>{text}</p>;\n}\n```\n\nIf `text` contains `<script>alert(\"bad\")</script>`, React escapes it. The browser displays it as text instead of executing it.\n\nThis is risky:\n\n```jsx\nfunction Comment({ html }) {\n  return <div dangerouslySetInnerHTML={{ __html: html }} />;\n}\n```\n\nThe name is deliberately scary because React is telling you: if this string contains unsafe HTML, the browser may treat it as real markup and script-capable content.\n\nXSS can also appear in URLs and attributes. A link that accepts any string from a user can become dangerous if it allows schemes like `javascript:`.\n\n```jsx\n<a href={userProvidedUrl}>Open profile</a>\n```\n\nThat does not mean links are always unsafe. It means URL values should be validated based on what the product expects."
-      },
-      {
-        "title": "Make it practical",
-        "body": "Preventing XSS usually requires several layers.\n\nFirst, escape output by default. Frameworks like React help when you render values as text.\n\nSecond, avoid rendering raw HTML from users. If the product truly needs rich text, sanitize it with a trusted sanitizer that removes dangerous tags and attributes. Do not write your own sanitizer casually.\n\nThird, validate URLs and other dangerous fields. If a profile link should be `https`, enforce that.\n\nFourth, use safe APIs. Prefer `textContent` over `innerHTML` when setting text manually.\n\n```js\nelement.textContent = userComment;\n```\n\nFifth, use Content Security Policy as an additional defense. CSP can reduce damage by limiting which scripts the browser is allowed to execute. It should not be your only protection, but it is valuable.\n\nIn a real app, I would also pay attention to where tokens are stored, whether cookies are `HttpOnly`, and whether third-party scripts are allowed to run on sensitive pages."
-      },
-      {
-        "title": "Common mistakes",
-        "body": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
-      }
-    ],
-    "answer": "Cross-site scripting, usually called XSS, happens when an attacker gets malicious JavaScript to run in another user's browser as if it belonged to your site.",
-    "reasoning": "Preventing XSS usually requires several layers.\n\nFirst, escape output by default. Frameworks like React help when you render values as text.\n\nSecond, avoid rendering raw HTML from users. If the product truly needs rich text, sanitize it with a trusted sanitizer that removes dangerous tags and attributes. Do not write your own sanitizer casually.\n\nThird, validate URLs and other dangerous fields. If a profile link should be `https`, enforce that.\n\nFourth, use safe APIs. Prefer `textContent` over `innerHTML` when setting text manually.\n\n```js\nelement.textContent = userComment;\n```\n\nFifth, use Content Security Policy as an additional defense. CSP can reduce damage by limiting which scripts the browser is allowed to execute. It should not be your only protection, but it is valuable.\n\nIn a real app, I would also pay attention to where tokens are stored, whether cookies are `HttpOnly`, and whether third-party scripts are allowed to run on sensitive pages.",
-    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
-    "followUps": [
-      "What does XSS let an attacker do?",
-      "Why is untrusted input becoming executable code dangerous?",
-      "Why is normal React text rendering safer than raw HTML insertion?",
-      "When would sanitization be needed?",
-      "Why is CSP a defense layer rather than the whole solution?"
-    ],
-    "interviewAnswer": "XSS is when attacker-controlled input runs as JavaScript in another user's browser under your site's trust. It can steal data, perform actions as the user, or alter the page.\n\nTo prevent it, render untrusted input as text, avoid raw HTML, sanitize rich text when truly needed, validate dangerous values like URLs, use safe DOM APIs, protect tokens, and add Content Security Policy as defense in depth. A strong answer should mention that React escapes text by default but does not remove every XSS risk.",
-    "sourceLinks": [
-      {
-        "label": "OWASP: Cross Site Scripting Prevention Cheat Sheet",
-        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
-      },
-      {
-        "label": "MDN: Content Security Policy",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP"
-      }
-    ],
-    "beginnerExplanation": "Cross-site scripting, usually called XSS, happens when an attacker gets malicious JavaScript to run in another user's browser as if it belonged to your site.\n\nThat is dangerous because JavaScript running on your site can often read page content, make requests as the user, steal tokens if they are exposed, change what the user sees, or trick the user into taking actions.\n\nThe core problem is untrusted input becoming executable code.\n\nImagine a comment feature. A normal user writes:\n\n```txt\nGreat article.\n```\n\nAn attacker writes:\n\n```html\n<script>sendCookiesToAttacker()</script>\n```\n\nIf your app stores that comment and later renders it as real HTML, the browser may execute the attacker's script for every user who views the page.\n\nThe beginner-friendly rule is: user input should be treated as data, not as code.",
-    "example": "In React, this is usually safe:\n\n```jsx\nfunction Comment({ text }) {\n  return <p>{text}</p>;\n}\n```\n\nIf `text` contains `<script>alert(\"bad\")</script>`, React escapes it. The browser displays it as text instead of executing it.\n\nThis is risky:\n\n```jsx\nfunction Comment({ html }) {\n  return <div dangerouslySetInnerHTML={{ __html: html }} />;\n}\n```\n\nThe name is deliberately scary because React is telling you: if this string contains unsafe HTML, the browser may treat it as real markup and script-capable content.\n\nXSS can also appear in URLs and attributes. A link that accepts any string from a user can become dangerous if it allows schemes like `javascript:`.\n\n```jsx\n<a href={userProvidedUrl}>Open profile</a>\n```\n\nThat does not mean links are always unsafe. It means URL values should be validated based on what the product expects.",
-    "commonMistakes": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
-  },
-  {
     "id": "tpm-account-freeze-appeals",
     "track": "TPM",
     "category": "Fraud & Risk",
@@ -5737,5 +4900,842 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A third-party vendor can help a team move faster, but it also becomes part of the product's risk. If the vendor is slow, wrong, expensive, insecure, unavailable, or hard to integrate, customers may blame your product.\n\nEvaluating a vendor is not only procurement. It is a product, technical, security, legal, operational, and financial decision.\n\nThe beginner mistake is to compare vendors only by feature checklist. Feature coverage matters, but it is not enough.\n\nA strong TPM asks:\n\n- Does this vendor solve the actual user and business problem?\n- Can engineering integrate and operate it safely?\n- Does it meet security, privacy, compliance, and legal requirements?\n- What happens when it fails?\n- How much does it cost now and at scale?\n- How hard would it be to switch later?",
     "example": "Imagine choosing an identity verification vendor.\n\nVendor A has great pricing and easy integration, but weaker coverage in countries the business wants to enter.\n\nVendor B has strong global coverage and compliance support, but integration is more complex and support response is slower.\n\nVendor C has excellent developer experience, but the contract has strict minimums and data retention terms that legal dislikes.\n\nThe right answer depends on strategy. If the company is only launching in one country, Vendor A may be fine. If expansion is the roadmap, Vendor B may be better. If the team needs a fast prototype, Vendor C may be useful but risky for long-term scale.\n\nVendor evaluation is about fit, not abstract best.\n\nA useful scorecard makes the comparison visible:\n\n```txt\nVendor A\n- Product fit: strong for launch country, weak for expansion\n- Technical fit: simple API, limited webhook detail\n- Compliance fit: acceptable for current scope\n- Operations: fast support, limited manual review tooling\n- Commercials: low cost now, medium cost at scale\n- Exit risk: medium\n\nVendor B\n- Product fit: strong global coverage\n- Technical fit: more complex API, stronger status model\n- Compliance fit: stronger audit and reporting\n- Operations: slower support, better admin tooling\n- Commercials: higher minimum contract\n- Exit risk: lower because data export is clearer\n```\n\nThe TPM's job is to make the tradeoff visible enough that the team can choose based on strategy, not demo polish.",
     "commonMistakes": "A common mistake is letting the best demo win. Demos are optimized to look smooth. Real integration reveals edge cases.\n\nAnother mistake is ignoring operational fit. A vendor can have a great API but poor support when something breaks.\n\nA third mistake is not thinking about exit strategy. If switching later would be painful, that risk should be part of the decision."
+  },
+  {
+    "id": "fe-closures",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Foundational",
+    "question": "Explain closures in JavaScript.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A closure is one of those JavaScript ideas that sounds abstract until you connect it to something very simple: where variables live, and which functions can still reach them.\n\nStart with scope. Scope means the area of code where a variable is available. If you create a variable inside a function, that variable belongs to that function's local scope. Code outside the function cannot normally reach it directly. This is useful because it keeps temporary details private.\n\nNow add nested functions. In JavaScript, an inner function can use variables from the outer function where it was written. This is called lexical scoping. Lexical means JavaScript decides variable access from the physical structure of the code, not from where the function is eventually called.\n\nHere is the first step:\n\n```js\nfunction init() {\n  const name = \"Ada\";\n\n  function displayName() {\n    console.log(name);\n  }\n\n  displayName();\n}\n\ninit();\n```\n\n`displayName` does not have its own `name` variable. JavaScript looks around the function and finds `name` in the outer `init` scope. That part is lexical scoping.\n\nA closure appears when the inner function keeps access to that outer scope even after the outer function has finished running. That is the part that surprises people."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Look at this version carefully:\n\n```js\nfunction makeGreeter() {\n  const name = \"Ada\";\n\n  function greet() {\n    return `Hello, ${name}`;\n  }\n\n  return greet;\n}\n\nconst sayHello = makeGreeter();\n\nsayHello(); // \"Hello, Ada\"\n```\n\nWhen `makeGreeter()` runs, it creates `name` and creates the `greet` function. Then it returns `greet`. After that, `makeGreeter()` is finished.\n\nIf you are new to closures, you may expect `name` to disappear at that point. But `sayHello` is now holding the returned `greet` function, and `greet` still refers to `name`. So JavaScript keeps the needed lexical environment alive. That combination, the function plus the variables it can still access, is the closure.\n\nAnother example makes the idea more obvious:\n\n```js\nfunction makeAdder(x) {\n  return function add(y) {\n    return x + y;\n  };\n}\n\nconst add5 = makeAdder(5);\nconst add10 = makeAdder(10);\n\nadd5(2); // 7\nadd10(2); // 12\n```\n\nBoth returned functions use the same code shape, but they remember different environments. `add5` remembers an environment where `x` is `5`. `add10` remembers an environment where `x` is `10`.\n\nThis is the key: a closure does not just remember a function body. It remembers the surrounding variables the function needs."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Closures are common in frontend code because frontend code is event-based. You often define behavior now and run it later when the user clicks, types, focuses an input, or when a timer fires.\n\nFor example:\n\n```js\nfunction makeSizer(size) {\n  return function resizeBody() {\n    document.body.style.fontSize = `${size}px`;\n  };\n}\n\nconst size12 = makeSizer(12);\nconst size16 = makeSizer(16);\n\ndocument.getElementById(\"small\").onclick = size12;\ndocument.getElementById(\"large\").onclick = size16;\n```\n\nThe click handler runs later, but it still knows which `size` it was created with. That is closure doing useful work.\n\nClosures also explain private state:\n\n```js\nfunction createCounter() {\n  let count = 0;\n\n  return {\n    increment() {\n      count += 1;\n    },\n    value() {\n      return count;\n    },\n  };\n}\n\nconst counter = createCounter();\n\ncounter.increment();\ncounter.value(); // 1\n```\n\nNothing outside `createCounter` can directly touch `count`, but the returned methods can. They share access to the same hidden variable.\n\nOnce this clicks, closure bugs also become easier to understand. If a callback runs later and sees an old value, you are probably dealing with a stale closure. If a long-lived listener keeps a large object alive, closure lifetime may be part of the memory problem."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common beginner mistake is thinking a closure copies a value once and freezes it forever. That is not quite right. A closure keeps access to a variable environment. If multiple functions share that environment, they can see changes made through that same environment.\n\nAnother common mistake happens with old `var` loop code. `var` is function-scoped, so callbacks created inside the loop can accidentally share the same changing variable. Modern `let` and `const` create block-scoped bindings, which usually avoids that problem.\n\nDo not treat closures as rare advanced syntax. If a function uses a variable from outside itself, you are already using closure behavior."
+      }
+    ],
+    "answer": "A closure is one of those JavaScript ideas that sounds abstract until you connect it to something very simple: where variables live, and which functions can still reach them.",
+    "reasoning": "Closures are common in frontend code because frontend code is event-based. You often define behavior now and run it later when the user clicks, types, focuses an input, or when a timer fires.\n\nFor example:\n\n```js\nfunction makeSizer(size) {\n  return function resizeBody() {\n    document.body.style.fontSize = `${size}px`;\n  };\n}\n\nconst size12 = makeSizer(12);\nconst size16 = makeSizer(16);\n\ndocument.getElementById(\"small\").onclick = size12;\ndocument.getElementById(\"large\").onclick = size16;\n```\n\nThe click handler runs later, but it still knows which `size` it was created with. That is closure doing useful work.\n\nClosures also explain private state:\n\n```js\nfunction createCounter() {\n  let count = 0;\n\n  return {\n    increment() {\n      count += 1;\n    },\n    value() {\n      return count;\n    },\n  };\n}\n\nconst counter = createCounter();\n\ncounter.increment();\ncounter.value(); // 1\n```\n\nNothing outside `createCounter` can directly touch `count`, but the returned methods can. They share access to the same hidden variable.\n\nOnce this clicks, closure bugs also become easier to understand. If a callback runs later and sees an old value, you are probably dealing with a stale closure. If a long-lived listener keeps a large object alive, closure lifetime may be part of the memory problem.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between lexical scoping and closure?",
+      "Why does `sayHello()` still know the value of `name` after `makeGreeter()` finishes?",
+      "Why do `add5` and `add10` remember different values of `x`?",
+      "How can closures help create private state?",
+      "What kind of bug might happen when a callback remembers an old value?"
+    ],
+    "interviewAnswer": "A closure is a function together with references to the lexical environment where it was created. In plain terms, a function can keep access to variables from an outer scope even after that outer function has finished running.\n\nClosures matter in frontend code because callbacks, event handlers, timers, debounced functions, and hooks often run later while still depending on variables from the place where they were created. A strong answer should mention lexical scope, lifetime, practical uses like private state or event callbacks, and common risks like stale values or retained memory.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Closures",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures"
+      },
+      {
+        "label": "Front End Interview Handbook: JavaScript questions",
+        "url": "https://www.frontendinterviewhandbook.com/javascript-questions/"
+      }
+    ],
+    "beginnerExplanation": "A closure is one of those JavaScript ideas that sounds abstract until you connect it to something very simple: where variables live, and which functions can still reach them.\n\nStart with scope. Scope means the area of code where a variable is available. If you create a variable inside a function, that variable belongs to that function's local scope. Code outside the function cannot normally reach it directly. This is useful because it keeps temporary details private.\n\nNow add nested functions. In JavaScript, an inner function can use variables from the outer function where it was written. This is called lexical scoping. Lexical means JavaScript decides variable access from the physical structure of the code, not from where the function is eventually called.\n\nHere is the first step:\n\n```js\nfunction init() {\n  const name = \"Ada\";\n\n  function displayName() {\n    console.log(name);\n  }\n\n  displayName();\n}\n\ninit();\n```\n\n`displayName` does not have its own `name` variable. JavaScript looks around the function and finds `name` in the outer `init` scope. That part is lexical scoping.\n\nA closure appears when the inner function keeps access to that outer scope even after the outer function has finished running. That is the part that surprises people.",
+    "example": "Look at this version carefully:\n\n```js\nfunction makeGreeter() {\n  const name = \"Ada\";\n\n  function greet() {\n    return `Hello, ${name}`;\n  }\n\n  return greet;\n}\n\nconst sayHello = makeGreeter();\n\nsayHello(); // \"Hello, Ada\"\n```\n\nWhen `makeGreeter()` runs, it creates `name` and creates the `greet` function. Then it returns `greet`. After that, `makeGreeter()` is finished.\n\nIf you are new to closures, you may expect `name` to disappear at that point. But `sayHello` is now holding the returned `greet` function, and `greet` still refers to `name`. So JavaScript keeps the needed lexical environment alive. That combination, the function plus the variables it can still access, is the closure.\n\nAnother example makes the idea more obvious:\n\n```js\nfunction makeAdder(x) {\n  return function add(y) {\n    return x + y;\n  };\n}\n\nconst add5 = makeAdder(5);\nconst add10 = makeAdder(10);\n\nadd5(2); // 7\nadd10(2); // 12\n```\n\nBoth returned functions use the same code shape, but they remember different environments. `add5` remembers an environment where `x` is `5`. `add10` remembers an environment where `x` is `10`.\n\nThis is the key: a closure does not just remember a function body. It remembers the surrounding variables the function needs.",
+    "commonMistakes": "A common beginner mistake is thinking a closure copies a value once and freezes it forever. That is not quite right. A closure keeps access to a variable environment. If multiple functions share that environment, they can see changes made through that same environment.\n\nAnother common mistake happens with old `var` loop code. `var` is function-scoped, so callbacks created inside the loop can accidentally share the same changing variable. Modern `let` and `const` create block-scoped bindings, which usually avoids that problem.\n\nDo not treat closures as rare advanced syntax. If a function uses a variable from outside itself, you are already using closure behavior."
+  },
+  {
+    "id": "fe-controlled-components",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Foundational",
+    "question": "What is the difference between controlled and uncontrolled components in React?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "When people talk about controlled and uncontrolled components, they are usually talking about form inputs. The question is simple: who is currently in charge of the input's value?\n\nIn a controlled component, React state is the source of truth. The input shows whatever value React gives it, and every user change goes through React.\n\n```jsx\nfunction SearchBox() {\n  const [query, setQuery] = useState(\"\");\n\n  return (\n    <input\n      value={query}\n      onChange={(event) => setQuery(event.target.value)}\n    />\n  );\n}\n```\n\nHere, the browser does not get to quietly keep its own final answer. The input displays `query`. When the user types, `onChange` updates `query`. React renders again, and the input displays the new value.\n\nIn an uncontrolled component, the browser keeps the current value inside the DOM input. React may set an initial value, but React does not update state on every keystroke.\n\n```jsx\nfunction SearchBox() {\n  const inputRef = useRef(null);\n\n  function handleSubmit() {\n    console.log(inputRef.current.value);\n  }\n\n  return <input ref={inputRef} defaultValue=\"\" />;\n}\n```\n\nThe mental model is: controlled means React owns the value. Uncontrolled means the DOM owns the value, and React reads it when needed."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a signup form with an email field.\n\nIf the field is controlled, the app can react immediately as the user types. It can disable the submit button until the email looks valid. It can show an error. It can transform text. It can keep multiple fields in sync. It can reset the field by setting state back to an empty string.\n\n```jsx\nfunction SignupForm() {\n  const [email, setEmail] = useState(\"\");\n  const isValid = email.includes(\"@\");\n\n  return (\n    <form>\n      <input value={email} onChange={(event) => setEmail(event.target.value)} />\n      <button disabled={!isValid}>Create account</button>\n    </form>\n  );\n}\n```\n\nIf the field is uncontrolled, React does less work during typing. This can be fine when you only need the value at submit time.\n\n```jsx\nfunction SignupForm() {\n  const emailRef = useRef(null);\n\n  function handleSubmit(event) {\n    event.preventDefault();\n    const email = emailRef.current.value;\n    console.log(email);\n  }\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <input ref={emailRef} name=\"email\" />\n      <button>Create account</button>\n    </form>\n  );\n}\n```\n\nNeither approach is automatically better. Controlled inputs give you direct product control. Uncontrolled inputs can be simpler when the browser can manage the field and you only need to read the value later."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Use controlled inputs when the UI depends on the current value. Examples include live validation, dependent fields, formatting, search as you type, disabling buttons, preview panes, and forms that need to be reset from app state.\n\nUse uncontrolled inputs when you only need a value at the end, especially for small forms, file inputs, or cases where a form library handles the DOM details for you.\n\nThe most important rule is consistency. An input should not switch between controlled and uncontrolled during its lifetime. This often happens when a controlled `value` starts as `undefined` and later becomes a string.\n\n```jsx\n// Risky because name might be undefined at first.\n<input value={name} onChange={handleChange} />\n\n// Safer because the input is always controlled with a string.\n<input value={name ?? \"\"} onChange={handleChange} />\n```\n\nThat tiny detail matters because React needs to know who owns the input. If ownership changes halfway through, bugs become confusing."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using `value` without `onChange`. That makes the input controlled but impossible to edit, because React keeps forcing the same value back into the field.\n\nAnother mistake is using `defaultValue` and expecting it to update later when props change. `defaultValue` only sets the initial DOM value. If the value needs to follow React state, use `value`.\n\nA third mistake is assuming controlled components are only about forms. The deeper idea is ownership. The same product question appears everywhere: should this thing manage itself locally, or should the parent/app own the state because other parts of the UI depend on it?"
+      }
+    ],
+    "answer": "When people talk about controlled and uncontrolled components, they are usually talking about form inputs. The question is simple: who is currently in charge of the input's value?",
+    "reasoning": "Use controlled inputs when the UI depends on the current value. Examples include live validation, dependent fields, formatting, search as you type, disabling buttons, preview panes, and forms that need to be reset from app state.\n\nUse uncontrolled inputs when you only need a value at the end, especially for small forms, file inputs, or cases where a form library handles the DOM details for you.\n\nThe most important rule is consistency. An input should not switch between controlled and uncontrolled during its lifetime. This often happens when a controlled `value` starts as `undefined` and later becomes a string.\n\n```jsx\n// Risky because name might be undefined at first.\n<input value={name} onChange={handleChange} />\n\n// Safer because the input is always controlled with a string.\n<input value={name ?? \"\"} onChange={handleChange} />\n```\n\nThat tiny detail matters because React needs to know who owns the input. If ownership changes halfway through, bugs become confusing.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Who owns the value in a controlled input?",
+      "Why does a controlled input need `onChange`?",
+      "What is `defaultValue` for?",
+      "When might an uncontrolled input be enough?",
+      "Why is switching between controlled and uncontrolled input state a problem?"
+    ],
+    "interviewAnswer": "A controlled component gets its value from React state and reports changes back through an event handler. An uncontrolled component keeps its current value in the DOM, usually accessed with a ref or form submission.\n\nControlled inputs are best when the UI needs to respond to the value immediately, such as validation, previews, dependent fields, resets, or submit-button state. Uncontrolled inputs are useful when the browser can own the field until submit time. A good answer should mention source of truth, `value` versus `defaultValue`, `onChange`, refs, and the warning caused by switching ownership during the component's lifetime.",
+    "sourceLinks": [
+      {
+        "label": "React: input component",
+        "url": "https://react.dev/reference/react-dom/components/input"
+      },
+      {
+        "label": "React: Sharing state between components",
+        "url": "https://react.dev/learn/sharing-state-between-components"
+      }
+    ],
+    "beginnerExplanation": "When people talk about controlled and uncontrolled components, they are usually talking about form inputs. The question is simple: who is currently in charge of the input's value?\n\nIn a controlled component, React state is the source of truth. The input shows whatever value React gives it, and every user change goes through React.\n\n```jsx\nfunction SearchBox() {\n  const [query, setQuery] = useState(\"\");\n\n  return (\n    <input\n      value={query}\n      onChange={(event) => setQuery(event.target.value)}\n    />\n  );\n}\n```\n\nHere, the browser does not get to quietly keep its own final answer. The input displays `query`. When the user types, `onChange` updates `query`. React renders again, and the input displays the new value.\n\nIn an uncontrolled component, the browser keeps the current value inside the DOM input. React may set an initial value, but React does not update state on every keystroke.\n\n```jsx\nfunction SearchBox() {\n  const inputRef = useRef(null);\n\n  function handleSubmit() {\n    console.log(inputRef.current.value);\n  }\n\n  return <input ref={inputRef} defaultValue=\"\" />;\n}\n```\n\nThe mental model is: controlled means React owns the value. Uncontrolled means the DOM owns the value, and React reads it when needed.",
+    "example": "Imagine a signup form with an email field.\n\nIf the field is controlled, the app can react immediately as the user types. It can disable the submit button until the email looks valid. It can show an error. It can transform text. It can keep multiple fields in sync. It can reset the field by setting state back to an empty string.\n\n```jsx\nfunction SignupForm() {\n  const [email, setEmail] = useState(\"\");\n  const isValid = email.includes(\"@\");\n\n  return (\n    <form>\n      <input value={email} onChange={(event) => setEmail(event.target.value)} />\n      <button disabled={!isValid}>Create account</button>\n    </form>\n  );\n}\n```\n\nIf the field is uncontrolled, React does less work during typing. This can be fine when you only need the value at submit time.\n\n```jsx\nfunction SignupForm() {\n  const emailRef = useRef(null);\n\n  function handleSubmit(event) {\n    event.preventDefault();\n    const email = emailRef.current.value;\n    console.log(email);\n  }\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <input ref={emailRef} name=\"email\" />\n      <button>Create account</button>\n    </form>\n  );\n}\n```\n\nNeither approach is automatically better. Controlled inputs give you direct product control. Uncontrolled inputs can be simpler when the browser can manage the field and you only need to read the value later.",
+    "commonMistakes": "A common mistake is using `value` without `onChange`. That makes the input controlled but impossible to edit, because React keeps forcing the same value back into the field.\n\nAnother mistake is using `defaultValue` and expecting it to update later when props change. `defaultValue` only sets the initial DOM value. If the value needs to follow React state, use `value`.\n\nA third mistake is assuming controlled components are only about forms. The deeper idea is ownership. The same product question appears everywhere: should this thing manage itself locally, or should the parent/app own the state because other parts of the UI depend on it?"
+  },
+  {
+    "id": "fe-core-web-vitals",
+    "track": "Frontend",
+    "category": "Performance",
+    "level": "Intermediate",
+    "question": "What are Core Web Vitals, and how would you improve them?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Core Web Vitals are a small set of user-experience performance metrics. They are useful because they describe what the page feels like to a real person, not just how fast a server responded.\n\nThe three main Core Web Vitals are:\n\n- Largest Contentful Paint, or LCP: how long it takes for the main visible content to load.\n- Interaction to Next Paint, or INP: how responsive the page feels when the user interacts.\n- Cumulative Layout Shift, or CLS: how much the layout unexpectedly moves around.\n\nThink of them as three beginner-friendly questions.\n\nDid the important content show up quickly? That is LCP.\n\nDid the page respond quickly when I clicked or typed? That is INP.\n\nDid the page stay visually stable, or did things jump around? That is CLS.\n\nThese metrics matter because users do not experience a page as one technical number. A page can have a fast API but still feel slow if JavaScript blocks the main thread. A page can load content quickly but still feel broken if buttons jump just as the user taps them."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "LCP is often affected by the largest hero image, product image, heading, or content block near the top of the page. If the browser discovers the important image late, downloads a huge file, waits on render-blocking CSS, or waits for JavaScript before showing content, LCP gets worse.\n\nINP is about interaction responsiveness. When a user clicks a filter button, opens a menu, types in a search box, or submits a form, the browser needs time to run JavaScript, update state, calculate layout, paint the result, and show feedback. If the main thread is busy doing expensive work, the user feels delay.\n\nCLS happens when visible elements move after the page starts loading. A common example is an image without width and height. The browser first lays out the page without knowing the image size. Then the image loads, takes space, and pushes text or buttons down. Ads, late-loading banners, injected fonts, and dynamic content can cause the same problem.\n\nThe key is that each metric points to a different kind of user frustration. LCP is waiting. INP is lag. CLS is surprise movement."
+      },
+      {
+        "title": "Make it practical",
+        "body": "To improve LCP, start by identifying the main content element. Then make it easy for the browser to load and render it. Use properly sized images, modern formats, priority loading for the most important image, server-rendered or static content when appropriate, less render-blocking CSS, and avoid making the user wait for unnecessary JavaScript before content appears.\n\nTo improve INP, reduce expensive work during interactions. Break long tasks into smaller chunks, avoid re-rendering large parts of the page unnecessarily, debounce work that does not need to run on every keystroke, virtualize huge lists, move heavy computation away from the main interaction path, and show immediate feedback.\n\nTo improve CLS, reserve space before content arrives. Set image dimensions, avoid inserting banners above existing content, use stable skeletons, load fonts in a way that avoids dramatic text shifts, and keep dynamic UI from pushing important controls around unexpectedly.\n\nA useful workflow is:\n\n1. Measure in the field if possible, because lab tests can miss real device and network conditions.\n2. Find which metric is bad.\n3. Identify the page element or interaction causing it.\n4. Make one targeted change.\n5. Measure again.\n\nPerformance work becomes much less mysterious when you connect each metric to a visible user pain."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating performance as only bundle size. Bundle size matters, but a small bundle can still create poor INP if one interaction does too much synchronous work.\n\nAnother mistake is optimizing the wrong page. The homepage might be fine while the dashboard, product detail page, or checkout flow performs badly.\n\nA third mistake is chasing scores without understanding the user journey. A TPM, designer, or frontend engineer should ask which slow moment hurts the user or business most, then improve that moment first."
+      }
+    ],
+    "answer": "Core Web Vitals are a small set of user-experience performance metrics. They are useful because they describe what the page feels like to a real person, not just how fast a server responded.",
+    "reasoning": "To improve LCP, start by identifying the main content element. Then make it easy for the browser to load and render it. Use properly sized images, modern formats, priority loading for the most important image, server-rendered or static content when appropriate, less render-blocking CSS, and avoid making the user wait for unnecessary JavaScript before content appears.\n\nTo improve INP, reduce expensive work during interactions. Break long tasks into smaller chunks, avoid re-rendering large parts of the page unnecessarily, debounce work that does not need to run on every keystroke, virtualize huge lists, move heavy computation away from the main interaction path, and show immediate feedback.\n\nTo improve CLS, reserve space before content arrives. Set image dimensions, avoid inserting banners above existing content, use stable skeletons, load fonts in a way that avoids dramatic text shifts, and keep dynamic UI from pushing important controls around unexpectedly.\n\nA useful workflow is:\n\n1. Measure in the field if possible, because lab tests can miss real device and network conditions.\n2. Find which metric is bad.\n3. Identify the page element or interaction causing it.\n4. Make one targeted change.\n5. Measure again.\n\nPerformance work becomes much less mysterious when you connect each metric to a visible user pain.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Which Core Web Vital is about the main content appearing?",
+      "Which one is about interaction responsiveness?",
+      "Which one is about unexpected layout movement?",
+      "Why can a page have a fast API but still poor INP?",
+      "What would you check first if the hero image is the LCP element?"
+    ],
+    "interviewAnswer": "Core Web Vitals measure loading, responsiveness, and visual stability through LCP, INP, and CLS. I would improve them by first measuring the affected pages and identifying the exact element or interaction causing the poor score.\n\nFor LCP, I would optimize the main content path. For INP, I would reduce main-thread work during interactions. For CLS, I would reserve space and avoid late layout changes. The strongest answer ties each metric back to what the user feels: waiting, lag, or unexpected movement.",
+    "sourceLinks": [
+      {
+        "label": "web.dev: Core Web Vitals",
+        "url": "https://web.dev/articles/vitals"
+      },
+      {
+        "label": "web.dev: Optimize Interaction to Next Paint",
+        "url": "https://web.dev/articles/optimize-inp"
+      }
+    ],
+    "beginnerExplanation": "Core Web Vitals are a small set of user-experience performance metrics. They are useful because they describe what the page feels like to a real person, not just how fast a server responded.\n\nThe three main Core Web Vitals are:\n\n- Largest Contentful Paint, or LCP: how long it takes for the main visible content to load.\n- Interaction to Next Paint, or INP: how responsive the page feels when the user interacts.\n- Cumulative Layout Shift, or CLS: how much the layout unexpectedly moves around.\n\nThink of them as three beginner-friendly questions.\n\nDid the important content show up quickly? That is LCP.\n\nDid the page respond quickly when I clicked or typed? That is INP.\n\nDid the page stay visually stable, or did things jump around? That is CLS.\n\nThese metrics matter because users do not experience a page as one technical number. A page can have a fast API but still feel slow if JavaScript blocks the main thread. A page can load content quickly but still feel broken if buttons jump just as the user taps them.",
+    "example": "LCP is often affected by the largest hero image, product image, heading, or content block near the top of the page. If the browser discovers the important image late, downloads a huge file, waits on render-blocking CSS, or waits for JavaScript before showing content, LCP gets worse.\n\nINP is about interaction responsiveness. When a user clicks a filter button, opens a menu, types in a search box, or submits a form, the browser needs time to run JavaScript, update state, calculate layout, paint the result, and show feedback. If the main thread is busy doing expensive work, the user feels delay.\n\nCLS happens when visible elements move after the page starts loading. A common example is an image without width and height. The browser first lays out the page without knowing the image size. Then the image loads, takes space, and pushes text or buttons down. Ads, late-loading banners, injected fonts, and dynamic content can cause the same problem.\n\nThe key is that each metric points to a different kind of user frustration. LCP is waiting. INP is lag. CLS is surprise movement.",
+    "commonMistakes": "A common mistake is treating performance as only bundle size. Bundle size matters, but a small bundle can still create poor INP if one interaction does too much synchronous work.\n\nAnother mistake is optimizing the wrong page. The homepage might be fine while the dashboard, product detail page, or checkout flow performs badly.\n\nA third mistake is chasing scores without understanding the user journey. A TPM, designer, or frontend engineer should ask which slow moment hurts the user or business most, then improve that moment first."
+  },
+  {
+    "id": "fe-css-cascade-specificity-stacking",
+    "track": "Frontend",
+    "category": "CSS",
+    "level": "Intermediate",
+    "question": "Explain the CSS cascade, specificity, and stacking context.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.\n\nThe cascade is that decision system. It considers where styles came from, importance, cascade layers, specificity, order, and inheritance.\n\nThe beginner mistake is thinking CSS is only \"last rule wins.\" Order matters, but only after other rules are considered.\n\nSpecificity is one part of the cascade. It is the weight of a selector.\n\n```css\nbutton {\n  color: black;\n}\n\n.primary {\n  color: blue;\n}\n\n#checkout {\n  color: red;\n}\n```\n\nIf the same button has `id=\"checkout\"` and `class=\"primary\"`, the ID selector is more specific, so red wins over blue and black."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Think of specificity like a score:\n\n```txt\nInline styles:\nVery strong\n\nID selectors:\nStrong\n\nClass, attribute, pseudo-class selectors:\nMedium\n\nElement and pseudo-element selectors:\nLow\n```\n\nThis is why deeply specific CSS can become hard to override.\n\n```css\n.app .sidebar nav ul li a.active {\n  color: red;\n}\n```\n\nLater, someone tries:\n\n```css\n.active {\n  color: blue;\n}\n```\n\nThe second rule may come later, but it is less specific. The red rule can still win.\n\nThat is why good CSS often uses low, predictable specificity."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Stacking context is a different but related source of confusion. It affects which things appear in front of other things.\n\nA common beginner belief is:\n\n```txt\nThe biggest z-index always appears on top.\n```\n\nThat is not always true. `z-index` is compared inside stacking contexts. A child can be trapped inside its parent's stacking context.\n\n```html\n<div class=\"modal-shell\">\n  <div class=\"tooltip\">Tooltip</div>\n</div>\n\n<header class=\"site-header\">Header</header>\n```\n\n```css\n.modal-shell {\n  position: relative;\n  z-index: 1;\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 9999;\n}\n\n.site-header {\n  position: relative;\n  z-index: 10;\n}\n```\n\nEven though the tooltip has `z-index: 9999`, it may still appear behind the header because it lives inside `.modal-shell`, and `.modal-shell` is below the header in the parent stacking order.\n\nTo fix stacking bugs, inspect the parent contexts, not only the element with the big `z-index`.\n\n```txt\nDebug checklist\n\n1. Which rule is winning in DevTools?\n2. Is the losing rule less specific?\n3. Is `!important` involved?\n4. Is the element inside a stacking context?\n5. Is a parent setting position, z-index, transform, opacity, filter, or isolation?\n6. Can the CSS be simplified instead of raising z-index again?\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is adding `!important` instead of understanding why a rule lost. That may fix one bug and create the next one.\n\nAnother mistake is increasing `z-index` forever. If the element is inside a lower stacking context, a bigger number may not help.\n\nA third mistake is writing selectors that are too specific. They make future overrides harder and make the stylesheet fragile."
+      }
+    ],
+    "answer": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.",
+    "reasoning": "Stacking context is a different but related source of confusion. It affects which things appear in front of other things.\n\nA common beginner belief is:\n\n```txt\nThe biggest z-index always appears on top.\n```\n\nThat is not always true. `z-index` is compared inside stacking contexts. A child can be trapped inside its parent's stacking context.\n\n```html\n<div class=\"modal-shell\">\n  <div class=\"tooltip\">Tooltip</div>\n</div>\n\n<header class=\"site-header\">Header</header>\n```\n\n```css\n.modal-shell {\n  position: relative;\n  z-index: 1;\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 9999;\n}\n\n.site-header {\n  position: relative;\n  z-index: 10;\n}\n```\n\nEven though the tooltip has `z-index: 9999`, it may still appear behind the header because it lives inside `.modal-shell`, and `.modal-shell` is below the header in the parent stacking order.\n\nTo fix stacking bugs, inspect the parent contexts, not only the element with the big `z-index`.\n\n```txt\nDebug checklist\n\n1. Which rule is winning in DevTools?\n2. Is the losing rule less specific?\n3. Is `!important` involved?\n4. Is the element inside a stacking context?\n5. Is a parent setting position, z-index, transform, opacity, filter, or isolation?\n6. Can the CSS be simplified instead of raising z-index again?\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is CSS not simply \"last rule wins\"?",
+      "What is specificity?",
+      "Why can an ID selector beat a class selector?",
+      "What is a stacking context?",
+      "Why might `z-index: 9999` still appear behind another element?"
+    ],
+    "interviewAnswer": "The cascade is the browser's process for deciding which CSS declaration wins. Specificity is the selector weight used when competing rules apply in the same cascade layer and origin. Stacking context controls how elements are layered on the z-axis, and `z-index` is compared within those contexts.\n\nA strong answer should mention cascade order, specificity, source order, avoiding unnecessary `!important`, and debugging stacking bugs by checking parent stacking contexts.",
+    "sourceLinks": [
+      {
+        "label": "MDN: CSS cascade",
+        "url": "https://developer.mozilla.org/docs/Web/CSS/CSS_cascade/Cascade"
+      },
+      {
+        "label": "MDN: CSS specificity",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascade/Specificity"
+      },
+      {
+        "label": "MDN: Stacking context",
+        "url": "https://developer.mozilla.org/docs/Web/CSS/Guides/Positioned_layout/Stacking_context"
+      }
+    ],
+    "beginnerExplanation": "CSS can feel confusing because more than one rule can target the same element. The browser needs a way to decide which declaration wins.\n\nThe cascade is that decision system. It considers where styles came from, importance, cascade layers, specificity, order, and inheritance.\n\nThe beginner mistake is thinking CSS is only \"last rule wins.\" Order matters, but only after other rules are considered.\n\nSpecificity is one part of the cascade. It is the weight of a selector.\n\n```css\nbutton {\n  color: black;\n}\n\n.primary {\n  color: blue;\n}\n\n#checkout {\n  color: red;\n}\n```\n\nIf the same button has `id=\"checkout\"` and `class=\"primary\"`, the ID selector is more specific, so red wins over blue and black.",
+    "example": "Think of specificity like a score:\n\n```txt\nInline styles:\nVery strong\n\nID selectors:\nStrong\n\nClass, attribute, pseudo-class selectors:\nMedium\n\nElement and pseudo-element selectors:\nLow\n```\n\nThis is why deeply specific CSS can become hard to override.\n\n```css\n.app .sidebar nav ul li a.active {\n  color: red;\n}\n```\n\nLater, someone tries:\n\n```css\n.active {\n  color: blue;\n}\n```\n\nThe second rule may come later, but it is less specific. The red rule can still win.\n\nThat is why good CSS often uses low, predictable specificity.",
+    "commonMistakes": "A common mistake is adding `!important` instead of understanding why a rule lost. That may fix one bug and create the next one.\n\nAnother mistake is increasing `z-index` forever. If the element is inside a lower stacking context, a bigger number may not help.\n\nA third mistake is writing selectors that are too specific. They make future overrides harder and make the stylesheet fragile."
+  },
+  {
+    "id": "fe-data-fetching-cache-invalidation",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Intermediate",
+    "question": "How should frontend apps handle data fetching and cache invalidation?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.\n\nThe beginner mistake is thinking the problem ends after `fetch()` returns. Real apps need loading states, error states, retries, stale data, background refresh, mutations, and consistency after the user changes something.\n\nServer data is different from local UI state. A dropdown open state belongs to the browser session. A list of invoices belongs to the server. The frontend can cache it, but the server is the real source of truth."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an issues page.\n\n```jsx\nconst queryKey = [\"issues\", { status, owner }];\n```\n\nThat key means: \"the issues list for this status and owner.\" If the user changes the filter, the key changes and the app needs a different data set.\n\nNow imagine the user closes an issue. The old list may be wrong because one item changed status. Cache invalidation tells the app: \"the issues query may be stale, refetch it.\"\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: closeIssue,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: [\"issues\"] });\n  },\n});\n```\n\nThe key idea is that fetching is not just making requests. It is managing the relationship between UI state, server state, and time."
+      },
+      {
+        "title": "Make it practical",
+        "body": "A good data-fetching plan answers:\n\n1. What is the query key?\n2. What loading UI appears?\n3. What error UI appears?\n4. When is cached data considered stale?\n5. What mutations change this data?\n6. Which queries should be invalidated after mutation?\n7. Should the UI update optimistically?\n8. How does pagination or filtering affect the cache?\n\nHere is a simple optimistic update shape:\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onMutate: async (nextTodo) => {\n    await queryClient.cancelQueries({ queryKey: [\"todos\"] });\n    const previousTodos = queryClient.getQueryData([\"todos\"]);\n\n    queryClient.setQueryData([\"todos\"], (todos) =>\n      todos.map((todo) => todo.id === nextTodo.id ? nextTodo : todo)\n    );\n\n    return { previousTodos };\n  },\n  onError: (_error, _nextTodo, context) => {\n    queryClient.setQueryData([\"todos\"], context.previousTodos);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: [\"todos\"] });\n  },\n});\n```\n\nThis shows the tradeoff. Optimistic updates feel fast, but the app must recover if the server rejects the change."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using one generic key for data that actually depends on filters or user ID. That mixes unrelated data.\n\nAnother mistake is refetching everything after every mutation. That works at small scale but becomes slow and noisy.\n\nA third mistake is forgetting error and stale states. Users need to know whether data is loading, failed, refreshing, or possibly outdated."
+      }
+    ],
+    "answer": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.",
+    "reasoning": "A good data-fetching plan answers:\n\n1. What is the query key?\n2. What loading UI appears?\n3. What error UI appears?\n4. When is cached data considered stale?\n5. What mutations change this data?\n6. Which queries should be invalidated after mutation?\n7. Should the UI update optimistically?\n8. How does pagination or filtering affect the cache?\n\nHere is a simple optimistic update shape:\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: updateTodo,\n  onMutate: async (nextTodo) => {\n    await queryClient.cancelQueries({ queryKey: [\"todos\"] });\n    const previousTodos = queryClient.getQueryData([\"todos\"]);\n\n    queryClient.setQueryData([\"todos\"], (todos) =>\n      todos.map((todo) => todo.id === nextTodo.id ? nextTodo : todo)\n    );\n\n    return { previousTodos };\n  },\n  onError: (_error, _nextTodo, context) => {\n    queryClient.setQueryData([\"todos\"], context.previousTodos);\n  },\n  onSettled: () => {\n    queryClient.invalidateQueries({ queryKey: [\"todos\"] });\n  },\n});\n```\n\nThis shows the tradeoff. Optimistic updates feel fast, but the app must recover if the server rejects the change.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is server data different from local UI state?",
+      "What is a query key?",
+      "What does invalidation mean?",
+      "When might optimistic updates be useful?",
+      "What can go wrong if cache keys are too vague?"
+    ],
+    "interviewAnswer": "Frontend data fetching should treat server data as cached, asynchronous state. I would define query keys, loading and error states, stale timing, mutation behavior, invalidation rules, and optimistic update recovery.\n\nA strong answer shows that the hard part is not calling `fetch`. The hard part is keeping the UI honest when data changes, requests fail, filters change, or cached data becomes stale.",
+    "sourceLinks": [
+      {
+        "label": "TanStack Query: Query invalidation",
+        "url": "https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation"
+      },
+      {
+        "label": "React: Fetching data with Effects",
+        "url": "https://react.dev/reference/react/useEffect#fetching-data-with-effects"
+      }
+    ],
+    "beginnerExplanation": "Data fetching is how the UI gets server data. Cache invalidation is how the UI decides that cached data may be stale and should be refreshed.\n\nThe beginner mistake is thinking the problem ends after `fetch()` returns. Real apps need loading states, error states, retries, stale data, background refresh, mutations, and consistency after the user changes something.\n\nServer data is different from local UI state. A dropdown open state belongs to the browser session. A list of invoices belongs to the server. The frontend can cache it, but the server is the real source of truth.",
+    "example": "Imagine an issues page.\n\n```jsx\nconst queryKey = [\"issues\", { status, owner }];\n```\n\nThat key means: \"the issues list for this status and owner.\" If the user changes the filter, the key changes and the app needs a different data set.\n\nNow imagine the user closes an issue. The old list may be wrong because one item changed status. Cache invalidation tells the app: \"the issues query may be stale, refetch it.\"\n\n```jsx\nconst mutation = useMutation({\n  mutationFn: closeIssue,\n  onSuccess: () => {\n    queryClient.invalidateQueries({ queryKey: [\"issues\"] });\n  },\n});\n```\n\nThe key idea is that fetching is not just making requests. It is managing the relationship between UI state, server state, and time.",
+    "commonMistakes": "A common mistake is using one generic key for data that actually depends on filters or user ID. That mixes unrelated data.\n\nAnother mistake is refetching everything after every mutation. That works at small scale but becomes slow and noisy.\n\nA third mistake is forgetting error and stale states. Users need to know whether data is loading, failed, refreshing, or possibly outdated."
+  },
+  {
+    "id": "fe-debounce-throttle",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Foundational",
+    "question": "What is the difference between debounce and throttle?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Debounce and throttle are techniques for controlling how often a function runs.\n\nThey matter because frontend events can fire very quickly. Typing, scrolling, resizing, mouse movement, and input changes can trigger many calls per second. If every event runs expensive work, the UI can feel slow or the server can receive too many requests.\n\nDebounce waits until activity pauses. Throttle runs at most once in a fixed time window.\n\nUse debounce when you care about the final value after the user stops. Use throttle when you want regular updates while activity continues."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Search input is a debounce example. If a user types `react`, you usually do not want to call the API for `r`, `re`, `rea`, `reac`, and `react`. You can wait until the user pauses typing.\n\n```js\nfunction debounce(callback, delay) {\n  let timerId;\n\n  return function debounced(...args) {\n    clearTimeout(timerId);\n\n    timerId = setTimeout(() => {\n      callback(...args);\n    }, delay);\n  };\n}\n```\n\nScroll tracking is often a throttle example. If a user scrolls continuously, you may want to update position at most every 100ms.\n\n```js\nfunction throttle(callback, delay) {\n  let waiting = false;\n\n  return function throttled(...args) {\n    if (waiting) return;\n\n    callback(...args);\n    waiting = true;\n\n    setTimeout(() => {\n      waiting = false;\n    }, delay);\n  };\n}\n```\n\nThe difference is timing. Debounce resets the timer each time. Throttle allows periodic execution."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Use debounce for:\n\n- Search suggestions.\n- Auto-save after typing pauses.\n- Validation after input pauses.\n- Resizing work after the resize stops.\n\nUse throttle for:\n\n- Scroll position updates.\n- Infinite-scroll checks.\n- Drag movement.\n- Mouse movement tracking.\n- Sending periodic analytics during continuous activity.\n\nIn React, be careful that the debounced or throttled function has stable identity. If you recreate it on every render, it may lose its timer state.\n\n```jsx\nfunction SearchBox({ onSearch }) {\n  const debouncedSearch = useMemo(\n    () => debounce(onSearch, 300),\n    [onSearch]\n  );\n\n  return (\n    <input onChange={(event) => debouncedSearch(event.target.value)} />\n  );\n}\n```\n\nIn production, you also need cleanup if a component unmounts while a timer is waiting."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using debounce when the user expects continuous feedback. Scroll position should not wait until scrolling fully stops.\n\nAnother mistake is using throttle for search and still sending intermediate values the user did not mean to submit.\n\nA third mistake is forgetting stale closures. A delayed callback may use old props or state if you do not design it carefully."
+      }
+    ],
+    "answer": "Debounce and throttle are techniques for controlling how often a function runs.",
+    "reasoning": "Use debounce for:\n\n- Search suggestions.\n- Auto-save after typing pauses.\n- Validation after input pauses.\n- Resizing work after the resize stops.\n\nUse throttle for:\n\n- Scroll position updates.\n- Infinite-scroll checks.\n- Drag movement.\n- Mouse movement tracking.\n- Sending periodic analytics during continuous activity.\n\nIn React, be careful that the debounced or throttled function has stable identity. If you recreate it on every render, it may lose its timer state.\n\n```jsx\nfunction SearchBox({ onSearch }) {\n  const debouncedSearch = useMemo(\n    () => debounce(onSearch, 300),\n    [onSearch]\n  );\n\n  return (\n    <input onChange={(event) => debouncedSearch(event.target.value)} />\n  );\n}\n```\n\nIn production, you also need cleanup if a component unmounts while a timer is waiting.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does debounce wait for?",
+      "What does throttle limit?",
+      "Why is search usually debounced?",
+      "Why is scroll usually throttled?",
+      "What React bug can happen if a debounced function is recreated every render?"
+    ],
+    "interviewAnswer": "Debounce delays a function until activity has stopped for a period of time. Throttle allows a function to run at most once per time interval while activity continues.\n\nI would use debounce for search, validation, and autosave after typing pauses. I would use throttle for scroll, resize, drag, or pointer updates where periodic feedback matters. A strong answer mentions performance, user intent, timers, cleanup, and stale closures.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Debounce",
+        "url": "https://developer.mozilla.org/en-US/docs/Glossary/Debounce"
+      },
+      {
+        "label": "MDN: Throttle",
+        "url": "https://developer.mozilla.org/en-US/docs/Glossary/Throttle"
+      }
+    ],
+    "beginnerExplanation": "Debounce and throttle are techniques for controlling how often a function runs.\n\nThey matter because frontend events can fire very quickly. Typing, scrolling, resizing, mouse movement, and input changes can trigger many calls per second. If every event runs expensive work, the UI can feel slow or the server can receive too many requests.\n\nDebounce waits until activity pauses. Throttle runs at most once in a fixed time window.\n\nUse debounce when you care about the final value after the user stops. Use throttle when you want regular updates while activity continues.",
+    "example": "Search input is a debounce example. If a user types `react`, you usually do not want to call the API for `r`, `re`, `rea`, `reac`, and `react`. You can wait until the user pauses typing.\n\n```js\nfunction debounce(callback, delay) {\n  let timerId;\n\n  return function debounced(...args) {\n    clearTimeout(timerId);\n\n    timerId = setTimeout(() => {\n      callback(...args);\n    }, delay);\n  };\n}\n```\n\nScroll tracking is often a throttle example. If a user scrolls continuously, you may want to update position at most every 100ms.\n\n```js\nfunction throttle(callback, delay) {\n  let waiting = false;\n\n  return function throttled(...args) {\n    if (waiting) return;\n\n    callback(...args);\n    waiting = true;\n\n    setTimeout(() => {\n      waiting = false;\n    }, delay);\n  };\n}\n```\n\nThe difference is timing. Debounce resets the timer each time. Throttle allows periodic execution.",
+    "commonMistakes": "A common mistake is using debounce when the user expects continuous feedback. Scroll position should not wait until scrolling fully stops.\n\nAnother mistake is using throttle for search and still sending intermediate values the user did not mean to submit.\n\nA third mistake is forgetting stale closures. A delayed callback may use old props or state if you do not design it carefully."
+  },
+  {
+    "id": "fe-event-loop",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Intermediate",
+    "question": "Explain the JavaScript event loop.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.\n\nThis creates an obvious question: if JavaScript runs one thing at a time, how can a page handle clicks, timers, network responses, animations, and promise callbacks?\n\nThe answer is the event loop.\n\nThe event loop is the browser's scheduling system for deciding what work JavaScript should run next. It coordinates the call stack, task queue, microtask queue, rendering, and browser APIs.\n\nStart with the call stack. The call stack is where currently running functions live. When you call a function, it goes on the stack. When it returns, it leaves the stack. JavaScript keeps running until the stack is empty.\n\nAsynchronous browser features like timers, events, and network requests do not magically run inside your current function. The browser tracks them outside the call stack. When they are ready, their callbacks are queued to run later."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Look at this code:\n\n```js\nconsole.log(\"A\");\n\nsetTimeout(() => {\n  console.log(\"B\");\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log(\"C\");\n});\n\nconsole.log(\"D\");\n```\n\nThe output is:\n\n```txt\nA\nD\nC\nB\n```\n\nHere is the beginner-friendly version of what happened.\n\nFirst, JavaScript runs the current script from top to bottom. `console.log(\"A\")` runs immediately. `setTimeout` asks the browser to run a callback later, even though the delay is `0`. That callback does not run immediately because the current script is still running. `Promise.resolve().then(...)` queues a microtask. Then `console.log(\"D\")` runs.\n\nNow the call stack is empty. Before the browser picks the next regular task, JavaScript drains the microtask queue. Promise callbacks are microtasks, so `C` logs next.\n\nAfter microtasks are done, the event loop can pick a task from the task queue. The timer callback is a task, so `B` logs last.\n\nThis is why `setTimeout(fn, 0)` does not mean \"run now.\" It means \"run after the current JavaScript finishes and after microtasks that are already waiting.\""
+      },
+      {
+        "title": "Make it practical",
+        "body": "The event loop matters because frontend apps must stay responsive. If you run a huge synchronous loop, the browser cannot handle clicks, paint updates, or run other callbacks until that work finishes.\n\n```js\nbutton.addEventListener(\"click\", () => {\n  for (let i = 0; i < 1_000_000_000; i += 1) {\n    // expensive work\n  }\n\n  console.log(\"done\");\n});\n```\n\nWhile that loop runs, the page may freeze. The click handler owns the main thread until it returns.\n\nA better approach is to break expensive work into smaller chunks, move heavy computation to a Web Worker when appropriate, or avoid doing the expensive work during the user's interaction path.\n\nThe event loop also explains why UI updates may not appear immediately. If you set loading state and then immediately run expensive synchronous code, the browser may not get a chance to paint the loading state until after the expensive code finishes.\n\n```js\nsetLoading(true);\ndoVeryExpensiveWork();\n```\n\nReact can schedule a state update, but the browser still needs a chance to paint. If JavaScript keeps the main thread busy, the user will not see the intermediate feedback when you expect."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is saying JavaScript is asynchronous because it runs multiple callbacks at the same time. That is not the usual browser model. JavaScript callbacks are scheduled asynchronously, but the main thread still runs one piece of JavaScript at a time.\n\nAnother mistake is forgetting the difference between tasks and microtasks. Promise callbacks usually run before timers that are waiting in the task queue.\n\nA third mistake is ignoring rendering. The user does not care only about callback order. They care whether the page can paint, animate, and respond while your code is running."
+      }
+    ],
+    "answer": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.",
+    "reasoning": "The event loop matters because frontend apps must stay responsive. If you run a huge synchronous loop, the browser cannot handle clicks, paint updates, or run other callbacks until that work finishes.\n\n```js\nbutton.addEventListener(\"click\", () => {\n  for (let i = 0; i < 1_000_000_000; i += 1) {\n    // expensive work\n  }\n\n  console.log(\"done\");\n});\n```\n\nWhile that loop runs, the page may freeze. The click handler owns the main thread until it returns.\n\nA better approach is to break expensive work into smaller chunks, move heavy computation to a Web Worker when appropriate, or avoid doing the expensive work during the user's interaction path.\n\nThe event loop also explains why UI updates may not appear immediately. If you set loading state and then immediately run expensive synchronous code, the browser may not get a chance to paint the loading state until after the expensive code finishes.\n\n```js\nsetLoading(true);\ndoVeryExpensiveWork();\n```\n\nReact can schedule a state update, but the browser still needs a chance to paint. If JavaScript keeps the main thread busy, the user will not see the intermediate feedback when you expect.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the call stack?",
+      "Why does `setTimeout(fn, 0)` not run immediately?",
+      "Why do Promise callbacks often run before timer callbacks?",
+      "What happens to user clicks while JavaScript is doing a long synchronous task?",
+      "How can you make expensive frontend work less blocking?"
+    ],
+    "interviewAnswer": "The event loop is the mechanism that lets JavaScript coordinate synchronous execution with asynchronous browser work. JavaScript runs functions on the call stack one at a time. Browser APIs queue callbacks as tasks or microtasks, and the event loop decides what runs after the stack is empty.\n\nA strong answer should mention the call stack, task queue, microtask queue, Promise callbacks, timers, and rendering. The practical point is that long synchronous work blocks the main thread, which makes the UI feel frozen even if the code is technically correct.",
+    "sourceLinks": [
+      {
+        "label": "MDN: JavaScript execution model",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop"
+      },
+      {
+        "label": "JavaScript.info: Event loop",
+        "url": "https://javascript.info/event-loop"
+      }
+    ],
+    "beginnerExplanation": "JavaScript in the browser usually runs on one main thread. That means only one piece of JavaScript can actively run at a time on that thread. If a function is running, another function cannot interrupt it in the middle and run at the same time.\n\nThis creates an obvious question: if JavaScript runs one thing at a time, how can a page handle clicks, timers, network responses, animations, and promise callbacks?\n\nThe answer is the event loop.\n\nThe event loop is the browser's scheduling system for deciding what work JavaScript should run next. It coordinates the call stack, task queue, microtask queue, rendering, and browser APIs.\n\nStart with the call stack. The call stack is where currently running functions live. When you call a function, it goes on the stack. When it returns, it leaves the stack. JavaScript keeps running until the stack is empty.\n\nAsynchronous browser features like timers, events, and network requests do not magically run inside your current function. The browser tracks them outside the call stack. When they are ready, their callbacks are queued to run later.",
+    "example": "Look at this code:\n\n```js\nconsole.log(\"A\");\n\nsetTimeout(() => {\n  console.log(\"B\");\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log(\"C\");\n});\n\nconsole.log(\"D\");\n```\n\nThe output is:\n\n```txt\nA\nD\nC\nB\n```\n\nHere is the beginner-friendly version of what happened.\n\nFirst, JavaScript runs the current script from top to bottom. `console.log(\"A\")` runs immediately. `setTimeout` asks the browser to run a callback later, even though the delay is `0`. That callback does not run immediately because the current script is still running. `Promise.resolve().then(...)` queues a microtask. Then `console.log(\"D\")` runs.\n\nNow the call stack is empty. Before the browser picks the next regular task, JavaScript drains the microtask queue. Promise callbacks are microtasks, so `C` logs next.\n\nAfter microtasks are done, the event loop can pick a task from the task queue. The timer callback is a task, so `B` logs last.\n\nThis is why `setTimeout(fn, 0)` does not mean \"run now.\" It means \"run after the current JavaScript finishes and after microtasks that are already waiting.\"",
+    "commonMistakes": "A common mistake is saying JavaScript is asynchronous because it runs multiple callbacks at the same time. That is not the usual browser model. JavaScript callbacks are scheduled asynchronously, but the main thread still runs one piece of JavaScript at a time.\n\nAnother mistake is forgetting the difference between tasks and microtasks. Promise callbacks usually run before timers that are waiting in the task queue.\n\nA third mistake is ignoring rendering. The user does not care only about callback order. They care whether the page can paint, animate, and respond while your code is running."
+  },
+  {
+    "id": "fe-event-propagation-delegation",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Foundational",
+    "question": "Explain event propagation and event delegation in the browser.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.\n\nImagine this HTML:\n\n```html\n<section id=\"panel\">\n  <button id=\"save\">Save</button>\n</section>\n```\n\nIf you click the button, the click happened on the button, but the button is inside the section, and the section is inside the page. The browser gives different ancestors a chance to respond.\n\nThe usual mental model has three phases:\n\n```txt\nCapture phase:\nThe event travels down from the window toward the target.\n\nTarget phase:\nThe event reaches the element that was actually clicked.\n\nBubbling phase:\nThe event travels back up through parent elements.\n```\n\nMost everyday event listeners run during bubbling unless you opt into capture."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Here is a small example:\n\n```html\n<div id=\"card\">\n  <button id=\"buy\">Buy</button>\n</div>\n```\n\n```js\ndocument.querySelector(\"#card\").addEventListener(\"click\", () => {\n  console.log(\"card clicked\");\n});\n\ndocument.querySelector(\"#buy\").addEventListener(\"click\", () => {\n  console.log(\"button clicked\");\n});\n```\n\nWhen the user clicks the button, the button handler runs, then the card handler can also run because the click bubbles up.\n\nThat is why clicking a button inside a clickable card can accidentally trigger both actions.\n\nIf the button action should not also trigger the card action, you might stop propagation:\n\n```js\ndocument.querySelector(\"#buy\").addEventListener(\"click\", (event) => {\n  event.stopPropagation();\n  console.log(\"button clicked only\");\n});\n```\n\nUse that carefully. Stopping propagation can also prevent useful parent behavior, analytics, menus, or accessibility-related handlers if overused."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Event delegation uses bubbling on purpose.\n\nInstead of putting a listener on every item in a list, you put one listener on the parent and inspect what was clicked.\n\n```html\n<ul id=\"todo-list\">\n  <li><button data-id=\"1\">Complete</button> Learn closures</li>\n  <li><button data-id=\"2\">Complete</button> Practice CSS</li>\n  <li><button data-id=\"3\">Complete</button> Review React</li>\n</ul>\n```\n\n```js\ndocument.querySelector(\"#todo-list\").addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-id]\");\n\n  if (!button) return;\n\n  const id = button.dataset.id;\n  console.log(`Complete todo ${id}`);\n});\n```\n\nThis works even if more todo items are added later, because the parent listener still receives bubbled clicks.\n\nThis is useful for dynamic lists, tables, menus, and any UI where adding a listener to every child would be noisy."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is confusing `event.target` and `event.currentTarget`. `target` is where the event started. `currentTarget` is the element whose listener is currently running.\n\nAnother mistake is using `stopPropagation()` as a default fix. It can hide problems and break parent-level behavior.\n\nA third mistake is assuming every event bubbles. Many common events do, but not all events behave the same way."
+      }
+    ],
+    "answer": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.",
+    "reasoning": "Event delegation uses bubbling on purpose.\n\nInstead of putting a listener on every item in a list, you put one listener on the parent and inspect what was clicked.\n\n```html\n<ul id=\"todo-list\">\n  <li><button data-id=\"1\">Complete</button> Learn closures</li>\n  <li><button data-id=\"2\">Complete</button> Practice CSS</li>\n  <li><button data-id=\"3\">Complete</button> Review React</li>\n</ul>\n```\n\n```js\ndocument.querySelector(\"#todo-list\").addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-id]\");\n\n  if (!button) return;\n\n  const id = button.dataset.id;\n  console.log(`Complete todo ${id}`);\n});\n```\n\nThis works even if more todo items are added later, because the parent listener still receives bubbled clicks.\n\nThis is useful for dynamic lists, tables, menus, and any UI where adding a listener to every child would be noisy.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does it mean for an event to bubble?",
+      "Why can a button click trigger a parent card handler?",
+      "What is event delegation?",
+      "What is the difference between `target` and `currentTarget`?",
+      "Why should `stopPropagation()` be used carefully?"
+    ],
+    "interviewAnswer": "Event propagation is the path an event takes through the DOM: capture down, target, then bubble up. Event delegation uses bubbling by placing one listener on a parent and checking which child triggered the event.\n\nA strong answer should mention bubbling, capture, target, `event.target`, `event.currentTarget`, `stopPropagation()`, and why delegation is useful for dynamic lists.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Event bubbling",
+        "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling"
+      },
+      {
+        "label": "MDN: EventTarget addEventListener",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"
+      }
+    ],
+    "beginnerExplanation": "When you click something on a web page, the browser does not only think about the exact element you clicked. The event travels through the page structure.\n\nImagine this HTML:\n\n```html\n<section id=\"panel\">\n  <button id=\"save\">Save</button>\n</section>\n```\n\nIf you click the button, the click happened on the button, but the button is inside the section, and the section is inside the page. The browser gives different ancestors a chance to respond.\n\nThe usual mental model has three phases:\n\n```txt\nCapture phase:\nThe event travels down from the window toward the target.\n\nTarget phase:\nThe event reaches the element that was actually clicked.\n\nBubbling phase:\nThe event travels back up through parent elements.\n```\n\nMost everyday event listeners run during bubbling unless you opt into capture.",
+    "example": "Here is a small example:\n\n```html\n<div id=\"card\">\n  <button id=\"buy\">Buy</button>\n</div>\n```\n\n```js\ndocument.querySelector(\"#card\").addEventListener(\"click\", () => {\n  console.log(\"card clicked\");\n});\n\ndocument.querySelector(\"#buy\").addEventListener(\"click\", () => {\n  console.log(\"button clicked\");\n});\n```\n\nWhen the user clicks the button, the button handler runs, then the card handler can also run because the click bubbles up.\n\nThat is why clicking a button inside a clickable card can accidentally trigger both actions.\n\nIf the button action should not also trigger the card action, you might stop propagation:\n\n```js\ndocument.querySelector(\"#buy\").addEventListener(\"click\", (event) => {\n  event.stopPropagation();\n  console.log(\"button clicked only\");\n});\n```\n\nUse that carefully. Stopping propagation can also prevent useful parent behavior, analytics, menus, or accessibility-related handlers if overused.",
+    "commonMistakes": "A common mistake is confusing `event.target` and `event.currentTarget`. `target` is where the event started. `currentTarget` is the element whose listener is currently running.\n\nAnother mistake is using `stopPropagation()` as a default fix. It can hide problems and break parent-level behavior.\n\nA third mistake is assuming every event bubbles. Many common events do, but not all events behave the same way."
+  },
+  {
+    "id": "fe-flexbox-grid",
+    "track": "Frontend",
+    "category": "CSS",
+    "level": "Foundational",
+    "question": "When would you use Flexbox versus CSS Grid?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Flexbox and Grid are both layout systems in CSS, but they are built for different layout problems.\n\nFlexbox is mainly for one-dimensional layout. That means you are arranging items in a row or a column. You can wrap to multiple lines, but the core thinking is still one direction at a time.\n\nGrid is mainly for two-dimensional layout. That means you are arranging items across rows and columns at the same time.\n\nA simple way to remember it:\n\n- Use Flexbox when the content itself should decide how space is shared along one direction.\n- Use Grid when the page or component needs a deliberate row-and-column structure.\n\nFor example, a button group, navigation bar, toolbar, avatar plus text row, or centered modal content is usually a Flexbox problem.\n\nA dashboard, pricing table, gallery, card layout, calendar, or page shell with named areas is often a Grid problem."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Here is a Flexbox row:\n\n```css\n.toolbar {\n  display: flex;\n  align-items: center;\n  gap: 0.75rem;\n}\n\n.toolbar .search {\n  flex: 1;\n}\n```\n\nThis says: place the toolbar items in a row, align them vertically, leave a gap, and let the search field take remaining space. The exact width of each item can adapt to the content and available space.\n\nHere is a Grid layout:\n\n```css\n.dashboard {\n  display: grid;\n  grid-template-columns: 16rem 1fr;\n  grid-template-areas:\n    \"sidebar header\"\n    \"sidebar main\";\n}\n\n.sidebar {\n  grid-area: sidebar;\n}\n```\n\nThis says: create a defined page structure with columns and rows. The sidebar occupies a named area. The main content has a predictable position.\n\nThe difference is not about which syntax looks nicer. It is about the job. Flexbox is great when items flow along an axis. Grid is great when you are designing a layout map."
+      },
+      {
+        "title": "Make it practical",
+        "body": "A good frontend engineer often uses both together.\n\nImagine a product dashboard. The outer page might use Grid because the app has a sidebar, header, and main content area. Inside the header, Flexbox might align the title, search field, and account menu. Inside a card, Flexbox might align an icon and label. Inside the main area, Grid might arrange analytic tiles.\n\n```css\n.app-shell {\n  display: grid;\n  grid-template-columns: 15rem minmax(0, 1fr);\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.metrics {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));\n  gap: 1rem;\n}\n```\n\nThis combination is normal. You do not need to pick one layout system for the entire app.\n\nWhen deciding, ask: am I aligning items in one direction, or am I defining a structure across both rows and columns? That question usually gets you to the right tool."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using Flexbox for a layout that really needs columns to line up across rows. Flexbox can wrap, but each line behaves independently. If you need consistent tracks across rows, Grid is usually cleaner.\n\nAnother mistake is using Grid for tiny one-axis alignment. A row with an icon, label, spacer, and button is often easier with Flexbox.\n\nAlso remember that layout should protect content. Avoid fixed widths unless you really need them. Use `minmax(0, 1fr)`, `auto-fit`, `min()`, `max()`, and responsive constraints so text and controls have room to behave on small screens."
+      }
+    ],
+    "answer": "Flexbox and Grid are both layout systems in CSS, but they are built for different layout problems.",
+    "reasoning": "A good frontend engineer often uses both together.\n\nImagine a product dashboard. The outer page might use Grid because the app has a sidebar, header, and main content area. Inside the header, Flexbox might align the title, search field, and account menu. Inside a card, Flexbox might align an icon and label. Inside the main area, Grid might arrange analytic tiles.\n\n```css\n.app-shell {\n  display: grid;\n  grid-template-columns: 15rem minmax(0, 1fr);\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.metrics {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));\n  gap: 1rem;\n}\n```\n\nThis combination is normal. You do not need to pick one layout system for the entire app.\n\nWhen deciding, ask: am I aligning items in one direction, or am I defining a structure across both rows and columns? That question usually gets you to the right tool.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does one-dimensional layout mean?",
+      "What does two-dimensional layout mean?",
+      "Why is a toolbar usually a Flexbox problem?",
+      "Why is a dashboard shell usually a Grid problem?",
+      "Can Flexbox and Grid be used together in the same component tree?"
+    ],
+    "interviewAnswer": "Flexbox is best for one-dimensional layout, where items are arranged along a row or column and space is distributed along that axis. Grid is best for two-dimensional layout, where rows and columns need to be controlled together.\n\nI would use Flexbox for nav bars, toolbars, centering, and small alignment patterns. I would use Grid for dashboards, galleries, page shells, calendars, and layouts where items must line up across both axes. In real apps, I often combine them.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Basic concepts of flexbox",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox"
+      },
+      {
+        "label": "MDN: Basic concepts of grid layout",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Basic_concepts_of_grid_layout"
+      }
+    ],
+    "beginnerExplanation": "Flexbox and Grid are both layout systems in CSS, but they are built for different layout problems.\n\nFlexbox is mainly for one-dimensional layout. That means you are arranging items in a row or a column. You can wrap to multiple lines, but the core thinking is still one direction at a time.\n\nGrid is mainly for two-dimensional layout. That means you are arranging items across rows and columns at the same time.\n\nA simple way to remember it:\n\n- Use Flexbox when the content itself should decide how space is shared along one direction.\n- Use Grid when the page or component needs a deliberate row-and-column structure.\n\nFor example, a button group, navigation bar, toolbar, avatar plus text row, or centered modal content is usually a Flexbox problem.\n\nA dashboard, pricing table, gallery, card layout, calendar, or page shell with named areas is often a Grid problem.",
+    "example": "Here is a Flexbox row:\n\n```css\n.toolbar {\n  display: flex;\n  align-items: center;\n  gap: 0.75rem;\n}\n\n.toolbar .search {\n  flex: 1;\n}\n```\n\nThis says: place the toolbar items in a row, align them vertically, leave a gap, and let the search field take remaining space. The exact width of each item can adapt to the content and available space.\n\nHere is a Grid layout:\n\n```css\n.dashboard {\n  display: grid;\n  grid-template-columns: 16rem 1fr;\n  grid-template-areas:\n    \"sidebar header\"\n    \"sidebar main\";\n}\n\n.sidebar {\n  grid-area: sidebar;\n}\n```\n\nThis says: create a defined page structure with columns and rows. The sidebar occupies a named area. The main content has a predictable position.\n\nThe difference is not about which syntax looks nicer. It is about the job. Flexbox is great when items flow along an axis. Grid is great when you are designing a layout map.",
+    "commonMistakes": "A common mistake is using Flexbox for a layout that really needs columns to line up across rows. Flexbox can wrap, but each line behaves independently. If you need consistent tracks across rows, Grid is usually cleaner.\n\nAnother mistake is using Grid for tiny one-axis alignment. A row with an icon, label, spacer, and button is often easier with Flexbox.\n\nAlso remember that layout should protect content. Avoid fixed widths unless you really need them. Use `minmax(0, 1fr)`, `auto-fit`, `min()`, `max()`, and responsive constraints so text and controls have room to behave on small screens."
+  },
+  {
+    "id": "fe-promises-async-await",
+    "track": "Frontend",
+    "category": "JavaScript",
+    "level": "Foundational",
+    "question": "Explain Promises and async/await in JavaScript.",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.\n\nThis is useful because frontend apps are full of waiting: waiting for a network request, waiting for a file to load, waiting for permission, waiting for an animation, or waiting for a database response from an API.\n\nA Promise has three states:\n\n- Pending: the work is still in progress.\n- Fulfilled: the work succeeded and produced a value.\n- Rejected: the work failed and produced an error reason.\n\nHere is a basic Promise chain:\n\n```js\nfetch(\"/api/user\")\n  .then((response) => response.json())\n  .then((user) => {\n    console.log(user.name);\n  })\n  .catch((error) => {\n    console.error(error);\n  });\n```\n\n`async` and `await` do not replace Promises. They give you a more readable way to work with Promises.\n\n```js\nasync function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n    const user = await response.json();\n    console.log(user.name);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```\n\nThe important idea is: `await` pauses the async function until the Promise settles, but it does not freeze the whole browser."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Suppose a user opens a profile page. The app asks the server for profile data.\n\n```js\nasync function getProfile(userId) {\n  const response = await fetch(`/api/users/${userId}`);\n\n  if (!response.ok) {\n    throw new Error(\"Could not load profile\");\n  }\n\n  return response.json();\n}\n```\n\nWhen JavaScript reaches `await fetch(...)`, the async function waits for that Promise. Other browser work can continue. The user can still move the mouse. Other events can still be scheduled. JavaScript is not sitting in a blocking loop.\n\nIf the request succeeds, execution continues and `response` is available. If the Promise rejects, control jumps to the nearest `catch`.\n\n```js\nasync function showProfile(userId) {\n  try {\n    const profile = await getProfile(userId);\n    renderProfile(profile);\n  } catch (error) {\n    renderError(\"We could not load this profile.\");\n  }\n}\n```\n\nThis reads like normal step-by-step code, but it is still Promise-based underneath."
+      },
+      {
+        "title": "Make it practical",
+        "body": "The main frontend skill is not just knowing syntax. It is knowing what should happen in each state.\n\nWhen loading data, the UI usually needs:\n\n1. A loading state while the Promise is pending.\n2. A success state when data arrives.\n3. An error state when the request fails.\n4. A retry or recovery path if the user can try again.\n\n```jsx\nfunction Profile({ userId }) {\n  const [state, setState] = useState({ status: \"loading\" });\n\n  useEffect(() => {\n    let ignore = false;\n\n    async function load() {\n      try {\n        const profile = await getProfile(userId);\n        if (!ignore) setState({ status: \"success\", profile });\n      } catch (error) {\n        if (!ignore) setState({ status: \"error\" });\n      }\n    }\n\n    load();\n\n    return () => {\n      ignore = true;\n    };\n  }, [userId]);\n\n  if (state.status === \"loading\") return <p>Loading...</p>;\n  if (state.status === \"error\") return <p>Could not load profile.</p>;\n  return <h1>{state.profile.name}</h1>;\n}\n```\n\nThis example also shows a real bug to avoid: stale async results. If `userId` changes before the first request finishes, you do not want the old request to overwrite the new page state."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is forgetting to return or await a Promise. If you call an async function without awaiting it, the surrounding code continues immediately.\n\nAnother mistake is using `try/catch` but only wrapping synchronous code. Errors from awaited Promises are caught by `try/catch`, but errors from Promises you do not await may escape that block.\n\nA third mistake is accidentally running async work one at a time when it could run in parallel.\n\n```js\nconst user = await fetchUser();\nconst teams = await fetchTeams();\n```\n\nIf those two requests do not depend on each other, this may be slower than:\n\n```js\nconst [user, teams] = await Promise.all([fetchUser(), fetchTeams()]);\n```"
+      }
+    ],
+    "answer": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.",
+    "reasoning": "The main frontend skill is not just knowing syntax. It is knowing what should happen in each state.\n\nWhen loading data, the UI usually needs:\n\n1. A loading state while the Promise is pending.\n2. A success state when data arrives.\n3. An error state when the request fails.\n4. A retry or recovery path if the user can try again.\n\n```jsx\nfunction Profile({ userId }) {\n  const [state, setState] = useState({ status: \"loading\" });\n\n  useEffect(() => {\n    let ignore = false;\n\n    async function load() {\n      try {\n        const profile = await getProfile(userId);\n        if (!ignore) setState({ status: \"success\", profile });\n      } catch (error) {\n        if (!ignore) setState({ status: \"error\" });\n      }\n    }\n\n    load();\n\n    return () => {\n      ignore = true;\n    };\n  }, [userId]);\n\n  if (state.status === \"loading\") return <p>Loading...</p>;\n  if (state.status === \"error\") return <p>Could not load profile.</p>;\n  return <h1>{state.profile.name}</h1>;\n}\n```\n\nThis example also shows a real bug to avoid: stale async results. If `userId` changes before the first request finishes, you do not want the old request to overwrite the new page state.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What are the three Promise states?",
+      "What does `await` actually wait for?",
+      "Does `await` block the whole browser?",
+      "Why does UI need loading, success, and error states?",
+      "When should you use `Promise.all`?"
+    ],
+    "interviewAnswer": "A Promise represents an asynchronous result that is pending, fulfilled, or rejected. `async/await` is syntax for writing Promise-based code in a more sequential style. `await` pauses the async function until the Promise settles, but it does not block the whole browser thread.\n\nA strong frontend answer should connect Promises to UI states: loading, success, error, retry, cancellation or stale-result handling, and parallel work with `Promise.all` when requests do not depend on each other.",
+    "sourceLinks": [
+      {
+        "label": "MDN: Promise",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+      },
+      {
+        "label": "MDN: async function",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
+      }
+    ],
+    "beginnerExplanation": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.\n\nThis is useful because frontend apps are full of waiting: waiting for a network request, waiting for a file to load, waiting for permission, waiting for an animation, or waiting for a database response from an API.\n\nA Promise has three states:\n\n- Pending: the work is still in progress.\n- Fulfilled: the work succeeded and produced a value.\n- Rejected: the work failed and produced an error reason.\n\nHere is a basic Promise chain:\n\n```js\nfetch(\"/api/user\")\n  .then((response) => response.json())\n  .then((user) => {\n    console.log(user.name);\n  })\n  .catch((error) => {\n    console.error(error);\n  });\n```\n\n`async` and `await` do not replace Promises. They give you a more readable way to work with Promises.\n\n```js\nasync function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n    const user = await response.json();\n    console.log(user.name);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```\n\nThe important idea is: `await` pauses the async function until the Promise settles, but it does not freeze the whole browser.",
+    "example": "Suppose a user opens a profile page. The app asks the server for profile data.\n\n```js\nasync function getProfile(userId) {\n  const response = await fetch(`/api/users/${userId}`);\n\n  if (!response.ok) {\n    throw new Error(\"Could not load profile\");\n  }\n\n  return response.json();\n}\n```\n\nWhen JavaScript reaches `await fetch(...)`, the async function waits for that Promise. Other browser work can continue. The user can still move the mouse. Other events can still be scheduled. JavaScript is not sitting in a blocking loop.\n\nIf the request succeeds, execution continues and `response` is available. If the Promise rejects, control jumps to the nearest `catch`.\n\n```js\nasync function showProfile(userId) {\n  try {\n    const profile = await getProfile(userId);\n    renderProfile(profile);\n  } catch (error) {\n    renderError(\"We could not load this profile.\");\n  }\n}\n```\n\nThis reads like normal step-by-step code, but it is still Promise-based underneath.",
+    "commonMistakes": "A common mistake is forgetting to return or await a Promise. If you call an async function without awaiting it, the surrounding code continues immediately.\n\nAnother mistake is using `try/catch` but only wrapping synchronous code. Errors from awaited Promises are caught by `try/catch`, but errors from Promises you do not await may escape that block.\n\nA third mistake is accidentally running async work one at a time when it could run in parallel.\n\n```js\nconst user = await fetchUser();\nconst teams = await fetchTeams();\n```\n\nIf those two requests do not depend on each other, this may be slower than:\n\n```js\nconst [user, teams] = await Promise.all([fetchUser(), fetchTeams()]);\n```"
+  },
+  {
+    "id": "fe-props-state",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Foundational",
+    "question": "What is the difference between props and state in React?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Props and state are both data that affect what a React component renders. The difference is where the data comes from and who is allowed to change it.\n\nProps are data passed into a component by its parent.\n\nState is data a component owns and can update over time.\n\nThink of a component like a function that draws UI. Props are the arguments given to the function. State is the component's own memory between renders.\n\n```jsx\nfunction Greeting({ name }) {\n  return <h1>Hello, {name}</h1>;\n}\n```\n\nIn this example, `name` is a prop. `Greeting` does not decide the name. The parent decides it.\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return <button onClick={() => setCount(count + 1)}>{count}</button>;\n}\n```\n\nIn this example, `count` is state. `Counter` owns it and updates it when the user clicks."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a shopping cart page. The parent component may fetch the user's cart and pass each item into a `CartItem` component.\n\n```jsx\nfunction CartItem({ item }) {\n  return (\n    <li>\n      {item.name} - {item.quantity}\n    </li>\n  );\n}\n```\n\n`CartItem` receives `item` as a prop. It should not secretly rewrite the parent's cart data. It can ask the parent to change something by calling a callback prop.\n\n```jsx\nfunction CartItem({ item, onIncrease }) {\n  return (\n    <li>\n      {item.name}\n      <button onClick={() => onIncrease(item.id)}>+</button>\n    </li>\n  );\n}\n```\n\nNow `CartItem` is still not the owner of the cart. It reports the user's intent upward. The parent, which owns the cart state, decides how to update it.\n\nThis is the heart of React data flow: data usually moves down as props, and events or intentions move up through callback props."
+      },
+      {
+        "title": "Make it practical",
+        "body": "A good rule is: put state in the closest component that needs to own it, but lift it up when multiple components need to share it.\n\nIf only a dropdown needs to know whether it is open, local state is fine.\n\n```jsx\nfunction Menu() {\n  const [open, setOpen] = useState(false);\n  return <button onClick={() => setOpen(!open)}>Menu</button>;\n}\n```\n\nIf the open value affects the page header, sidebar, and content, the state probably belongs higher up.\n\nProps are also how you make components reusable. A `Button` component should not hard-code every label and action. It should receive them.\n\n```jsx\nfunction Button({ children, onClick }) {\n  return <button onClick={onClick}>{children}</button>;\n}\n```\n\nThe beginner mistake is thinking state is more powerful, so everything should become state. That creates duplicated truth. If a value can be calculated from props during render, calculate it instead of storing it again."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is mutating props. Props should be treated as read-only. If a child changes an object it received from a parent, the app can become hard to reason about.\n\nAnother mistake is copying props into state without a clear reason.\n\n```jsx\nfunction Profile({ user }) {\n  const [name, setName] = useState(user.name);\n}\n```\n\nThis may look fine, but now there are two places for the name: `user.name` and `name`. If the parent passes a different user later, the local state may not update the way you expect.\n\nA better question is: is this value truly local editable state, or am I just duplicating a prop?"
+      }
+    ],
+    "answer": "Props and state are both data that affect what a React component renders. The difference is where the data comes from and who is allowed to change it.",
+    "reasoning": "A good rule is: put state in the closest component that needs to own it, but lift it up when multiple components need to share it.\n\nIf only a dropdown needs to know whether it is open, local state is fine.\n\n```jsx\nfunction Menu() {\n  const [open, setOpen] = useState(false);\n  return <button onClick={() => setOpen(!open)}>Menu</button>;\n}\n```\n\nIf the open value affects the page header, sidebar, and content, the state probably belongs higher up.\n\nProps are also how you make components reusable. A `Button` component should not hard-code every label and action. It should receive them.\n\n```jsx\nfunction Button({ children, onClick }) {\n  return <button onClick={onClick}>{children}</button>;\n}\n```\n\nThe beginner mistake is thinking state is more powerful, so everything should become state. That creates duplicated truth. If a value can be calculated from props during render, calculate it instead of storing it again.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Who passes props into a component?",
+      "Who updates state?",
+      "Why should props be treated as read-only?",
+      "What does \"data down, actions up\" mean?",
+      "When should state be lifted to a parent component?"
+    ],
+    "interviewAnswer": "Props are inputs passed from a parent component. State is data a component owns and can update over time. Props are read-only from the child's perspective, while state changes through state setters and triggers re-rendering.\n\nThe practical React pattern is data down and actions up: parents pass props down, children call callbacks to report user intent, and state lives at the closest common owner. A strong answer should warn against mutating props or copying props into state without a real reason.",
+    "sourceLinks": [
+      {
+        "label": "React: Passing props to a component",
+        "url": "https://react.dev/learn/passing-props-to-a-component"
+      },
+      {
+        "label": "React: State as a snapshot",
+        "url": "https://react.dev/learn/state-as-a-snapshot"
+      }
+    ],
+    "beginnerExplanation": "Props and state are both data that affect what a React component renders. The difference is where the data comes from and who is allowed to change it.\n\nProps are data passed into a component by its parent.\n\nState is data a component owns and can update over time.\n\nThink of a component like a function that draws UI. Props are the arguments given to the function. State is the component's own memory between renders.\n\n```jsx\nfunction Greeting({ name }) {\n  return <h1>Hello, {name}</h1>;\n}\n```\n\nIn this example, `name` is a prop. `Greeting` does not decide the name. The parent decides it.\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return <button onClick={() => setCount(count + 1)}>{count}</button>;\n}\n```\n\nIn this example, `count` is state. `Counter` owns it and updates it when the user clicks.",
+    "example": "Imagine a shopping cart page. The parent component may fetch the user's cart and pass each item into a `CartItem` component.\n\n```jsx\nfunction CartItem({ item }) {\n  return (\n    <li>\n      {item.name} - {item.quantity}\n    </li>\n  );\n}\n```\n\n`CartItem` receives `item` as a prop. It should not secretly rewrite the parent's cart data. It can ask the parent to change something by calling a callback prop.\n\n```jsx\nfunction CartItem({ item, onIncrease }) {\n  return (\n    <li>\n      {item.name}\n      <button onClick={() => onIncrease(item.id)}>+</button>\n    </li>\n  );\n}\n```\n\nNow `CartItem` is still not the owner of the cart. It reports the user's intent upward. The parent, which owns the cart state, decides how to update it.\n\nThis is the heart of React data flow: data usually moves down as props, and events or intentions move up through callback props.",
+    "commonMistakes": "A common mistake is mutating props. Props should be treated as read-only. If a child changes an object it received from a parent, the app can become hard to reason about.\n\nAnother mistake is copying props into state without a clear reason.\n\n```jsx\nfunction Profile({ user }) {\n  const [name, setName] = useState(user.name);\n}\n```\n\nThis may look fine, but now there are two places for the name: `user.name` and `name`. If the parent passes a different user later, the local state may not update the way you expect.\n\nA better question is: is this value truly local editable state, or am I just duplicating a prop?"
+  },
+  {
+    "id": "fe-react-keys",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Intermediate",
+    "question": "Why are keys important when rendering lists in React?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Keys help React understand which item is which when a list changes.\n\nWhen React renders a list, it does not only see text on the screen. It also has component instances, DOM nodes, input state, focus, and sometimes local component state attached to each item. If the list changes, React needs to match the old items to the new items.\n\nThe key is the stable identity for each item.\n\n```jsx\nconst rows = users.map((user) => (\n  <UserRow key={user.id} user={user} />\n));\n```\n\nHere, `user.id` tells React that this row belongs to this specific user. If the list is sorted, filtered, inserted into, or deleted from, React can still match each row to the same user identity.\n\nWithout good keys, React may reuse the wrong row. That can cause visual bugs, wrong input values, lost state, strange animations, or focus jumping."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a list of editable todo items.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo, index) => (\n    <TodoRow key={index} todo={todo} />\n  ));\n}\n```\n\nUsing `index` looks harmless when the list never changes. But if a new todo is inserted at the top, every old item gets a new index.\n\nBefore insert:\n\n1. Buy milk has key `0`.\n2. Pay rent has key `1`.\n\nAfter insert:\n\n1. Call bank has key `0`.\n2. Buy milk has key `1`.\n3. Pay rent has key `2`.\n\nReact sees key `0` and thinks the first row identity stayed the same, even though the actual todo changed from Buy milk to Call bank. If `TodoRow` has local state, React may preserve that state on the wrong todo.\n\nWith stable IDs, the identity stays attached to the data.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo) => (\n    <TodoRow key={todo.id} todo={todo} />\n  ));\n}\n```\n\nNow inserting, deleting, or sorting does not confuse item identity."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Use IDs from your data whenever possible: database IDs, slugs, stable UUIDs, or another value that uniquely identifies that item among its siblings.\n\nKeys only need to be unique among siblings in the same list. They do not need to be globally unique across the entire app.\n\nAvoid generating keys during render with `Math.random()` or a new UUID call. That gives React a different key every render, so React treats every item as brand new. That can destroy local state and create unnecessary DOM work.\n\n```jsx\n// Bad: a new key every render.\nitems.map((item) => <Row key={crypto.randomUUID()} item={item} />);\n\n// Good: the key comes from stable item identity.\nitems.map((item) => <Row key={item.id} item={item} />);\n```\n\nThere are rare cases where index keys are acceptable: a static list that never reorders, inserts, deletes, filters, or stores local item state. But in interview and production thinking, stable data IDs are the default answer."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is thinking keys are passed as normal props. They are not. React uses `key` internally. If the child component needs the ID, pass it separately.\n\n```jsx\n<UserRow key={user.id} userId={user.id} />\n```\n\nAnother mistake is thinking keys only affect performance. They affect correctness too. Bad keys can attach state to the wrong item.\n\nA third mistake is using the array index because it removes a warning. Removing the warning is not the goal. Giving React stable identity is the goal."
+      }
+    ],
+    "answer": "Keys help React understand which item is which when a list changes.",
+    "reasoning": "Use IDs from your data whenever possible: database IDs, slugs, stable UUIDs, or another value that uniquely identifies that item among its siblings.\n\nKeys only need to be unique among siblings in the same list. They do not need to be globally unique across the entire app.\n\nAvoid generating keys during render with `Math.random()` or a new UUID call. That gives React a different key every render, so React treats every item as brand new. That can destroy local state and create unnecessary DOM work.\n\n```jsx\n// Bad: a new key every render.\nitems.map((item) => <Row key={crypto.randomUUID()} item={item} />);\n\n// Good: the key comes from stable item identity.\nitems.map((item) => <Row key={item.id} item={item} />);\n```\n\nThere are rare cases where index keys are acceptable: a static list that never reorders, inserts, deletes, filters, or stores local item state. But in interview and production thinking, stable data IDs are the default answer.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does a key tell React?",
+      "Why can array indexes break when items are inserted or sorted?",
+      "Why is `Math.random()` a bad key?",
+      "Do keys need to be globally unique across the app?",
+      "How do keys relate to preserving or resetting component state?"
+    ],
+    "interviewAnswer": "Keys give React stable identity for items in a list so it can match previous and next renders correctly. Good keys help React preserve the right DOM and component state when items are inserted, removed, filtered, or reordered.\n\nI would use stable IDs from the data. I would avoid indexes for dynamic lists and avoid random keys because they change every render. A strong answer should mention that keys are about correctness and identity, not only performance.",
+    "sourceLinks": [
+      {
+        "label": "React: Rendering lists",
+        "url": "https://react.dev/learn/rendering-lists"
+      },
+      {
+        "label": "React: Preserving and resetting state",
+        "url": "https://react.dev/learn/preserving-and-resetting-state"
+      }
+    ],
+    "beginnerExplanation": "Keys help React understand which item is which when a list changes.\n\nWhen React renders a list, it does not only see text on the screen. It also has component instances, DOM nodes, input state, focus, and sometimes local component state attached to each item. If the list changes, React needs to match the old items to the new items.\n\nThe key is the stable identity for each item.\n\n```jsx\nconst rows = users.map((user) => (\n  <UserRow key={user.id} user={user} />\n));\n```\n\nHere, `user.id` tells React that this row belongs to this specific user. If the list is sorted, filtered, inserted into, or deleted from, React can still match each row to the same user identity.\n\nWithout good keys, React may reuse the wrong row. That can cause visual bugs, wrong input values, lost state, strange animations, or focus jumping.",
+    "example": "Imagine a list of editable todo items.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo, index) => (\n    <TodoRow key={index} todo={todo} />\n  ));\n}\n```\n\nUsing `index` looks harmless when the list never changes. But if a new todo is inserted at the top, every old item gets a new index.\n\nBefore insert:\n\n1. Buy milk has key `0`.\n2. Pay rent has key `1`.\n\nAfter insert:\n\n1. Call bank has key `0`.\n2. Buy milk has key `1`.\n3. Pay rent has key `2`.\n\nReact sees key `0` and thinks the first row identity stayed the same, even though the actual todo changed from Buy milk to Call bank. If `TodoRow` has local state, React may preserve that state on the wrong todo.\n\nWith stable IDs, the identity stays attached to the data.\n\n```jsx\nfunction TodoList({ todos }) {\n  return todos.map((todo) => (\n    <TodoRow key={todo.id} todo={todo} />\n  ));\n}\n```\n\nNow inserting, deleting, or sorting does not confuse item identity.",
+    "commonMistakes": "A common mistake is thinking keys are passed as normal props. They are not. React uses `key` internally. If the child component needs the ID, pass it separately.\n\n```jsx\n<UserRow key={user.id} userId={user.id} />\n```\n\nAnother mistake is thinking keys only affect performance. They affect correctness too. Bad keys can attach state to the wrong item.\n\nA third mistake is using the array index because it removes a warning. Removing the warning is not the goal. Giving React stable identity is the goal."
+  },
+  {
+    "id": "fe-react-rerenders",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Intermediate",
+    "question": "What causes React components to re-render?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.\n\nThe beginner mistake is thinking a render always means the DOM changed. Rendering is calculation. After rendering, React compares the new result to the previous result and commits the necessary DOM changes.\n\nComponents re-render when their state changes, their parent renders, or context they use changes. Props are part of the parent render path: if a parent renders, React may call the child again with the current props."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Here is a simple example:\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  console.log(\"render\");\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      {count}\n    </button>\n  );\n}\n```\n\nClicking the button updates state. React calls `Counter` again. The new render returns UI with the new count.\n\nParent renders can also cause child renders:\n\n```jsx\nfunction Parent() {\n  const [theme, setTheme] = useState(\"light\");\n\n  return <Child />;\n}\n```\n\nIf `theme` changes, `Parent` renders again. `Child` may also be called again even if its props did not change. That is not automatically a bug. React rendering should be pure and cheap enough that normal renders are fine."
+      },
+      {
+        "title": "Make it practical",
+        "body": "The right question is not \"how do I stop all renders?\" The right question is \"which renders are expensive or causing visible problems?\"\n\nCommon tools:\n\n- Move state down so only the component that needs it re-renders.\n- Split large components into smaller components.\n- Use `React.memo` when a child receives stable props and rendering it is expensive.\n- Use `useMemo` for expensive derived calculations.\n- Use `useCallback` when function identity causes memoized children to re-render.\n- Avoid putting frequently changing values in broad context providers.\n\n```jsx\nconst UserRow = React.memo(function UserRow({ user, onSelect }) {\n  return <button onClick={() => onSelect(user.id)}>{user.name}</button>;\n});\n```\n\nMemoization is not free. It adds comparison work and complexity. Use it when there is a measured or obvious reason."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating every re-render as bad. Many renders are harmless.\n\nAnother mistake is memoizing everything. That can make code harder to understand without improving performance.\n\nA third mistake is mutating objects. If you mutate state in place, React may not see a meaningful change, and memoized components may behave incorrectly.\n\nAlso remember that render should be pure. Do not start network requests, change DOM manually, or write to storage during render."
+      }
+    ],
+    "answer": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.",
+    "reasoning": "The right question is not \"how do I stop all renders?\" The right question is \"which renders are expensive or causing visible problems?\"\n\nCommon tools:\n\n- Move state down so only the component that needs it re-renders.\n- Split large components into smaller components.\n- Use `React.memo` when a child receives stable props and rendering it is expensive.\n- Use `useMemo` for expensive derived calculations.\n- Use `useCallback` when function identity causes memoized children to re-render.\n- Avoid putting frequently changing values in broad context providers.\n\n```jsx\nconst UserRow = React.memo(function UserRow({ user, onSelect }) {\n  return <button onClick={() => onSelect(user.id)}>{user.name}</button>;\n});\n```\n\nMemoization is not free. It adds comparison work and complexity. Use it when there is a measured or obvious reason.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is React doing during render?",
+      "Does every render change the DOM?",
+      "What causes a component to re-render?",
+      "Why should render logic be pure?",
+      "When is memoization useful?"
+    ],
+    "interviewAnswer": "React components re-render when state changes, a parent renders, or consumed context changes. Rendering means React calls the component to calculate the next UI; it does not always mean the DOM changed.\n\nA strong answer should explain render versus commit, purity, parent-child render behavior, and practical optimization tools like moving state down, splitting components, memoization, and avoiding overly broad context updates.",
+    "sourceLinks": [
+      {
+        "label": "React: Render and commit",
+        "url": "https://react.dev/learn/render-and-commit"
+      },
+      {
+        "label": "React: Keeping components pure",
+        "url": "https://react.dev/learn/keeping-components-pure"
+      }
+    ],
+    "beginnerExplanation": "A React render is React calling your component function to calculate what the UI should look like. A re-render means React calls it again because something changed.\n\nThe beginner mistake is thinking a render always means the DOM changed. Rendering is calculation. After rendering, React compares the new result to the previous result and commits the necessary DOM changes.\n\nComponents re-render when their state changes, their parent renders, or context they use changes. Props are part of the parent render path: if a parent renders, React may call the child again with the current props.",
+    "example": "Here is a simple example:\n\n```jsx\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  console.log(\"render\");\n\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      {count}\n    </button>\n  );\n}\n```\n\nClicking the button updates state. React calls `Counter` again. The new render returns UI with the new count.\n\nParent renders can also cause child renders:\n\n```jsx\nfunction Parent() {\n  const [theme, setTheme] = useState(\"light\");\n\n  return <Child />;\n}\n```\n\nIf `theme` changes, `Parent` renders again. `Child` may also be called again even if its props did not change. That is not automatically a bug. React rendering should be pure and cheap enough that normal renders are fine.",
+    "commonMistakes": "A common mistake is treating every re-render as bad. Many renders are harmless.\n\nAnother mistake is memoizing everything. That can make code harder to understand without improving performance.\n\nA third mistake is mutating objects. If you mutate state in place, React may not see a meaningful change, and memoized components may behave incorrectly.\n\nAlso remember that render should be pure. Do not start network requests, change DOM manually, or write to storage during render."
+  },
+  {
+    "id": "fe-semantic-html",
+    "track": "Frontend",
+    "category": "Accessibility",
+    "level": "Foundational",
+    "question": "Why does semantic HTML matter?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Semantic HTML means using HTML elements according to their meaning, not only their appearance.\n\nA `<button>` means an action can be triggered. An `<a>` means navigation to another location. A `<nav>` means a navigation region. A `<main>` means the main content of the page. A `<form>` means a set of controls can be submitted. A heading means a section title.\n\nThis matters because the browser, screen readers, keyboard users, search engines, password managers, form tools, and testing tools all understand meaning from HTML.\n\nIf you use the right element, you get useful behavior for free. A real button can be focused with the keyboard. It responds to Enter and Space. It communicates itself as a button to assistive technology. It can be disabled. It participates in forms.\n\nIf you use a `<div>` and make it look like a button, you have to rebuild all of that behavior yourself.\n\n```html\n<button type=\"button\">Save changes</button>\n```\n\nThis is better than:\n\n```html\n<div class=\"button\">Save changes</div>\n```\n\nThe second version may look correct visually, but it has weak meaning and weak built-in behavior."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "The most common semantic decision is button versus link.\n\nUse a link when the user is going somewhere.\n\n```html\n<a href=\"/settings\">Account settings</a>\n```\n\nUse a button when the user is doing something on the current page.\n\n```html\n<button type=\"button\">Open menu</button>\n```\n\nThis distinction helps keyboard and screen reader users understand what will happen. It also helps the browser provide the right default behavior.\n\nHeadings are another major example. Headings create a document outline. A screen reader user can jump between headings to understand the page structure, similar to how a sighted user scans large text.\n\n```html\n<main>\n  <h1>Billing</h1>\n  <section>\n    <h2>Payment method</h2>\n  </section>\n  <section>\n    <h2>Invoices</h2>\n  </section>\n</main>\n```\n\nThis is much more understandable than a page made entirely of styled `<div>` elements."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Semantic HTML does not mean ugly HTML. You can style semantic elements however the design requires. The point is to start with the correct meaning, then style it.\n\nFor forms, connect labels to inputs.\n\n```html\n<label for=\"email\">Email address</label>\n<input id=\"email\" name=\"email\" type=\"email\" />\n```\n\nFor page structure, use landmarks.\n\n```html\n<header>...</header>\n<nav>...</nav>\n<main>...</main>\n<footer>...</footer>\n```\n\nFor interactive controls, prefer native elements before reaching for ARIA. ARIA can add accessibility information, but it does not automatically add all native keyboard behavior. A custom div with `role=\"button\"` still needs keyboard handling, focus styling, disabled behavior, and careful testing.\n\nThe best practical mindset is: choose the HTML element that already means what the UI does."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using clickable divs everywhere because they are easy to style. That creates keyboard and assistive technology problems.\n\nAnother mistake is using ARIA to cover up incorrect HTML. ARIA is powerful, but native semantic elements are usually more reliable.\n\nA third mistake is choosing elements based on visual style. A link can look like a button. A button can look like an icon. Meaning should come from behavior, not appearance."
+      }
+    ],
+    "answer": "Semantic HTML means using HTML elements according to their meaning, not only their appearance.",
+    "reasoning": "Semantic HTML does not mean ugly HTML. You can style semantic elements however the design requires. The point is to start with the correct meaning, then style it.\n\nFor forms, connect labels to inputs.\n\n```html\n<label for=\"email\">Email address</label>\n<input id=\"email\" name=\"email\" type=\"email\" />\n```\n\nFor page structure, use landmarks.\n\n```html\n<header>...</header>\n<nav>...</nav>\n<main>...</main>\n<footer>...</footer>\n```\n\nFor interactive controls, prefer native elements before reaching for ARIA. ARIA can add accessibility information, but it does not automatically add all native keyboard behavior. A custom div with `role=\"button\"` still needs keyboard handling, focus styling, disabled behavior, and careful testing.\n\nThe best practical mindset is: choose the HTML element that already means what the UI does.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does semantic HTML mean?",
+      "When should you use a link instead of a button?",
+      "Why are headings important for navigation?",
+      "Why is a native button better than a clickable div?",
+      "Why should ARIA not be your first tool for normal controls?"
+    ],
+    "interviewAnswer": "Semantic HTML means using elements for their real meaning and behavior. It improves accessibility, keyboard support, browser behavior, maintainability, and tooling because the platform understands what the UI is.\n\nI would use links for navigation, buttons for actions, labels for inputs, headings for structure, and landmarks for page regions. A strong answer should mention that native elements give built-in behavior that custom divs and ARIA often require you to recreate manually.",
+    "sourceLinks": [
+      {
+        "label": "MDN: HTML elements reference",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements"
+      },
+      {
+        "label": "WAI-ARIA APG: Read me first",
+        "url": "https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/"
+      }
+    ],
+    "beginnerExplanation": "Semantic HTML means using HTML elements according to their meaning, not only their appearance.\n\nA `<button>` means an action can be triggered. An `<a>` means navigation to another location. A `<nav>` means a navigation region. A `<main>` means the main content of the page. A `<form>` means a set of controls can be submitted. A heading means a section title.\n\nThis matters because the browser, screen readers, keyboard users, search engines, password managers, form tools, and testing tools all understand meaning from HTML.\n\nIf you use the right element, you get useful behavior for free. A real button can be focused with the keyboard. It responds to Enter and Space. It communicates itself as a button to assistive technology. It can be disabled. It participates in forms.\n\nIf you use a `<div>` and make it look like a button, you have to rebuild all of that behavior yourself.\n\n```html\n<button type=\"button\">Save changes</button>\n```\n\nThis is better than:\n\n```html\n<div class=\"button\">Save changes</div>\n```\n\nThe second version may look correct visually, but it has weak meaning and weak built-in behavior.",
+    "example": "The most common semantic decision is button versus link.\n\nUse a link when the user is going somewhere.\n\n```html\n<a href=\"/settings\">Account settings</a>\n```\n\nUse a button when the user is doing something on the current page.\n\n```html\n<button type=\"button\">Open menu</button>\n```\n\nThis distinction helps keyboard and screen reader users understand what will happen. It also helps the browser provide the right default behavior.\n\nHeadings are another major example. Headings create a document outline. A screen reader user can jump between headings to understand the page structure, similar to how a sighted user scans large text.\n\n```html\n<main>\n  <h1>Billing</h1>\n  <section>\n    <h2>Payment method</h2>\n  </section>\n  <section>\n    <h2>Invoices</h2>\n  </section>\n</main>\n```\n\nThis is much more understandable than a page made entirely of styled `<div>` elements.",
+    "commonMistakes": "A common mistake is using clickable divs everywhere because they are easy to style. That creates keyboard and assistive technology problems.\n\nAnother mistake is using ARIA to cover up incorrect HTML. ARIA is powerful, but native semantic elements are usually more reliable.\n\nA third mistake is choosing elements based on visual style. A link can look like a button. A button can look like an icon. Meaning should come from behavior, not appearance."
+  },
+  {
+    "id": "fe-testing-confidence",
+    "track": "Frontend",
+    "category": "Testing",
+    "level": "Intermediate",
+    "question": "What should you test in a frontend app?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Frontend testing is not about proving every line of code exists. It is about gaining confidence that important user behavior works.\n\nA beginner often starts by asking, \"Which functions should I test?\" A better question is, \"What would hurt the user or business if it broke?\"\n\nFor a login form, the important behavior is not that a `setEmail` function was called. The important behavior is that the user can enter credentials, submit the form, see loading feedback, handle invalid credentials, and reach the next screen on success.\n\nGood frontend tests usually focus on behavior visible to the user:\n\n- What the user can see.\n- What the user can type, click, select, or submit.\n- What changes after an action.\n- What happens when the server succeeds or fails.\n- What accessibility roles and labels expose to assistive technology.\n\nThis is why Testing Library encourages tests that resemble how users interact with the app."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine this login form:\n\n```jsx\nfunction LoginForm({ onSubmit }) {\n  return (\n    <form onSubmit={onSubmit}>\n      <label htmlFor=\"email\">Email</label>\n      <input id=\"email\" name=\"email\" />\n\n      <label htmlFor=\"password\">Password</label>\n      <input id=\"password\" name=\"password\" type=\"password\" />\n\n      <button>Sign in</button>\n    </form>\n  );\n}\n```\n\nA user-focused test would find elements the way a user or assistive technology would.\n\n```jsx\nconst user = userEvent.setup();\n\nrender(<LoginForm onSubmit={handleSubmit} />);\n\nawait user.type(screen.getByLabelText(/email/i), \"ada@example.com\");\nawait user.type(screen.getByLabelText(/password/i), \"secret\");\nawait user.click(screen.getByRole(\"button\", { name: /sign in/i }));\n\nexpect(handleSubmit).toHaveBeenCalled();\n```\n\nNotice the selectors: label text and role. That encourages accessible HTML. If your test cannot find the input by label, maybe the user cannot understand it either.\n\nFor data loading, you can mock the network at the request level instead of mocking every internal function. Tools like Mock Service Worker let the component behave as if it is talking to a real API, while the test controls the response."
+      },
+      {
+        "title": "Make it practical",
+        "body": "A healthy frontend test strategy has layers.\n\nUse unit tests for pure logic: formatting, validation rules, reducers, small utilities, and edge cases that are easy to isolate.\n\nUse component or integration tests for user flows inside a screen: forms, modals, filters, empty states, loading states, errors, permissions, and data rendering.\n\nUse end-to-end tests for the highest-value journeys across the app: signup, checkout, money transfer, onboarding, or any flow where many systems must work together.\n\nThe more a test resembles real user behavior, the more confidence it gives, but it may also be slower and more expensive. The trick is balance. Do not write only tiny tests that miss real behavior. Do not write only end-to-end tests that are slow and brittle.\n\nFor an interview, it is good to say what you would test and why. For example: \"I would test the successful path, the validation errors, the server failure, the loading state, and the keyboard-accessible controls because those are the states a real user depends on.\""
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is testing implementation details. If a test breaks because you renamed an internal function but the user behavior still works, the test may be too coupled to the implementation.\n\nAnother mistake is only testing the happy path. Real users see loading, empty, error, disabled, unauthenticated, and slow-network states.\n\nA third mistake is snapshotting large trees and treating the snapshot as confidence. Snapshots can catch accidental markup changes, but they often do not prove the user can complete a task."
+      }
+    ],
+    "answer": "Frontend testing is not about proving every line of code exists. It is about gaining confidence that important user behavior works.",
+    "reasoning": "A healthy frontend test strategy has layers.\n\nUse unit tests for pure logic: formatting, validation rules, reducers, small utilities, and edge cases that are easy to isolate.\n\nUse component or integration tests for user flows inside a screen: forms, modals, filters, empty states, loading states, errors, permissions, and data rendering.\n\nUse end-to-end tests for the highest-value journeys across the app: signup, checkout, money transfer, onboarding, or any flow where many systems must work together.\n\nThe more a test resembles real user behavior, the more confidence it gives, but it may also be slower and more expensive. The trick is balance. Do not write only tiny tests that miss real behavior. Do not write only end-to-end tests that are slow and brittle.\n\nFor an interview, it is good to say what you would test and why. For example: \"I would test the successful path, the validation errors, the server failure, the loading state, and the keyboard-accessible controls because those are the states a real user depends on.\"",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the main purpose of frontend tests?",
+      "Why are role and label queries useful?",
+      "What kinds of behavior belong in component tests?",
+      "When would an end-to-end test be worth it?",
+      "Why can implementation-detail tests become brittle?"
+    ],
+    "interviewAnswer": "I would test frontend behavior that matters to users: rendering important content, completing key interactions, validation, loading states, error states, accessibility labels and roles, and server success or failure. I would use unit tests for pure logic, component tests for screen behavior, and end-to-end tests for critical journeys.\n\nThe strongest answer is not \"test everything.\" It is \"test the things whose failure would hurt the user, and write those tests in a way that resembles how the user experiences the product.\"",
+    "sourceLinks": [
+      {
+        "label": "Testing Library: Guiding principles",
+        "url": "https://testing-library.com/docs/guiding-principles"
+      },
+      {
+        "label": "Mock Service Worker: Documentation",
+        "url": "https://mswjs.io/docs/"
+      }
+    ],
+    "beginnerExplanation": "Frontend testing is not about proving every line of code exists. It is about gaining confidence that important user behavior works.\n\nA beginner often starts by asking, \"Which functions should I test?\" A better question is, \"What would hurt the user or business if it broke?\"\n\nFor a login form, the important behavior is not that a `setEmail` function was called. The important behavior is that the user can enter credentials, submit the form, see loading feedback, handle invalid credentials, and reach the next screen on success.\n\nGood frontend tests usually focus on behavior visible to the user:\n\n- What the user can see.\n- What the user can type, click, select, or submit.\n- What changes after an action.\n- What happens when the server succeeds or fails.\n- What accessibility roles and labels expose to assistive technology.\n\nThis is why Testing Library encourages tests that resemble how users interact with the app.",
+    "example": "Imagine this login form:\n\n```jsx\nfunction LoginForm({ onSubmit }) {\n  return (\n    <form onSubmit={onSubmit}>\n      <label htmlFor=\"email\">Email</label>\n      <input id=\"email\" name=\"email\" />\n\n      <label htmlFor=\"password\">Password</label>\n      <input id=\"password\" name=\"password\" type=\"password\" />\n\n      <button>Sign in</button>\n    </form>\n  );\n}\n```\n\nA user-focused test would find elements the way a user or assistive technology would.\n\n```jsx\nconst user = userEvent.setup();\n\nrender(<LoginForm onSubmit={handleSubmit} />);\n\nawait user.type(screen.getByLabelText(/email/i), \"ada@example.com\");\nawait user.type(screen.getByLabelText(/password/i), \"secret\");\nawait user.click(screen.getByRole(\"button\", { name: /sign in/i }));\n\nexpect(handleSubmit).toHaveBeenCalled();\n```\n\nNotice the selectors: label text and role. That encourages accessible HTML. If your test cannot find the input by label, maybe the user cannot understand it either.\n\nFor data loading, you can mock the network at the request level instead of mocking every internal function. Tools like Mock Service Worker let the component behave as if it is talking to a real API, while the test controls the response.",
+    "commonMistakes": "A common mistake is testing implementation details. If a test breaks because you renamed an internal function but the user behavior still works, the test may be too coupled to the implementation.\n\nAnother mistake is only testing the happy path. Real users see loading, empty, error, disabled, unauthenticated, and slow-network states.\n\nA third mistake is snapshotting large trees and treating the snapshot as confidence. Snapshots can catch accidental markup changes, but they often do not prove the user can complete a task."
+  },
+  {
+    "id": "fe-use-effect",
+    "track": "Frontend",
+    "category": "React",
+    "level": "Intermediate",
+    "question": "What should go in useEffect?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "`useEffect` is easier to understand when you first separate three kinds of code inside a React component.\n\nFirst, there is rendering code. Rendering code calculates what the UI should look like from the current props and state. It should be pure. That means it should not change the outside world. It should not start network requests, modify DOM nodes, subscribe to services, or set timers.\n\nSecond, there are event handlers. Event handlers run because a specific user action happened: a click, a form submit, a key press, a selection. If the work is caused by a particular user action, it usually belongs in the event handler.\n\nThird, there are Effects. Effects are for synchronizing React with something outside React because the component is now on the screen or because some rendered state changed. This is why React calls Effects an escape hatch.\n\nSo the simple rule is: `useEffect` should not be your default place for logic. It should be used when React needs to coordinate with an external system after rendering."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a video player component:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  if (isPlaying) {\n    ref.current.play();\n  } else {\n    ref.current.pause();\n  }\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nThis is wrong because render is trying to control a DOM node. During render, React is still calculating the UI. The DOM node may not even be ready yet. Rendering should describe the video element, not imperatively play or pause it.\n\nThe Effect version synchronizes after React commits the UI:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  useEffect(() => {\n    if (isPlaying) {\n      ref.current.play();\n    } else {\n      ref.current.pause();\n    }\n  }, [isPlaying]);\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nNow the component says: after this render is on screen, make the real browser video element match the React state.\n\nThat is the right mental model. An Effect is not simply code that runs after render. It is code that keeps an external system in sync with what React rendered."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Good Effect use cases include connecting to a chat server, subscribing to browser events, starting and clearing timers, controlling a non-React widget, manually interacting with a DOM API, and sometimes fetching data when a framework does not provide a better data-fetching layer.\n\nBad Effect use cases often involve derived state. If you can calculate a value from props or state during render, do that instead.\n\nAvoid this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const [fullName, setFullName] = useState(\"\");\n\n  useEffect(() => {\n    setFullName(`${firstName} ${lastName}`);\n  }, [firstName, lastName]);\n}\n```\n\nThis creates duplicated truth. React renders once with an old `fullName`, then the Effect runs, then React renders again.\n\nPrefer this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const fullName = `${firstName} ${lastName}`;\n}\n```\n\nNo Effect is needed because no external system is involved."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "The biggest mistake is using Effects to repair state that should not exist. If a value can be derived during render, storing it separately creates synchronization bugs.\n\nAnother mistake is forgetting cleanup. If an Effect subscribes, it should unsubscribe. If it starts a timer, it should clear the timer. If it starts async work, it should handle cancellation or ignore stale results.\n\nDevelopers are also surprised when Effects run twice in development Strict Mode. React does this to reveal Effects that are not resilient to being started, cleaned up, and started again."
+      }
+    ],
+    "answer": "`useEffect` is easier to understand when you first separate three kinds of code inside a React component.",
+    "reasoning": "Good Effect use cases include connecting to a chat server, subscribing to browser events, starting and clearing timers, controlling a non-React widget, manually interacting with a DOM API, and sometimes fetching data when a framework does not provide a better data-fetching layer.\n\nBad Effect use cases often involve derived state. If you can calculate a value from props or state during render, do that instead.\n\nAvoid this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const [fullName, setFullName] = useState(\"\");\n\n  useEffect(() => {\n    setFullName(`${firstName} ${lastName}`);\n  }, [firstName, lastName]);\n}\n```\n\nThis creates duplicated truth. React renders once with an old `fullName`, then the Effect runs, then React renders again.\n\nPrefer this:\n\n```jsx\nfunction Form({ firstName, lastName }) {\n  const fullName = `${firstName} ${lastName}`;\n}\n```\n\nNo Effect is needed because no external system is involved.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Is this logic caused by rendering, or by a specific user event?",
+      "Is there an external system involved?",
+      "Can this value be calculated from existing props or state instead?",
+      "What cleanup should happen when inputs change or the component unmounts?",
+      "What bug appears if this Effect runs more than once in development?"
+    ],
+    "interviewAnswer": "`useEffect` should be used to synchronize React with external systems after rendering: browser APIs, network connections, subscriptions, timers, imperative widgets, or DOM APIs. It should not be the default place for deriving state or responding to direct user actions.\n\nA strong answer separates render logic, event-handler logic, and Effect logic. It also mentions dependencies, cleanup, stale closures, Strict Mode behavior, and the fact that many data-fetching problems are better handled by framework loaders or libraries than by hand-written Effects.",
+    "sourceLinks": [
+      {
+        "label": "React: Synchronizing with Effects",
+        "url": "https://react.dev/learn/synchronizing-with-effects"
+      },
+      {
+        "label": "React: You Might Not Need an Effect",
+        "url": "https://react.dev/learn/you-might-not-need-an-effect"
+      }
+    ],
+    "beginnerExplanation": "`useEffect` is easier to understand when you first separate three kinds of code inside a React component.\n\nFirst, there is rendering code. Rendering code calculates what the UI should look like from the current props and state. It should be pure. That means it should not change the outside world. It should not start network requests, modify DOM nodes, subscribe to services, or set timers.\n\nSecond, there are event handlers. Event handlers run because a specific user action happened: a click, a form submit, a key press, a selection. If the work is caused by a particular user action, it usually belongs in the event handler.\n\nThird, there are Effects. Effects are for synchronizing React with something outside React because the component is now on the screen or because some rendered state changed. This is why React calls Effects an escape hatch.\n\nSo the simple rule is: `useEffect` should not be your default place for logic. It should be used when React needs to coordinate with an external system after rendering.",
+    "example": "Imagine a video player component:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  if (isPlaying) {\n    ref.current.play();\n  } else {\n    ref.current.pause();\n  }\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nThis is wrong because render is trying to control a DOM node. During render, React is still calculating the UI. The DOM node may not even be ready yet. Rendering should describe the video element, not imperatively play or pause it.\n\nThe Effect version synchronizes after React commits the UI:\n\n```jsx\nfunction VideoPlayer({ isPlaying, src }) {\n  const ref = useRef(null);\n\n  useEffect(() => {\n    if (isPlaying) {\n      ref.current.play();\n    } else {\n      ref.current.pause();\n    }\n  }, [isPlaying]);\n\n  return <video ref={ref} src={src} />;\n}\n```\n\nNow the component says: after this render is on screen, make the real browser video element match the React state.\n\nThat is the right mental model. An Effect is not simply code that runs after render. It is code that keeps an external system in sync with what React rendered.",
+    "commonMistakes": "The biggest mistake is using Effects to repair state that should not exist. If a value can be derived during render, storing it separately creates synchronization bugs.\n\nAnother mistake is forgetting cleanup. If an Effect subscribes, it should unsubscribe. If it starts a timer, it should clear the timer. If it starts async work, it should handle cancellation or ignore stale results.\n\nDevelopers are also surprised when Effects run twice in development Strict Mode. React does this to reveal Effects that are not resilient to being started, cleaned up, and started again."
+  },
+  {
+    "id": "fe-xss",
+    "track": "Frontend",
+    "category": "Security",
+    "level": "Intermediate",
+    "question": "What is cross-site scripting, and how do you prevent it?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Cross-site scripting, usually called XSS, happens when an attacker gets malicious JavaScript to run in another user's browser as if it belonged to your site.\n\nThat is dangerous because JavaScript running on your site can often read page content, make requests as the user, steal tokens if they are exposed, change what the user sees, or trick the user into taking actions.\n\nThe core problem is untrusted input becoming executable code.\n\nImagine a comment feature. A normal user writes:\n\n```txt\nGreat article.\n```\n\nAn attacker writes:\n\n```html\n<script>sendCookiesToAttacker()</script>\n```\n\nIf your app stores that comment and later renders it as real HTML, the browser may execute the attacker's script for every user who views the page.\n\nThe beginner-friendly rule is: user input should be treated as data, not as code."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "In React, this is usually safe:\n\n```jsx\nfunction Comment({ text }) {\n  return <p>{text}</p>;\n}\n```\n\nIf `text` contains `<script>alert(\"bad\")</script>`, React escapes it. The browser displays it as text instead of executing it.\n\nThis is risky:\n\n```jsx\nfunction Comment({ html }) {\n  return <div dangerouslySetInnerHTML={{ __html: html }} />;\n}\n```\n\nThe name is deliberately scary because React is telling you: if this string contains unsafe HTML, the browser may treat it as real markup and script-capable content.\n\nXSS can also appear in URLs and attributes. A link that accepts any string from a user can become dangerous if it allows schemes like `javascript:`.\n\n```jsx\n<a href={userProvidedUrl}>Open profile</a>\n```\n\nThat does not mean links are always unsafe. It means URL values should be validated based on what the product expects."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Preventing XSS usually requires several layers.\n\nFirst, escape output by default. Frameworks like React help when you render values as text.\n\nSecond, avoid rendering raw HTML from users. If the product truly needs rich text, sanitize it with a trusted sanitizer that removes dangerous tags and attributes. Do not write your own sanitizer casually.\n\nThird, validate URLs and other dangerous fields. If a profile link should be `https`, enforce that.\n\nFourth, use safe APIs. Prefer `textContent` over `innerHTML` when setting text manually.\n\n```js\nelement.textContent = userComment;\n```\n\nFifth, use Content Security Policy as an additional defense. CSP can reduce damage by limiting which scripts the browser is allowed to execute. It should not be your only protection, but it is valuable.\n\nIn a real app, I would also pay attention to where tokens are stored, whether cookies are `HttpOnly`, and whether third-party scripts are allowed to run on sensitive pages."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
+      }
+    ],
+    "answer": "Cross-site scripting, usually called XSS, happens when an attacker gets malicious JavaScript to run in another user's browser as if it belonged to your site.",
+    "reasoning": "Preventing XSS usually requires several layers.\n\nFirst, escape output by default. Frameworks like React help when you render values as text.\n\nSecond, avoid rendering raw HTML from users. If the product truly needs rich text, sanitize it with a trusted sanitizer that removes dangerous tags and attributes. Do not write your own sanitizer casually.\n\nThird, validate URLs and other dangerous fields. If a profile link should be `https`, enforce that.\n\nFourth, use safe APIs. Prefer `textContent` over `innerHTML` when setting text manually.\n\n```js\nelement.textContent = userComment;\n```\n\nFifth, use Content Security Policy as an additional defense. CSP can reduce damage by limiting which scripts the browser is allowed to execute. It should not be your only protection, but it is valuable.\n\nIn a real app, I would also pay attention to where tokens are stored, whether cookies are `HttpOnly`, and whether third-party scripts are allowed to run on sensitive pages.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does XSS let an attacker do?",
+      "Why is untrusted input becoming executable code dangerous?",
+      "Why is normal React text rendering safer than raw HTML insertion?",
+      "When would sanitization be needed?",
+      "Why is CSP a defense layer rather than the whole solution?"
+    ],
+    "interviewAnswer": "XSS is when attacker-controlled input runs as JavaScript in another user's browser under your site's trust. It can steal data, perform actions as the user, or alter the page.\n\nTo prevent it, render untrusted input as text, avoid raw HTML, sanitize rich text when truly needed, validate dangerous values like URLs, use safe DOM APIs, protect tokens, and add Content Security Policy as defense in depth. A strong answer should mention that React escapes text by default but does not remove every XSS risk.",
+    "sourceLinks": [
+      {
+        "label": "OWASP: Cross Site Scripting Prevention Cheat Sheet",
+        "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+      },
+      {
+        "label": "MDN: Content Security Policy",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP"
+      }
+    ],
+    "beginnerExplanation": "Cross-site scripting, usually called XSS, happens when an attacker gets malicious JavaScript to run in another user's browser as if it belonged to your site.\n\nThat is dangerous because JavaScript running on your site can often read page content, make requests as the user, steal tokens if they are exposed, change what the user sees, or trick the user into taking actions.\n\nThe core problem is untrusted input becoming executable code.\n\nImagine a comment feature. A normal user writes:\n\n```txt\nGreat article.\n```\n\nAn attacker writes:\n\n```html\n<script>sendCookiesToAttacker()</script>\n```\n\nIf your app stores that comment and later renders it as real HTML, the browser may execute the attacker's script for every user who views the page.\n\nThe beginner-friendly rule is: user input should be treated as data, not as code.",
+    "example": "In React, this is usually safe:\n\n```jsx\nfunction Comment({ text }) {\n  return <p>{text}</p>;\n}\n```\n\nIf `text` contains `<script>alert(\"bad\")</script>`, React escapes it. The browser displays it as text instead of executing it.\n\nThis is risky:\n\n```jsx\nfunction Comment({ html }) {\n  return <div dangerouslySetInnerHTML={{ __html: html }} />;\n}\n```\n\nThe name is deliberately scary because React is telling you: if this string contains unsafe HTML, the browser may treat it as real markup and script-capable content.\n\nXSS can also appear in URLs and attributes. A link that accepts any string from a user can become dangerous if it allows schemes like `javascript:`.\n\n```jsx\n<a href={userProvidedUrl}>Open profile</a>\n```\n\nThat does not mean links are always unsafe. It means URL values should be validated based on what the product expects.",
+    "commonMistakes": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
   }
 ];

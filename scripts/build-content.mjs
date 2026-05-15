@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -6,6 +6,8 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const contentDir = join(root, "content", "lessons");
 const outputFile = join(root, "src", "generatedQuestions.ts");
 const summariesFile = join(root, "src", "questionSummaries.ts");
+const searchIndexFile = join(root, "src", "questionSearchIndex.ts");
+const lessonDetailsDir = join(root, "src", "generated-lessons");
 
 function parseValue(value) {
   const trimmed = value.trim();
@@ -117,28 +119,74 @@ function buildQuestion(file) {
   };
 }
 
+const trackOrder = new Map([
+  ["TPM", 0],
+  ["Frontend", 1]
+]);
 const files = readdirSync(contentDir).filter((file) => file.endsWith(".md")).sort();
-const questions = files.map(buildQuestion);
+const questions = files
+  .map(buildQuestion)
+  .sort((left, right) => {
+    const leftTrack = trackOrder.get(left.track) ?? trackOrder.size;
+    const rightTrack = trackOrder.get(right.track) ?? trackOrder.size;
+    return leftTrack - rightTrack || left.id.localeCompare(right.id);
+  });
 const content = `import type { Question } from "./questionTypes";
 
 export const generatedQuestions: Question[] = ${JSON.stringify(questions, null, 2)};
 `;
-const summaries = questions.map(({ id, track, category, level, question }) => ({
-  id,
-  track,
-  category,
-  level,
-  question,
+const summaries = questions.map((item) => ({
+  id: item.id,
+  track: item.track,
+  category: item.category,
+  level: item.level,
+  question: item.question,
   answer: "",
   reasoning: "",
   tests: "",
   followUps: []
 }));
+const searchIndex = Object.fromEntries(
+  questions.map((item) => [
+    item.id,
+    [
+    item.question,
+    item.track,
+    item.category,
+    item.level,
+    item.beginnerExplanation,
+    item.answer,
+    item.interviewAnswer,
+    item.example,
+    item.reasoning,
+    item.commonMistakes,
+    item.tests,
+    ...(item.sourceLinks || []).flatMap((source) => [source.label, source.url])
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+  ])
+);
 const summariesContent = `import type { Question } from "./questionTypes";
 
 export const questionSummaries: Question[] = ${JSON.stringify(summaries, null, 2)};
 `;
+const searchIndexContent = `export const questionSearchIndex: Record<string, string> = ${JSON.stringify(searchIndex, null, 2)};
+`;
 
 mkdirSync(dirname(outputFile), { recursive: true });
+rmSync(lessonDetailsDir, { force: true, recursive: true });
+mkdirSync(lessonDetailsDir, { recursive: true });
+
+for (const question of questions) {
+  const lessonContent = `import type { Question } from "../questionTypes";
+
+export const lesson: Question = ${JSON.stringify(question, null, 2)};
+`;
+  writeFileSync(join(lessonDetailsDir, `${question.id}.ts`), lessonContent);
+}
+
 writeFileSync(outputFile, content);
 writeFileSync(summariesFile, summariesContent);
+writeFileSync(searchIndexFile, searchIndexContent);

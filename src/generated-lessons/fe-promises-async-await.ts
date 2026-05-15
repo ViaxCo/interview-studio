@@ -1,0 +1,51 @@
+import type { Question } from "../questionTypes";
+
+export const lesson: Question = {
+  "id": "fe-promises-async-await",
+  "track": "Frontend",
+  "category": "JavaScript",
+  "level": "Foundational",
+  "question": "Explain Promises and async/await in JavaScript.",
+  "lessonSections": [
+    {
+      "title": "Learn it",
+      "body": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.\n\nThis is useful because frontend apps are full of waiting: waiting for a network request, waiting for a file to load, waiting for permission, waiting for an animation, or waiting for a database response from an API.\n\nA Promise has three states:\n\n- Pending: the work is still in progress.\n- Fulfilled: the work succeeded and produced a value.\n- Rejected: the work failed and produced an error reason.\n\nHere is a basic Promise chain:\n\n```js\nfetch(\"/api/user\")\n  .then((response) => response.json())\n  .then((user) => {\n    console.log(user.name);\n  })\n  .catch((error) => {\n    console.error(error);\n  });\n```\n\n`async` and `await` do not replace Promises. They give you a more readable way to work with Promises.\n\n```js\nasync function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n    const user = await response.json();\n    console.log(user.name);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```\n\nThe important idea is: `await` pauses the async function until the Promise settles, but it does not freeze the whole browser."
+    },
+    {
+      "title": "Walkthrough",
+      "body": "Suppose a user opens a profile page. The app asks the server for profile data.\n\n```js\nasync function getProfile(userId) {\n  const response = await fetch(`/api/users/${userId}`);\n\n  if (!response.ok) {\n    throw new Error(\"Could not load profile\");\n  }\n\n  return response.json();\n}\n```\n\nWhen JavaScript reaches `await fetch(...)`, the async function waits for that Promise. Other browser work can continue. The user can still move the mouse. Other events can still be scheduled. JavaScript is not sitting in a blocking loop.\n\nIf the request succeeds, execution continues and `response` is available. If the Promise rejects, control jumps to the nearest `catch`.\n\n```js\nasync function showProfile(userId) {\n  try {\n    const profile = await getProfile(userId);\n    renderProfile(profile);\n  } catch (error) {\n    renderError(\"We could not load this profile.\");\n  }\n}\n```\n\nThis reads like normal step-by-step code, but it is still Promise-based underneath."
+    },
+    {
+      "title": "Make it practical",
+      "body": "The main frontend skill is not just knowing syntax. It is knowing what should happen in each state.\n\nWhen loading data, the UI usually needs:\n\n1. A loading state while the Promise is pending.\n2. A success state when data arrives.\n3. An error state when the request fails.\n4. A retry or recovery path if the user can try again.\n\n```jsx\nfunction Profile({ userId }) {\n  const [state, setState] = useState({ status: \"loading\" });\n\n  useEffect(() => {\n    let ignore = false;\n\n    async function load() {\n      try {\n        const profile = await getProfile(userId);\n        if (!ignore) setState({ status: \"success\", profile });\n      } catch (error) {\n        if (!ignore) setState({ status: \"error\" });\n      }\n    }\n\n    load();\n\n    return () => {\n      ignore = true;\n    };\n  }, [userId]);\n\n  if (state.status === \"loading\") return <p>Loading...</p>;\n  if (state.status === \"error\") return <p>Could not load profile.</p>;\n  return <h1>{state.profile.name}</h1>;\n}\n```\n\nThis example also shows a real bug to avoid: stale async results. If `userId` changes before the first request finishes, you do not want the old request to overwrite the new page state."
+    },
+    {
+      "title": "Common mistakes",
+      "body": "A common mistake is forgetting to return or await a Promise. If you call an async function without awaiting it, the surrounding code continues immediately.\n\nAnother mistake is using `try/catch` but only wrapping synchronous code. Errors from awaited Promises are caught by `try/catch`, but errors from Promises you do not await may escape that block.\n\nA third mistake is accidentally running async work one at a time when it could run in parallel.\n\n```js\nconst user = await fetchUser();\nconst teams = await fetchTeams();\n```\n\nIf those two requests do not depend on each other, this may be slower than:\n\n```js\nconst [user, teams] = await Promise.all([fetchUser(), fetchTeams()]);\n```"
+    }
+  ],
+  "answer": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.",
+  "reasoning": "The main frontend skill is not just knowing syntax. It is knowing what should happen in each state.\n\nWhen loading data, the UI usually needs:\n\n1. A loading state while the Promise is pending.\n2. A success state when data arrives.\n3. An error state when the request fails.\n4. A retry or recovery path if the user can try again.\n\n```jsx\nfunction Profile({ userId }) {\n  const [state, setState] = useState({ status: \"loading\" });\n\n  useEffect(() => {\n    let ignore = false;\n\n    async function load() {\n      try {\n        const profile = await getProfile(userId);\n        if (!ignore) setState({ status: \"success\", profile });\n      } catch (error) {\n        if (!ignore) setState({ status: \"error\" });\n      }\n    }\n\n    load();\n\n    return () => {\n      ignore = true;\n    };\n  }, [userId]);\n\n  if (state.status === \"loading\") return <p>Loading...</p>;\n  if (state.status === \"error\") return <p>Could not load profile.</p>;\n  return <h1>{state.profile.name}</h1>;\n}\n```\n\nThis example also shows a real bug to avoid: stale async results. If `userId` changes before the first request finishes, you do not want the old request to overwrite the new page state.",
+  "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+  "followUps": [
+    "What are the three Promise states?",
+    "What does `await` actually wait for?",
+    "Does `await` block the whole browser?",
+    "Why does UI need loading, success, and error states?",
+    "When should you use `Promise.all`?"
+  ],
+  "interviewAnswer": "A Promise represents an asynchronous result that is pending, fulfilled, or rejected. `async/await` is syntax for writing Promise-based code in a more sequential style. `await` pauses the async function until the Promise settles, but it does not block the whole browser thread.\n\nA strong frontend answer should connect Promises to UI states: loading, success, error, retry, cancellation or stale-result handling, and parallel work with `Promise.all` when requests do not depend on each other.",
+  "sourceLinks": [
+    {
+      "label": "MDN: Promise",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+    },
+    {
+      "label": "MDN: async function",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"
+    }
+  ],
+  "beginnerExplanation": "A Promise represents a value you do not have yet. The work may still be happening. Later, the Promise will either succeed with a value or fail with a reason.\n\nThis is useful because frontend apps are full of waiting: waiting for a network request, waiting for a file to load, waiting for permission, waiting for an animation, or waiting for a database response from an API.\n\nA Promise has three states:\n\n- Pending: the work is still in progress.\n- Fulfilled: the work succeeded and produced a value.\n- Rejected: the work failed and produced an error reason.\n\nHere is a basic Promise chain:\n\n```js\nfetch(\"/api/user\")\n  .then((response) => response.json())\n  .then((user) => {\n    console.log(user.name);\n  })\n  .catch((error) => {\n    console.error(error);\n  });\n```\n\n`async` and `await` do not replace Promises. They give you a more readable way to work with Promises.\n\n```js\nasync function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n    const user = await response.json();\n    console.log(user.name);\n  } catch (error) {\n    console.error(error);\n  }\n}\n```\n\nThe important idea is: `await` pauses the async function until the Promise settles, but it does not freeze the whole browser.",
+  "example": "Suppose a user opens a profile page. The app asks the server for profile data.\n\n```js\nasync function getProfile(userId) {\n  const response = await fetch(`/api/users/${userId}`);\n\n  if (!response.ok) {\n    throw new Error(\"Could not load profile\");\n  }\n\n  return response.json();\n}\n```\n\nWhen JavaScript reaches `await fetch(...)`, the async function waits for that Promise. Other browser work can continue. The user can still move the mouse. Other events can still be scheduled. JavaScript is not sitting in a blocking loop.\n\nIf the request succeeds, execution continues and `response` is available. If the Promise rejects, control jumps to the nearest `catch`.\n\n```js\nasync function showProfile(userId) {\n  try {\n    const profile = await getProfile(userId);\n    renderProfile(profile);\n  } catch (error) {\n    renderError(\"We could not load this profile.\");\n  }\n}\n```\n\nThis reads like normal step-by-step code, but it is still Promise-based underneath.",
+  "commonMistakes": "A common mistake is forgetting to return or await a Promise. If you call an async function without awaiting it, the surrounding code continues immediately.\n\nAnother mistake is using `try/catch` but only wrapping synchronous code. Errors from awaited Promises are caught by `try/catch`, but errors from Promises you do not await may escape that block.\n\nA third mistake is accidentally running async work one at a time when it could run in parallel.\n\n```js\nconst user = await fetchUser();\nconst teams = await fetchTeams();\n```\n\nIf those two requests do not depend on each other, this may be slower than:\n\n```js\nconst [user, teams] = await Promise.all([fetchUser(), fetchTeams()]);\n```"
+};

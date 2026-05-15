@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { categories, levels, loadQuestions, questionTrack, questions, tracks } from "./questions";
+import { categories, levels, loadQuestion, loadQuestionSearchIndex, questionTrack, questions, tracks } from "./questions";
 import type {
   AnswerDepth,
   ProgressMap,
@@ -909,6 +909,7 @@ function App({
   const [answerDepthState, setAnswerDepthState] = useState<AnswerDepthState>("idle");
   const [questionDetails, setQuestionDetails] = useState<Record<string, Question> | null>(null);
   const [questionDetailsState, setQuestionDetailsState] = useState<QuestionDetailsState>("idle");
+  const [questionSearchIndex, setQuestionSearchIndex] = useState<Record<string, string> | null>(null);
   const [pendingGuestImport, setPendingGuestImport] = useState<ImportableProgressState | null>(null);
   const [sessionNote, setSessionNote] = useState("");
   const [sessionTone, setSessionTone] = useState<SessionTone>("neutral");
@@ -920,7 +921,8 @@ function App({
   const pendingTheme = useRef<Theme | null>(null);
   const hasDeviceThemePreference = useRef(storedState.hasThemePreference);
   const answerDepthRequest = useRef<Promise<AnswerDepthMap> | null>(null);
-  const questionDetailsRequest = useRef<Promise<Question[]> | null>(null);
+  const questionDetailsRequest = useRef(new Map<string, Promise<Question>>());
+  const questionSearchIndexRequest = useRef<Promise<Record<string, string>> | null>(null);
   const previousReviewedCount = useRef(Object.values(storedState.reviewed).filter(Boolean).length);
   const [progressPulseKey, setProgressPulseKey] = useState(0);
 
@@ -1082,26 +1084,17 @@ function App({
       hydratedQuestions.map((item) => ({
         item,
         text: [
+          questionSearchIndex?.[item.id],
           item.question,
-          item.interviewerIntent,
-          item.beginnerExplanation,
-          item.answer,
-          item.interviewAnswer,
-          item.example,
-          item.reasoning,
-          item.commonMistakes,
-          item.seniorNuance,
-          item.tests,
           questionTrack(item),
           item.category,
-          item.level,
-          ...(item.sourceLinks || []).flatMap((source) => [source.label, source.url])
+          item.level
         ]
           .filter(Boolean)
           .join(" ")
           .toLowerCase()
       })),
-    [hydratedQuestions]
+    [hydratedQuestions, questionSearchIndex]
   );
   const filteredQuestions = useMemo(() => {
     const normalizedQuery = deferredQuery.trim().toLowerCase();
@@ -1113,13 +1106,13 @@ function App({
       const matchesLevel = level === "All" || item.level === level;
 
       if (!matchesTrack || !matchesCategory || !matchesLevel) continue;
-      if (!normalizedQuery || text.includes(normalizedQuery) || getQuestionSearchText(item, answerDepthMap).includes(normalizedQuery)) {
+      if (!normalizedQuery || text.includes(normalizedQuery)) {
         matches.push(item);
       }
     }
 
     return matches;
-  }, [answerDepthMap, category, deferredQuery, level, track]);
+  }, [baseQuestionSearchText, category, deferredQuery, level, track]);
 
   const starredQueue = useMemo(
     () => filteredQuestions.filter((item) => starred[item.id]),
@@ -1207,23 +1200,36 @@ function App({
   }, [activeQuestion, answerDepthMap, answerDepthState, deferredQuery, revealed]);
 
   useEffect(() => {
-    if (questionDetails || questionDetailsState === "loading" || questionDetailsState === "error") return;
-    if (!query.trim() && (!activeQuestion || !revealed[activeQuestion.id])) return;
+    if (!deferredQuery.trim() || questionSearchIndex) return;
 
-    setQuestionDetailsState("loading");
-    if (!questionDetailsRequest.current) {
-      questionDetailsRequest.current = loadQuestions();
+    if (!questionSearchIndexRequest.current) {
+      questionSearchIndexRequest.current = loadQuestionSearchIndex();
     }
 
-    questionDetailsRequest.current.then((loadedQuestions) => {
-      setQuestionDetails(Object.fromEntries(loadedQuestions.map((item) => [item.id, item])));
+    questionSearchIndexRequest.current.then((searchIndex) => {
+      setQuestionSearchIndex(searchIndex);
+    }).catch(() => {
+      questionSearchIndexRequest.current = null;
+    });
+  }, [deferredQuery, questionSearchIndex]);
+
+  useEffect(() => {
+    if (!activeQuestion || !revealed[activeQuestion.id] || activeQuestion.lessonSections?.length) return;
+
+    setQuestionDetailsState("loading");
+    if (!questionDetailsRequest.current.has(activeQuestion.id)) {
+      questionDetailsRequest.current.set(activeQuestion.id, loadQuestion(activeQuestion.id));
+    }
+
+    questionDetailsRequest.current.get(activeQuestion.id)?.then((loadedQuestion) => {
+      setQuestionDetails((current) => ({ ...current, [loadedQuestion.id]: loadedQuestion }));
       setQuestionDetailsState("ready");
     }).catch(() => {
-      questionDetailsRequest.current = null;
+      questionDetailsRequest.current.delete(activeQuestion.id);
       setQuestionDetailsState("error");
       showSessionNote("Lesson details failed to load. Try again in a moment.", "warning");
     });
-  }, [activeQuestion, query, questionDetails, questionDetailsState, revealed]);
+  }, [activeQuestion, revealed]);
 
   const reviewedCount = useMemo(
     () => trackQuestions.filter((item) => reviewed[item.id]).length,
