@@ -2113,6 +2113,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is assuming a small change cannot break anyone. Small schema changes can break strict clients.\n\nAnother mistake is versioning too late. If the team waits until the first breaking change, partners may already depend on undocumented behavior.\n\nA third mistake is forgetting webhooks. Webhook payloads and event names are API contracts too."
   },
   {
+    "id": "tpm-audit-trail-product-requirements",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "What audit trail requirements would you define for a fintech workflow?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An audit trail is a record of important actions and changes in a system.\n\nThe beginner mistake is logging only technical errors. In fintech, the audit trail should capture business actions: who changed a limit, who released a hold, who updated bank details, who approved a refund, and what reason they selected.\n\nThe mental model:\n\n```txt\nActor:\nWho did it?\n\nAction:\nWhat changed?\n\nReason and evidence:\nWhy was it changed?\n\nTime:\nWhen did it happen?\n```\n\nThe TPM should define audit requirements while designing the workflow, not after launch."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a support agent releases a transfer hold. Two weeks later, the transfer is disputed.\n\nThe company needs to know:\n\n```txt\nWho released the hold?\nWhat case were they viewing?\nWhat reason did they choose?\nWas approval required?\nWhat was the customer told?\nWhat data changed?\n```\n\nWithout an audit trail, the team cannot reconstruct the decision."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an audit trail artifact:\n\n```txt\nWorkflow:\nManual transfer hold release\n\nAudit fields:\n- Event ID\n- Actor ID and role\n- Customer/account ID\n- Object changed\n- Previous state\n- New state\n- Reason code\n- Free-text note if required\n- Approval ID\n- Timestamp\n- Source IP/device if relevant\n- Related case ID\n\nControls:\n- Audit events are append-only\n- Sensitive data is minimized\n- Access is restricted\n- Export is available for review\n- Product metrics count risky actions\n```\n\nGood audit logs make investigation possible without exposing everything to everyone."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is logging only \"updated successfully.\" That does not explain what changed.\n\nAnother mistake is allowing important changes without reason codes. Free text alone is hard to analyze.\n\nA third mistake is making logs editable by the same people whose actions are being audited."
+      }
+    ],
+    "answer": "An audit trail is a record of important actions and changes in a system.",
+    "reasoning": "Here is an audit trail artifact:\n\n```txt\nWorkflow:\nManual transfer hold release\n\nAudit fields:\n- Event ID\n- Actor ID and role\n- Customer/account ID\n- Object changed\n- Previous state\n- New state\n- Reason code\n- Free-text note if required\n- Approval ID\n- Timestamp\n- Source IP/device if relevant\n- Related case ID\n\nControls:\n- Audit events are append-only\n- Sensitive data is minimized\n- Access is restricted\n- Export is available for review\n- Product metrics count risky actions\n```\n\nGood audit logs make investigation possible without exposing everything to everyone.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between technical logging and audit logging?",
+      "What fields should an audit event include?",
+      "Why are previous and new states useful?",
+      "Which actions need reason codes?",
+      "Why should audit logs be append-only?"
+    ],
+    "interviewAnswer": "I would define audit trails for sensitive fintech actions with actor, role, object, previous state, new state, reason, related case, approval, timestamp, and access controls. Logs should be append-only, searchable, exportable, and privacy-aware.\n\nA strong answer shows that audit trails are product requirements, not only engineering implementation details.",
+    "sourceLinks": [
+      {
+        "label": "NIST Privacy Framework",
+        "url": "https://www.nist.gov/privacy-framework"
+      },
+      {
+        "label": "FFIEC: Information Security",
+        "url": "https://ithandbook.ffiec.gov/it-booklets/information-security.aspx"
+      }
+    ],
+    "beginnerExplanation": "An audit trail is a record of important actions and changes in a system.\n\nThe beginner mistake is logging only technical errors. In fintech, the audit trail should capture business actions: who changed a limit, who released a hold, who updated bank details, who approved a refund, and what reason they selected.\n\nThe mental model:\n\n```txt\nActor:\nWho did it?\n\nAction:\nWhat changed?\n\nReason and evidence:\nWhy was it changed?\n\nTime:\nWhen did it happen?\n```\n\nThe TPM should define audit requirements while designing the workflow, not after launch.",
+    "example": "Imagine a support agent releases a transfer hold. Two weeks later, the transfer is disputed.\n\nThe company needs to know:\n\n```txt\nWho released the hold?\nWhat case were they viewing?\nWhat reason did they choose?\nWas approval required?\nWhat was the customer told?\nWhat data changed?\n```\n\nWithout an audit trail, the team cannot reconstruct the decision.",
+    "commonMistakes": "A common mistake is logging only \"updated successfully.\" That does not explain what changed.\n\nAnother mistake is allowing important changes without reason codes. Free text alone is hard to analyze.\n\nA third mistake is making logs editable by the same people whose actions are being audited."
+  },
+  {
     "id": "tpm-build-versus-buy",
     "track": "TPM",
     "category": "Technical Strategy",
@@ -2554,6 +2603,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is building charts before agreeing on metric definitions. If teams disagree on what \"active user\" or \"successful payout\" means, the dashboard will create arguments instead of decisions.\n\nAnother mistake is ignoring freshness. A real-time operations dashboard and a monthly finance report have different needs.\n\nA third mistake is forgetting permissions. Reports often expose sensitive user, financial, or operational data."
   },
   {
+    "id": "tpm-data-retention-deletion-fintech",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you design data retention and deletion for a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Data retention is deciding how long the product keeps data. Deletion is removing or anonymizing data when it is no longer needed or when a valid request applies.\n\nThe beginner mistake is saying \"delete everything when the user asks.\" Fintech products often have legal, fraud, tax, dispute, audit, and compliance reasons to retain some records. The product needs clear data categories, retention rules, deletion behavior, and user communication.\n\nThe mental model:\n\n```txt\nKeep:\nData required for product, legal, risk, or audit purpose.\n\nDelete:\nData no longer needed and eligible for deletion.\n\nRestrict:\nData retained but no longer used for normal product activity.\n```\n\nThe TPM should make retention explicit by data type."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user closes their account and requests deletion.\n\nSome data may be deleted quickly:\n\n```txt\nMarketing preferences\nUnused device nicknames\nOptional profile photo\n```\n\nSome records may need retention:\n\n```txt\nTransaction history\nDispute records\nCompliance review records\nTax or statement records\nFraud investigation evidence\n```\n\nThe product should explain what can be deleted and what must be retained."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a retention artifact:\n\n```txt\nData category:\nCustomer identity document\n\nPurpose:\nIdentity verification and compliance evidence\n\nRetention rule:\nRetain while account is active and for approved period after closure\n\nDeletion behavior:\nDelete or archive when retention expires\n\nAccess:\nRestricted to verification, compliance, and audit roles\n\nUser communication:\nExplain that some financial records may be retained for legal and security reasons\n\nSystem needs:\n- Data inventory\n- Retention clock\n- Deletion job\n- Legal hold flag\n- Deletion audit record\n```\n\nRetention design should be boring, explicit, and enforceable."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is not having a data inventory. If the team does not know where data lives, it cannot reliably delete it.\n\nAnother mistake is deleting records needed for disputes or regulatory review.\n\nA third mistake is retaining everything forever. That increases privacy, security, and breach impact."
+      }
+    ],
+    "answer": "Data retention is deciding how long the product keeps data. Deletion is removing or anonymizing data when it is no longer needed or when a valid request applies.",
+    "reasoning": "Here is a retention artifact:\n\n```txt\nData category:\nCustomer identity document\n\nPurpose:\nIdentity verification and compliance evidence\n\nRetention rule:\nRetain while account is active and for approved period after closure\n\nDeletion behavior:\nDelete or archive when retention expires\n\nAccess:\nRestricted to verification, compliance, and audit roles\n\nUser communication:\nExplain that some financial records may be retained for legal and security reasons\n\nSystem needs:\n- Data inventory\n- Retention clock\n- Deletion job\n- Legal hold flag\n- Deletion audit record\n```\n\nRetention design should be boring, explicit, and enforceable.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is \"delete everything\" often wrong in fintech?",
+      "What data categories might need retention?",
+      "What is a legal hold?",
+      "Why does deletion need an audit record?",
+      "How would you explain partial deletion to a user?"
+    ],
+    "interviewAnswer": "I would design retention and deletion with a data inventory, purpose by category, retention periods, deletion eligibility, legal holds, restricted access, deletion jobs, audit records, and clear user communication. Some data can be deleted, some must be retained, and some should be restricted.\n\nA strong answer balances privacy rights with financial recordkeeping and risk obligations.",
+    "sourceLinks": [
+      {
+        "label": "NIST Privacy Framework",
+        "url": "https://www.nist.gov/privacy-framework"
+      },
+      {
+        "label": "ICO: Data protection by design",
+        "url": "https://ico.org.uk/for-organisations/guide-to-data-protection/guide-to-the-general-data-protection-regulation-gdpr/accountability-and-governance/data-protection-by-design-and-default/"
+      }
+    ],
+    "beginnerExplanation": "Data retention is deciding how long the product keeps data. Deletion is removing or anonymizing data when it is no longer needed or when a valid request applies.\n\nThe beginner mistake is saying \"delete everything when the user asks.\" Fintech products often have legal, fraud, tax, dispute, audit, and compliance reasons to retain some records. The product needs clear data categories, retention rules, deletion behavior, and user communication.\n\nThe mental model:\n\n```txt\nKeep:\nData required for product, legal, risk, or audit purpose.\n\nDelete:\nData no longer needed and eligible for deletion.\n\nRestrict:\nData retained but no longer used for normal product activity.\n```\n\nThe TPM should make retention explicit by data type.",
+    "example": "Imagine a user closes their account and requests deletion.\n\nSome data may be deleted quickly:\n\n```txt\nMarketing preferences\nUnused device nicknames\nOptional profile photo\n```\n\nSome records may need retention:\n\n```txt\nTransaction history\nDispute records\nCompliance review records\nTax or statement records\nFraud investigation evidence\n```\n\nThe product should explain what can be deleted and what must be retained.",
+    "commonMistakes": "A common mistake is not having a data inventory. If the team does not know where data lives, it cannot reliably delete it.\n\nAnother mistake is deleting records needed for disputes or regulatory review.\n\nA third mistake is retaining everything forever. That increases privacy, security, and breach impact."
+  },
+  {
     "id": "tpm-dependency-risk",
     "track": "TPM",
     "category": "Execution & Delivery",
@@ -2748,6 +2846,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "An experiment is a way to learn whether a change improves an outcome. In many product areas, you can run an A/B test. But not every product decision should be tested by casually exposing users to risk.\n\nThe beginner mistake is thinking \"experiment\" always means \"ship two versions and see which wins.\" In regulated, financial, health, safety, privacy, or trust-sensitive products, some experiments can harm users, create unfair treatment, or violate policy.\n\nThe TPM still needs learning, but the learning method must match the risk.\n\nThe mental model is:\n\n```txt\nLow-risk change:\nUse normal A/B test if measurement is clean.\n\nMedium-risk change:\nUse limited rollout, guardrails, and monitoring.\n\nHigh-risk change:\nUse research, simulation, backtesting, expert review, or staged release before live exposure.\n```",
     "example": "Imagine a remittance app wants to reduce identity-verification drop-off.\n\nThe growth idea is: \"Ask fewer questions upfront.\"\n\nThat might improve conversion. But it may also allow risky users to move further into the product before required checks happen.\n\nA weak experiment plan says:\n\n```txt\nVariant A: current onboarding\nVariant B: shorter onboarding\nPrimary metric: signup completion\nShip to 50 percent of users\n```\n\nThat ignores compliance and risk.\n\nA stronger experiment plan says:\n\n```txt\nHypothesis:\nMoving low-risk profile questions later will improve signup completion without increasing risky account progression.\n\nEligible users:\nOnly users in low-risk corridors and low transaction limits.\n\nPrimary metric:\nVerified signup completion.\n\nGuardrail metrics:\n- Manual review rate\n- Suspicious activity flags\n- Failed verification rate\n- Support contacts about missing information\n- Time to compliance decision\n\nRollout:\n5 percent for 48 hours, then 20 percent if guardrails stay healthy.\n\nStop condition:\nPause if manual review rate or suspicious flags exceed threshold.\n```\n\nNow the experiment has a learning goal and a safety model.",
     "commonMistakes": "A common mistake is optimizing the primary metric while ignoring harm. More signups are not useful if the product creates more fraud, support burden, or compliance exposure.\n\nAnother mistake is using an experiment where research would answer the question faster and more safely.\n\nA third mistake is failing to define stop conditions. If the team has no pause rule, it may argue while users are already being affected."
+  },
+  {
+    "id": "tpm-fee-transparency-disclosures",
+    "track": "TPM",
+    "category": "Compliance UX",
+    "level": "Intermediate",
+    "question": "How would you design fee transparency for a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Fee transparency means users can understand what they will pay before they commit.\n\nThe beginner mistake is showing fees only after the user is emotionally invested or at the final step. In fintech, fees can affect trust, complaints, conversion quality, and regulatory risk. Good design shows fees early enough, clearly enough, and in the context where the user is making the decision.\n\nThe mental model:\n\n```txt\nBase amount:\nWhat the user wants to send, spend, borrow, or withdraw.\n\nFee:\nWhat the product charges.\n\nNet result:\nWhat the user pays or receives after fees.\n```\n\nThe TPM should make fee math visible and consistent."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user sends $100 internationally.\n\nA weak flow says:\n\n```txt\nTotal: $106\n```\n\nA better flow says:\n\n```txt\nYou send: $100\nTransfer fee: $4\nExchange rate: 1 USD = 1,540 NGN\nRecipient gets: 154,000 NGN\nTotal charged: $104\n```\n\nNow the user understands the cost and outcome."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a fee transparency artifact:\n\n```txt\nProduct:\nInternational transfer\n\nFee display requirements:\n- Show fee before confirmation\n- Show total charged\n- Show recipient amount if applicable\n- Show exchange rate if applicable\n- Explain variable fees\n- Preserve receipt after transaction\n\nEdge cases:\n- Fee changes before confirmation\n- Promotional fee waiver\n- Partner fee added\n- Failed transaction refund\n- Partial refund\n\nMetrics:\n- Fee-related complaints\n- Dropoff at fee step\n- Refund contacts\n- Dispute reason mentions fee\n```\n\nFee transparency should reduce surprises, not hide complexity."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is hiding fees inside totals. Users notice later and lose trust.\n\nAnother mistake is not explaining fee changes. If the fee can change because amount, method, or corridor changes, the UI should update clearly.\n\nA third mistake is having receipts that do not match checkout. That creates support pain."
+      }
+    ],
+    "answer": "Fee transparency means users can understand what they will pay before they commit.",
+    "reasoning": "Here is a fee transparency artifact:\n\n```txt\nProduct:\nInternational transfer\n\nFee display requirements:\n- Show fee before confirmation\n- Show total charged\n- Show recipient amount if applicable\n- Show exchange rate if applicable\n- Explain variable fees\n- Preserve receipt after transaction\n\nEdge cases:\n- Fee changes before confirmation\n- Promotional fee waiver\n- Partner fee added\n- Failed transaction refund\n- Partial refund\n\nMetrics:\n- Fee-related complaints\n- Dropoff at fee step\n- Refund contacts\n- Dispute reason mentions fee\n```\n\nFee transparency should reduce surprises, not hide complexity.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why should fees appear before confirmation?",
+      "What is the difference between fee and total charged?",
+      "What fee edge cases should the product handle?",
+      "How can fee confusion show up in metrics?",
+      "Why should receipts match the confirmation screen?"
+    ],
+    "interviewAnswer": "I would design fee transparency by showing fees before confirmation, separating base amount, fee, exchange rate, recipient amount, and total charged, handling fee changes and refunds, preserving receipts, and monitoring fee-related complaints and dropoff.\n\nA strong answer shows that fee display is both UX and compliance risk control.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Remittance transfers",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/deposit-accounts-resources/remittance-transfer-rule/"
+      },
+      {
+        "label": "CFPB: Prepaid accounts rule",
+        "url": "https://www.consumerfinance.gov/rules-policy/final-rules/prepaid-accounts-under-electronic-fund-transfer-act-regulation-e-and-truth-lending-act-regulation-z/"
+      }
+    ],
+    "beginnerExplanation": "Fee transparency means users can understand what they will pay before they commit.\n\nThe beginner mistake is showing fees only after the user is emotionally invested or at the final step. In fintech, fees can affect trust, complaints, conversion quality, and regulatory risk. Good design shows fees early enough, clearly enough, and in the context where the user is making the decision.\n\nThe mental model:\n\n```txt\nBase amount:\nWhat the user wants to send, spend, borrow, or withdraw.\n\nFee:\nWhat the product charges.\n\nNet result:\nWhat the user pays or receives after fees.\n```\n\nThe TPM should make fee math visible and consistent.",
+    "example": "Imagine a user sends $100 internationally.\n\nA weak flow says:\n\n```txt\nTotal: $106\n```\n\nA better flow says:\n\n```txt\nYou send: $100\nTransfer fee: $4\nExchange rate: 1 USD = 1,540 NGN\nRecipient gets: 154,000 NGN\nTotal charged: $104\n```\n\nNow the user understands the cost and outcome.",
+    "commonMistakes": "A common mistake is hiding fees inside totals. Users notice later and lose trust.\n\nAnother mistake is not explaining fee changes. If the fee can change because amount, method, or corridor changes, the UI should update clearly.\n\nA third mistake is having receipts that do not match checkout. That creates support pain."
   },
   {
     "id": "tpm-fraud-case-management-tooling",
@@ -3436,6 +3583,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is monitoring only aggregate performance. Drift often appears in one segment first.\n\nAnother mistake is waiting for fraud losses before acting. Leading indicators like analyst overrides and false positives can warn earlier.\n\nA third mistake is not documenting model changes. If performance changes after retraining, the team needs traceability."
   },
   {
+    "id": "tpm-negative-balance-recovery",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design negative balance recovery?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A negative balance happens when an account owes money because refunds, disputes, returns, fees, or reversals exceed available funds.\n\nThe beginner mistake is treating recovery as simply \"take money back.\" In fintech, negative balance recovery needs clear balance display, user communication, payment collection rules, risk controls, support visibility, and escalation for disputes or hardship.\n\nThe mental model:\n\n```txt\nCause:\nWhy did the balance go negative?\n\nAmount:\nHow much is owed?\n\nRecovery path:\nHow can the account return to good standing?\n```\n\nThe TPM should make the balance understandable and prevent surprise debits."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a merchant receives a $300 payout. Later, a $500 dispute is lost. The account balance becomes negative $200.\n\nThe product should show:\n\n```txt\nReason: dispute debit\nAmount owed: $200\nRecovery options: future payments, manual payment, payout hold\nStatus: restricted until balance is resolved\n```\n\nThat is clearer than hiding the problem until the next payout fails."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a negative balance artifact:\n\n```txt\nBalance state:\nNegative due to dispute\n\nCustomer view:\n- Amount owed\n- Source transaction\n- Date created\n- Recovery options\n- Impact on payouts or account features\n\nRecovery methods:\n- Deduct from future incoming payments\n- Manual payment\n- Reserve adjustment\n- Collections path if unresolved\n\nControls:\n- Do not double collect\n- Show itemized history\n- Notify before major restriction\n- Support can see cause and status\n- Dispute or appeal path remains visible\n```\n\nThe product should make recovery predictable, not punitive."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is showing only one negative number. Users need to know what caused it.\n\nAnother mistake is recovering funds without clear communication. Surprise deductions create complaints.\n\nA third mistake is not guarding against duplicate recovery when multiple systems attempt collection."
+      }
+    ],
+    "answer": "A negative balance happens when an account owes money because refunds, disputes, returns, fees, or reversals exceed available funds.",
+    "reasoning": "Here is a negative balance artifact:\n\n```txt\nBalance state:\nNegative due to dispute\n\nCustomer view:\n- Amount owed\n- Source transaction\n- Date created\n- Recovery options\n- Impact on payouts or account features\n\nRecovery methods:\n- Deduct from future incoming payments\n- Manual payment\n- Reserve adjustment\n- Collections path if unresolved\n\nControls:\n- Do not double collect\n- Show itemized history\n- Notify before major restriction\n- Support can see cause and status\n- Dispute or appeal path remains visible\n```\n\nThe product should make recovery predictable, not punitive.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What can cause a negative balance?",
+      "Why does the cause matter to the user?",
+      "What recovery paths might exist?",
+      "How would you prevent double collection?",
+      "What should support be able to explain?"
+    ],
+    "interviewAnswer": "I would design negative balance recovery with cause attribution, itemized balance history, customer messaging, recovery options, payout or feature impacts, support visibility, duplicate-collection controls, dispute paths, and escalation for unresolved balances.\n\nA strong answer balances financial recovery with transparency and customer trust.",
+    "sourceLinks": [
+      {
+        "label": "Stripe negative balances",
+        "url": "https://docs.stripe.com/connect/account-balances?locale=en-GB"
+      },
+      {
+        "label": "CFPB: Debt collection rule FAQs",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/other-applicable-requirements/debt-collection/debt-collection-rule-faqs/"
+      }
+    ],
+    "beginnerExplanation": "A negative balance happens when an account owes money because refunds, disputes, returns, fees, or reversals exceed available funds.\n\nThe beginner mistake is treating recovery as simply \"take money back.\" In fintech, negative balance recovery needs clear balance display, user communication, payment collection rules, risk controls, support visibility, and escalation for disputes or hardship.\n\nThe mental model:\n\n```txt\nCause:\nWhy did the balance go negative?\n\nAmount:\nHow much is owed?\n\nRecovery path:\nHow can the account return to good standing?\n```\n\nThe TPM should make the balance understandable and prevent surprise debits.",
+    "example": "Imagine a merchant receives a $300 payout. Later, a $500 dispute is lost. The account balance becomes negative $200.\n\nThe product should show:\n\n```txt\nReason: dispute debit\nAmount owed: $200\nRecovery options: future payments, manual payment, payout hold\nStatus: restricted until balance is resolved\n```\n\nThat is clearer than hiding the problem until the next payout fails.",
+    "commonMistakes": "A common mistake is showing only one negative number. Users need to know what caused it.\n\nAnother mistake is recovering funds without clear communication. Surprise deductions create complaints.\n\nA third mistake is not guarding against duplicate recovery when multiple systems attempt collection."
+  },
+  {
     "id": "tpm-onboarding-activation-metrics",
     "track": "TPM",
     "category": "Metrics",
@@ -3534,6 +3730,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is asking for more data than the product needs. Extra data increases privacy risk and user discomfort.\n\nAnother mistake is making revocation hard to find. If users can grant access easily, they should be able to manage it easily.\n\nA third mistake is not separating connection failure from consent refusal. A user who wants to consent but hits a provider error needs a different path from a user who declines."
   },
   {
+    "id": "tpm-partner-bank-incident-comms",
+    "track": "TPM",
+    "category": "Observability & Operations",
+    "level": "Advanced",
+    "question": "How would you handle customer communications during a partner bank incident?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A partner bank incident can delay transfers, card authorizations, account updates, statements, or settlement even if your own app is healthy.\n\nThe beginner mistake is waiting until every detail is known before saying anything. In fintech, silence can create panic because users care about access to money. Communication should be accurate, calm, and updated as facts improve.\n\nThe mental model:\n\n```txt\nKnown:\nWhat we can confidently say.\n\nUnknown:\nWhat we are still investigating.\n\nNext update:\nWhen users will hear from us again.\n```\n\nThe TPM should coordinate product states, status page, support scripts, and customer messages."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a partner bank has delayed ACH processing. Users see transfers stuck.\n\nA weak message says:\n\n```txt\nSomething went wrong.\n```\n\nA stronger message says:\n\n```txt\nBank transfer processing is delayed due to a partner issue.\nYour transfer is still queued. You do not need to submit it again.\nNext update: 3:00 p.m.\n```\n\nThat message reduces duplicate attempts and support confusion."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an incident communication artifact:\n\n```txt\nIncident:\nPartner bank ACH delay\n\nCustomer segments:\n- Users with pending transfers\n- Users trying to initiate new transfers\n- Support agents\n- Internal leadership\n\nChannels:\n- In-app banner\n- Transfer detail status\n- Status page\n- Email for affected users\n- Support macro\n\nMessage requirements:\n- What is affected\n- What is not affected\n- Whether user action is needed\n- Expected next update\n- Safe wording approved by legal/compliance\n\nMetrics:\n- Affected users\n- Duplicate attempts\n- Support contact rate\n- Complaint rate\n- Time to first update\n```\n\nThe best incident communication prevents extra harm."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is overpromising a fix time. If the partner cannot guarantee it, do not make it sound guaranteed.\n\nAnother mistake is communicating only globally. Affected users need contextual status in the workflow they are using.\n\nA third mistake is forgetting support. If support does not get the same facts, customers hear conflicting answers."
+      }
+    ],
+    "answer": "A partner bank incident can delay transfers, card authorizations, account updates, statements, or settlement even if your own app is healthy.",
+    "reasoning": "Here is an incident communication artifact:\n\n```txt\nIncident:\nPartner bank ACH delay\n\nCustomer segments:\n- Users with pending transfers\n- Users trying to initiate new transfers\n- Support agents\n- Internal leadership\n\nChannels:\n- In-app banner\n- Transfer detail status\n- Status page\n- Email for affected users\n- Support macro\n\nMessage requirements:\n- What is affected\n- What is not affected\n- Whether user action is needed\n- Expected next update\n- Safe wording approved by legal/compliance\n\nMetrics:\n- Affected users\n- Duplicate attempts\n- Support contact rate\n- Complaint rate\n- Time to first update\n```\n\nThe best incident communication prevents extra harm.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is silence risky during money movement incidents?",
+      "What should an incident message include?",
+      "What channels should be coordinated?",
+      "Why should support scripts match in-app copy?",
+      "What metrics show communication is working?"
+    ],
+    "interviewAnswer": "I would handle partner bank incident communications by identifying affected users and flows, writing accurate approved messages, showing contextual in-app status, updating support scripts and status page, giving next-update timing, avoiding overpromises, and tracking support contacts, complaints, duplicate attempts, and time to first update.\n\nA strong answer treats incident communication as part of customer harm reduction.",
+    "sourceLinks": [
+      {
+        "label": "Atlassian incident communication",
+        "url": "https://www.atlassian.com/incident-management/incident-communication"
+      },
+      {
+        "label": "CFPB: Consumer Complaint Program",
+        "url": "https://www.consumerfinance.gov/compliance/consumer-complaint-program/"
+      }
+    ],
+    "beginnerExplanation": "A partner bank incident can delay transfers, card authorizations, account updates, statements, or settlement even if your own app is healthy.\n\nThe beginner mistake is waiting until every detail is known before saying anything. In fintech, silence can create panic because users care about access to money. Communication should be accurate, calm, and updated as facts improve.\n\nThe mental model:\n\n```txt\nKnown:\nWhat we can confidently say.\n\nUnknown:\nWhat we are still investigating.\n\nNext update:\nWhen users will hear from us again.\n```\n\nThe TPM should coordinate product states, status page, support scripts, and customer messages.",
+    "example": "Imagine a partner bank has delayed ACH processing. Users see transfers stuck.\n\nA weak message says:\n\n```txt\nSomething went wrong.\n```\n\nA stronger message says:\n\n```txt\nBank transfer processing is delayed due to a partner issue.\nYour transfer is still queued. You do not need to submit it again.\nNext update: 3:00 p.m.\n```\n\nThat message reduces duplicate attempts and support confusion.",
+    "commonMistakes": "A common mistake is overpromising a fix time. If the partner cannot guarantee it, do not make it sound guaranteed.\n\nAnother mistake is communicating only globally. Affected users need contextual status in the workflow they are using.\n\nA third mistake is forgetting support. If support does not get the same facts, customers hear conflicting answers."
+  },
+  {
     "id": "tpm-partner-outage-fallback",
     "track": "TPM",
     "category": "Operations",
@@ -3581,6 +3826,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A partner API outage happens when a system your product depends on becomes unavailable, slow, unreliable, or returns unclear results. The product may still be online, but the user journey is broken because an external dependency is broken.\n\nFor a TPM, the key question is not only \"when will the partner come back?\" It is \"how do we protect users, reduce harm, communicate clearly, and keep the business operating while the dependency is unhealthy?\"\n\nIf the partner moves money, verifies identity, sends notifications, or screens fraud, the outage can create financial, compliance, support, and trust risk.",
     "example": "Imagine a payout partner is timing out. Users are trying to send money.\n\nThe dangerous cases are:\n\n- A request timed out, but the partner may still process it.\n- A user retries and might create a duplicate payout.\n- Your app shows failure even though money may move later.\n- Webhooks are delayed, so status is stale.\n- Support cannot tell customers what happened.\n\nThe TPM should help classify the outage:\n\n```txt\nSeverity questions\n\n- Is every user affected or only one corridor?\n- Are new requests failing, or only status updates?\n- Is money movement uncertain?\n- Can users safely retry?\n- Is there a backup partner?\n- What message should users and support see?\n```",
     "commonMistakes": "A common mistake is letting users retry when the first request may still complete. That can create duplicates.\n\nAnother mistake is hiding the problem behind generic errors. Users and support need the truth in plain language.\n\nA third mistake is ending the incident when the partner returns. Recovery also includes reconciliation, customer communication, and operational cleanup."
+  },
+  {
+    "id": "tpm-partner-risk-scorecard",
+    "track": "TPM",
+    "category": "Vendor & Partner Management",
+    "level": "Advanced",
+    "question": "How would you build a partner risk scorecard for a fintech vendor?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A partner risk scorecard helps the company evaluate and monitor vendors or partners that affect critical fintech workflows.\n\nThe beginner mistake is doing vendor review only before signing the contract. Partners change. Their uptime, support quality, data controls, compliance posture, pricing, and incident history can become better or worse after launch.\n\nThe mental model:\n\n```txt\nPre-launch review:\nShould we use this partner?\n\nOngoing scorecard:\nIs this partner still safe and effective?\n\nExit plan:\nWhat happens if we need to leave?\n```\n\nThe TPM should make vendor risk visible to product decisions."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a payout partner has good pricing but frequent weekend delays.\n\nIf the scorecard tracks only cost, the partner looks great. If it tracks customer impact, it may show:\n\n```txt\nWeekend payout SLA missed 6 times\nSupport response average 18 hours\nComplaint rate doubled in one corridor\nReconciliation files delayed twice\n```\n\nThat changes the roadmap conversation."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a partner scorecard artifact:\n\n```txt\nPartner:\nPayout processor\n\nScorecard dimensions:\n- Availability\n- Latency\n- Incident history\n- Support responsiveness\n- Compliance evidence\n- Security posture\n- Reconciliation quality\n- Data export ability\n- Cost at scale\n- Product coverage\n- Exit risk\n\nReview cadence:\n- Monthly for critical partners\n- Quarterly for lower-risk partners\n- Immediate review after severe incident\n\nDecision outputs:\n- Continue\n- Improve with action plan\n- Limit usage\n- Add backup partner\n- Replace partner\n```\n\nThe scorecard should create decisions, not just scores."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is relying on sales promises instead of operational evidence.\n\nAnother mistake is not including exit risk. A cheap partner can become expensive if leaving is painful.\n\nA third mistake is treating all partners the same. A critical money-movement partner needs deeper monitoring than a low-risk analytics tool."
+      }
+    ],
+    "answer": "A partner risk scorecard helps the company evaluate and monitor vendors or partners that affect critical fintech workflows.",
+    "reasoning": "Here is a partner scorecard artifact:\n\n```txt\nPartner:\nPayout processor\n\nScorecard dimensions:\n- Availability\n- Latency\n- Incident history\n- Support responsiveness\n- Compliance evidence\n- Security posture\n- Reconciliation quality\n- Data export ability\n- Cost at scale\n- Product coverage\n- Exit risk\n\nReview cadence:\n- Monthly for critical partners\n- Quarterly for lower-risk partners\n- Immediate review after severe incident\n\nDecision outputs:\n- Continue\n- Improve with action plan\n- Limit usage\n- Add backup partner\n- Replace partner\n```\n\nThe scorecard should create decisions, not just scores.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why does partner review continue after launch?",
+      "What dimensions should a fintech partner scorecard include?",
+      "Why is exit risk important?",
+      "What incident data should affect the score?",
+      "How should scorecard results change roadmap decisions?"
+    ],
+    "interviewAnswer": "I would build a partner risk scorecard with availability, latency, incidents, support, compliance, security, reconciliation quality, data controls, cost, coverage, and exit risk. I would review critical partners regularly and tie scores to action plans, backup strategy, limits, or replacement.\n\nA strong answer treats vendors as ongoing product dependencies.",
+    "sourceLinks": [
+      {
+        "label": "FFIEC: Outsourcing Technology Services",
+        "url": "https://ithandbook.ffiec.gov/it-booklets/outsourcing-technology-services.aspx"
+      },
+      {
+        "label": "Google VSAQ",
+        "url": "https://vsaq-demo.withgoogle.com/"
+      }
+    ],
+    "beginnerExplanation": "A partner risk scorecard helps the company evaluate and monitor vendors or partners that affect critical fintech workflows.\n\nThe beginner mistake is doing vendor review only before signing the contract. Partners change. Their uptime, support quality, data controls, compliance posture, pricing, and incident history can become better or worse after launch.\n\nThe mental model:\n\n```txt\nPre-launch review:\nShould we use this partner?\n\nOngoing scorecard:\nIs this partner still safe and effective?\n\nExit plan:\nWhat happens if we need to leave?\n```\n\nThe TPM should make vendor risk visible to product decisions.",
+    "example": "Imagine a payout partner has good pricing but frequent weekend delays.\n\nIf the scorecard tracks only cost, the partner looks great. If it tracks customer impact, it may show:\n\n```txt\nWeekend payout SLA missed 6 times\nSupport response average 18 hours\nComplaint rate doubled in one corridor\nReconciliation files delayed twice\n```\n\nThat changes the roadmap conversation.",
+    "commonMistakes": "A common mistake is relying on sales promises instead of operational evidence.\n\nAnother mistake is not including exit risk. A cheap partner can become expensive if leaving is painful.\n\nA third mistake is treating all partners the same. A critical money-movement partner needs deeper monitoring than a low-risk analytics tool."
   },
   {
     "id": "tpm-payment-webhooks-idempotency",
@@ -3975,6 +4269,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is collecting data because it might be useful later. That creates privacy and security burden without clear user value.\n\nAnother mistake is hiding privacy choices in vague copy. Users should understand what is happening in plain language.\n\nA third mistake is forgetting lifecycle. Privacy includes collection, use, access, sharing, retention, deletion, and auditability."
   },
   {
+    "id": "tpm-privacy-request-dsar-fintech",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "How would you design a privacy data request workflow for fintech users?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A privacy data request workflow lets users ask to access, download, correct, or delete personal data, depending on what rights apply.\n\nThe beginner mistake is treating it like a support inbox. Privacy requests need identity verification, scope, deadlines, exclusions, secure delivery, and records. In fintech, the workflow must avoid exposing someone else's financial data while still giving the requester meaningful access.\n\nThe mental model:\n\n```txt\nRequest:\nWhat is the user asking for?\n\nVerify:\nCan we confirm the requester is allowed to receive it?\n\nFulfill:\nProvide, correct, delete, restrict, or explain limits.\n```\n\nThe TPM should design a workflow that is safe for both privacy and financial security."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user asks for all data connected to their account.\n\nThe system may need to gather:\n\n```txt\nProfile data\nTransaction history\nDevice history\nSupport tickets\nConsent records\nMarketing preferences\n```\n\nBut some data may need review or redaction:\n\n```txt\nInternal fraud investigation notes\nAnother person's details in a joint transaction\nSecurity signals that could expose controls\n```\n\nThis is why privacy fulfillment needs policy and review."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a privacy request artifact:\n\n```txt\nRequest types:\n- Access data\n- Download transactions\n- Correct profile data\n- Delete eligible data\n- Restrict marketing use\n\nWorkflow states:\n- Received\n- Identity verification required\n- In review\n- Fulfilled\n- Partially fulfilled\n- Denied with reason\n- Closed\n\nSystem requirements:\n- Request ID\n- Verified requester\n- Scope selected\n- Deadline\n- Data source checklist\n- Redaction review\n- Secure delivery\n- Fulfillment audit log\n```\n\nThe product should make common requests self-serve when safe and route sensitive requests to review."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is sending data before verifying identity strongly enough. That creates privacy risk.\n\nAnother mistake is forgetting redaction. Financial products often contain data about recipients, merchants, agents, and other users.\n\nA third mistake is having no source checklist. Missing one database can make fulfillment incomplete."
+      }
+    ],
+    "answer": "A privacy data request workflow lets users ask to access, download, correct, or delete personal data, depending on what rights apply.",
+    "reasoning": "Here is a privacy request artifact:\n\n```txt\nRequest types:\n- Access data\n- Download transactions\n- Correct profile data\n- Delete eligible data\n- Restrict marketing use\n\nWorkflow states:\n- Received\n- Identity verification required\n- In review\n- Fulfilled\n- Partially fulfilled\n- Denied with reason\n- Closed\n\nSystem requirements:\n- Request ID\n- Verified requester\n- Scope selected\n- Deadline\n- Data source checklist\n- Redaction review\n- Secure delivery\n- Fulfillment audit log\n```\n\nThe product should make common requests self-serve when safe and route sensitive requests to review.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a privacy request more than a support ticket?",
+      "What should be verified before sending data?",
+      "What data may need redaction?",
+      "What workflow states are useful?",
+      "How would you prove the request was fulfilled?"
+    ],
+    "interviewAnswer": "I would design privacy requests with request type, identity verification, scope, deadlines, data-source checklist, redaction review, secure delivery, fulfillment states, partial-denial reasons, and audit logs. The workflow should protect privacy without exposing sensitive financial or security data.\n\nA strong answer shows that privacy access is a controlled fulfillment workflow.",
+    "sourceLinks": [
+      {
+        "label": "NIST Privacy Framework",
+        "url": "https://www.nist.gov/privacy-framework"
+      },
+      {
+        "label": "ICO: Right of access",
+        "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-of-access/"
+      }
+    ],
+    "beginnerExplanation": "A privacy data request workflow lets users ask to access, download, correct, or delete personal data, depending on what rights apply.\n\nThe beginner mistake is treating it like a support inbox. Privacy requests need identity verification, scope, deadlines, exclusions, secure delivery, and records. In fintech, the workflow must avoid exposing someone else's financial data while still giving the requester meaningful access.\n\nThe mental model:\n\n```txt\nRequest:\nWhat is the user asking for?\n\nVerify:\nCan we confirm the requester is allowed to receive it?\n\nFulfill:\nProvide, correct, delete, restrict, or explain limits.\n```\n\nThe TPM should design a workflow that is safe for both privacy and financial security.",
+    "example": "Imagine a user asks for all data connected to their account.\n\nThe system may need to gather:\n\n```txt\nProfile data\nTransaction history\nDevice history\nSupport tickets\nConsent records\nMarketing preferences\n```\n\nBut some data may need review or redaction:\n\n```txt\nInternal fraud investigation notes\nAnother person's details in a joint transaction\nSecurity signals that could expose controls\n```\n\nThis is why privacy fulfillment needs policy and review.",
+    "commonMistakes": "A common mistake is sending data before verifying identity strongly enough. That creates privacy risk.\n\nAnother mistake is forgetting redaction. Financial products often contain data about recipients, merchants, agents, and other users.\n\nA third mistake is having no source checklist. Missing one database can make fulfillment incomplete."
+  },
+  {
     "id": "tpm-prompt-versioning-change-management",
     "track": "TPM",
     "category": "AI Product",
@@ -4022,6 +4365,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Prompts are product behavior. Changing a prompt can change what the AI says, refuses, summarizes, omits, escalates, or recommends.\n\nThe beginner mistake is treating prompt edits like copy tweaks. In production AI systems, prompt changes need versioning, testing, review, rollout, and rollback just like code or rules.\n\nThe mental model:\n\n```txt\nPrompt version:\nWhat instructions were active?\n\nEvaluation:\nDid the new version improve behavior without breaking important cases?\n\nRollout:\nWho sees the new version first?\n\nRollback:\nHow do we return to the previous version if quality drops?\n```",
     "example": "Imagine an AI support assistant that summarizes failed transfer cases. A PM changes the prompt to make summaries shorter. Now the summary sometimes omits the transfer ID or complaint language.\n\nThat is not a small writing issue. Support agents may miss escalation requirements.\n\nA safer system asks:\n\n```txt\nWhat changed?\nWhy did it change?\nWhich evals passed?\nWhich cases got worse?\nWho approved it?\nWhich users or agents see it first?\nCan we roll back quickly?\n```",
     "commonMistakes": "A common mistake is not knowing which prompt produced a bad output. Without version logs, debugging is guesswork.\n\nAnother mistake is evaluating only the changed happy path. Prompt edits can break unrelated cases.\n\nA third mistake is rolling out to everyone at once. Production prompts deserve controlled release."
+  },
+  {
+    "id": "tpm-regulatory-reporting-dashboard",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you design a regulatory reporting dashboard?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A regulatory reporting dashboard helps compliance, risk, legal, and operations understand whether the product is meeting reporting and monitoring obligations.\n\nThe beginner mistake is building an executive vanity dashboard. A useful regulatory dashboard answers operational questions: what needs to be reported, what is late, what is incomplete, what changed, and who owns the next action.\n\nThe mental model:\n\n```txt\nMetric:\nWhat is happening?\n\nException:\nWhat needs attention?\n\nEvidence:\nCan we prove what happened later?\n```\n\nThe TPM should design the dashboard around decisions and deadlines, not decoration."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a fintech tracks suspicious activity cases, complaints, unauthorized transfer claims, and delayed remittance payouts.\n\nEach area has different owners and timelines. The dashboard should show:\n\n```txt\nOpen cases by age\nItems near deadline\nIncomplete evidence\nOwner by queue\nTrend by product\nSevere customer harm\n```\n\nThis lets teams act before a deadline or risk becomes a surprise."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a reporting dashboard artifact:\n\n```txt\nDashboard users:\nCompliance, risk ops, legal, product, support leadership\n\nCore views:\n- Open regulatory workflows\n- Deadline risk\n- Missing evidence\n- Severe customer harm\n- Product area trends\n- Owner and status\n\nExample metrics:\n- Suspicious activity cases open by age\n- Complaints by severity\n- Unauthorized transfer claims by status\n- Remittance errors by corridor\n- Late evidence requests\n- Reopened cases\n\nControls:\n- Role-based access\n- Exportable evidence\n- Definitions documented\n- Data freshness visible\n- Drill-down to source record\n```\n\nThe dashboard should never require a second spreadsheet to explain what the numbers mean."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is showing totals without aging. A pile of open cases is less useful than knowing what is near deadline.\n\nAnother mistake is mixing definitions. If \"open complaint\" means different things across teams, the dashboard will create arguments.\n\nA third mistake is ignoring access control. Regulatory dashboards may contain sensitive customer and investigation information."
+      }
+    ],
+    "answer": "A regulatory reporting dashboard helps compliance, risk, legal, and operations understand whether the product is meeting reporting and monitoring obligations.",
+    "reasoning": "Here is a reporting dashboard artifact:\n\n```txt\nDashboard users:\nCompliance, risk ops, legal, product, support leadership\n\nCore views:\n- Open regulatory workflows\n- Deadline risk\n- Missing evidence\n- Severe customer harm\n- Product area trends\n- Owner and status\n\nExample metrics:\n- Suspicious activity cases open by age\n- Complaints by severity\n- Unauthorized transfer claims by status\n- Remittance errors by corridor\n- Late evidence requests\n- Reopened cases\n\nControls:\n- Role-based access\n- Exportable evidence\n- Definitions documented\n- Data freshness visible\n- Drill-down to source record\n```\n\nThe dashboard should never require a second spreadsheet to explain what the numbers mean.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What makes a regulatory dashboard different from a normal KPI dashboard?",
+      "Why do deadline and aging views matter?",
+      "What should be drillable to source records?",
+      "Why do metric definitions need owners?",
+      "What information should be restricted?"
+    ],
+    "interviewAnswer": "I would design the dashboard around open workflows, deadline risk, missing evidence, severity, ownership, trends, definitions, data freshness, role-based access, and drill-down to source records. The goal is to help teams act and prove what happened, not just observe totals.\n\nA strong answer treats reporting as operational control plus evidence.",
+    "sourceLinks": [
+      {
+        "label": "FFIEC: BSA/AML Risk Assessment",
+        "url": "https://bsaaml.ffiec.gov/manual/BSAAMLRiskAssessment/01"
+      },
+      {
+        "label": "CFPB: Consumer Complaint Program",
+        "url": "https://www.consumerfinance.gov/compliance/consumer-complaint-program/"
+      }
+    ],
+    "beginnerExplanation": "A regulatory reporting dashboard helps compliance, risk, legal, and operations understand whether the product is meeting reporting and monitoring obligations.\n\nThe beginner mistake is building an executive vanity dashboard. A useful regulatory dashboard answers operational questions: what needs to be reported, what is late, what is incomplete, what changed, and who owns the next action.\n\nThe mental model:\n\n```txt\nMetric:\nWhat is happening?\n\nException:\nWhat needs attention?\n\nEvidence:\nCan we prove what happened later?\n```\n\nThe TPM should design the dashboard around decisions and deadlines, not decoration.",
+    "example": "Imagine a fintech tracks suspicious activity cases, complaints, unauthorized transfer claims, and delayed remittance payouts.\n\nEach area has different owners and timelines. The dashboard should show:\n\n```txt\nOpen cases by age\nItems near deadline\nIncomplete evidence\nOwner by queue\nTrend by product\nSevere customer harm\n```\n\nThis lets teams act before a deadline or risk becomes a surprise.",
+    "commonMistakes": "A common mistake is showing totals without aging. A pile of open cases is less useful than knowing what is near deadline.\n\nAnother mistake is mixing definitions. If \"open complaint\" means different things across teams, the dashboard will create arguments.\n\nA third mistake is ignoring access control. Regulatory dashboards may contain sensitive customer and investigation information."
   },
   {
     "id": "tpm-release-readiness",
@@ -4367,6 +4759,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is bringing security in after the UX and engineering plan are fixed. That creates conflict and rework.\n\nAnother mistake is treating security requirements as invisible. Many controls need product decisions: copy, permissions, admin UI, alerts, logs, and recovery.\n\nA third mistake is accepting risk without naming it. If a security issue is deferred, the approver, reason, mitigation, and revisit date should be clear."
   },
   {
+    "id": "tpm-settlement-cutoff-pending-states",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design pending states around settlement cutoffs?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Settlement cutoffs are timing boundaries that affect when money actually moves or becomes available.\n\nThe beginner mistake is showing one vague \"pending\" state for everything. A payment pending before cutoff, after cutoff, during partner processing, under review, or waiting for settlement are different states with different customer expectations.\n\nThe mental model:\n\n```txt\nUser action time:\nWhen the user initiated the transfer.\n\nProcessing window:\nWhen partners and networks process it.\n\nAvailability:\nWhen money can be used, paid out, refunded, or considered final.\n```\n\nThe TPM should make timing understandable without overpromising."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user submits a transfer at 4:58 p.m. and the bank cutoff is 5:00 p.m.\n\nIf the transfer misses cutoff, the user may think the app failed. The product should show:\n\n```txt\nTransfer submitted\nProcessing starts next business day\nEstimated arrival updated\nCancellation available until processing begins\n```\n\nThat is more helpful than a generic spinner."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a pending-state artifact:\n\n```txt\nPayment flow:\nBank payout\n\nStates:\n- Draft\n- Submitted before cutoff\n- Submitted after cutoff\n- Processing\n- Partner accepted\n- Settled\n- Failed\n- Returned\n- Canceled\n\nUser copy:\n- \"Submitted after today's cutoff\"\n- \"Processing starts next business day\"\n- \"Expected arrival: Tuesday\"\n- \"You can cancel until processing begins\"\n\nSystem fields:\n- User submission time\n- Partner cutoff time\n- Business calendar\n- Current state\n- Estimated availability\n- Cancellation eligibility\n```\n\nPending states should explain time, not hide it."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using \"pending\" for every non-final state. Users and support need more detail.\n\nAnother mistake is ignoring weekends and holidays. Settlement timing is often business-day based.\n\nA third mistake is promising arrival times that partners or networks do not guarantee."
+      }
+    ],
+    "answer": "Settlement cutoffs are timing boundaries that affect when money actually moves or becomes available.",
+    "reasoning": "Here is a pending-state artifact:\n\n```txt\nPayment flow:\nBank payout\n\nStates:\n- Draft\n- Submitted before cutoff\n- Submitted after cutoff\n- Processing\n- Partner accepted\n- Settled\n- Failed\n- Returned\n- Canceled\n\nUser copy:\n- \"Submitted after today's cutoff\"\n- \"Processing starts next business day\"\n- \"Expected arrival: Tuesday\"\n- \"You can cancel until processing begins\"\n\nSystem fields:\n- User submission time\n- Partner cutoff time\n- Business calendar\n- Current state\n- Estimated availability\n- Cancellation eligibility\n```\n\nPending states should explain time, not hide it.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is one pending state not enough?",
+      "What happens when a payment misses cutoff?",
+      "Why do holidays matter?",
+      "What should support see?",
+      "How would you avoid overpromising arrival time?"
+    ],
+    "interviewAnswer": "I would design settlement pending states around submission time, cutoff, business calendar, partner processing, settlement, returns, cancellation eligibility, estimated availability, support visibility, and customer copy. The goal is to explain timing and options clearly.\n\nA strong answer shows that money movement UX depends on operational timing.",
+    "sourceLinks": [
+      {
+        "label": "Stripe balance availability",
+        "url": "https://docs.stripe.com/payments/balances"
+      },
+      {
+        "label": "CFPB: Remittance transfers",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/deposit-accounts-resources/remittance-transfer-rule/"
+      }
+    ],
+    "beginnerExplanation": "Settlement cutoffs are timing boundaries that affect when money actually moves or becomes available.\n\nThe beginner mistake is showing one vague \"pending\" state for everything. A payment pending before cutoff, after cutoff, during partner processing, under review, or waiting for settlement are different states with different customer expectations.\n\nThe mental model:\n\n```txt\nUser action time:\nWhen the user initiated the transfer.\n\nProcessing window:\nWhen partners and networks process it.\n\nAvailability:\nWhen money can be used, paid out, refunded, or considered final.\n```\n\nThe TPM should make timing understandable without overpromising.",
+    "example": "Imagine a user submits a transfer at 4:58 p.m. and the bank cutoff is 5:00 p.m.\n\nIf the transfer misses cutoff, the user may think the app failed. The product should show:\n\n```txt\nTransfer submitted\nProcessing starts next business day\nEstimated arrival updated\nCancellation available until processing begins\n```\n\nThat is more helpful than a generic spinner.",
+    "commonMistakes": "A common mistake is using \"pending\" for every non-final state. Users and support need more detail.\n\nAnother mistake is ignoring weekends and holidays. Settlement timing is often business-day based.\n\nA third mistake is promising arrival times that partners or networks do not guarantee."
+  },
+  {
     "id": "tpm-settlement-reconciliation-mismatches",
     "track": "TPM",
     "category": "Payments & Remittance",
@@ -4561,6 +5002,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Support tickets are not automatically product insight. They are raw signals. A TPM has to turn those signals into patterns, user needs, product problems, and decisions.\n\nThe beginner mistake is reacting to the latest loud complaint. One angry ticket may reveal a real issue, but it may also be an edge case. A thousand vague tickets may hide several different problems. The TPM needs a feedback loop that separates noise from evidence.\n\nThe mental model is:\n\n```txt\nTicket:\n\"I cannot send money.\"\n\nSignal:\nThe user got stuck.\n\nInsight:\nUsers do not understand pending verification.\n\nProduct decision:\nImprove status explanation, support visibility, and recovery path.\n```",
     "example": "Imagine support receives many tickets saying:\n\n```txt\n\"My transfer is stuck.\"\n\"Why is this taking so long?\"\n\"Did my money disappear?\"\n\"Cancel this now.\"\n```\n\nA weak product response is: \"Add a tooltip saying transfers can take time.\"\n\nA stronger TPM asks:\n\n```txt\nWhat exact status are these users in?\nWhich corridors are affected?\nHow long have they waited?\nWhat did the UI say?\nCould support see the real status?\nDid the partner send delayed webhooks?\nDid users have any action they could take?\n```\n\nAfter tagging and analysis, the TPM might find three different issues:\n\n```txt\nPattern 1:\nUsers in \"processing\" status do not know what it means.\n\nPattern 2:\nPartner delays are concentrated in one corridor.\n\nPattern 3:\nSupport cannot see whether the payout is retrying or waiting for partner confirmation.\n```\n\nEach pattern needs a different solution.",
     "commonMistakes": "A common mistake is counting tickets without reading them. Volume matters, but language and context reveal why users are confused.\n\nAnother mistake is letting support become a one-way inbox. Product should tell support what changed, what is coming, and what evidence is still needed.\n\nA third mistake is treating every request as a feature request. Many tickets are symptoms of unclear status, broken expectations, poor onboarding, or missing operational visibility."
+  },
+  {
+    "id": "tpm-suspicious-recipient-network-analysis",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Advanced",
+    "question": "How would you design product requirements for suspicious recipient network analysis?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Suspicious recipient network analysis looks for risky patterns across connected senders, recipients, accounts, devices, bank accounts, phone numbers, or addresses.\n\nThe beginner mistake is looking only at one transaction at a time. Financial crime and fraud can appear as a network: many senders to one recipient, one device creating many accounts, or repeated small transfers through related identities.\n\nThe mental model:\n\n```txt\nNode:\nAn entity such as customer, recipient, device, bank account, or phone number.\n\nEdge:\nA relationship such as transfer, login, shared device, or shared bank account.\n\nPattern:\nA structure that may indicate risk.\n```\n\nThe TPM should make network signals understandable and reviewable."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine ten new customers send money to the same recipient within two days. Each transfer alone looks small. Together, the pattern may be suspicious.\n\nThe product should show:\n\n```txt\nRecipient received 10 transfers from 10 new senders\nAll senders created accounts in the last 48 hours\nFour share the same device fingerprint\nTwo attempted chargebacks before\n```\n\nNow the analyst sees the network, not isolated dots."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a network-analysis artifact:\n\n```txt\nUse case:\nRecipient risk review\n\nEntities:\n- Sender\n- Recipient\n- Device\n- Bank account\n- Phone number\n- Address\n- IP range\n\nSignals:\n- Many-to-one transfer pattern\n- Shared device across accounts\n- Repeated failed verification\n- High-risk geography\n- Prior confirmed fraud link\n\nReviewer view:\n- Network summary\n- Timeline\n- Top risk links\n- Source records\n- Confidence or rule source\n- Allowed actions\n\nGuardrails:\n- Human review before severe action\n- Avoid guilt by weak association alone\n- Log reason for decision\n```\n\nNetwork analysis should support investigation, not automatically punish every connection."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating any shared attribute as proof of fraud. Families, businesses, and shared devices can create innocent connections.\n\nAnother mistake is hiding the source records. Analysts need to verify why entities are linked.\n\nA third mistake is not measuring false positives by community or user segment, which can reveal unfair impact."
+      }
+    ],
+    "answer": "Suspicious recipient network analysis looks for risky patterns across connected senders, recipients, accounts, devices, bank accounts, phone numbers, or addresses.",
+    "reasoning": "Here is a network-analysis artifact:\n\n```txt\nUse case:\nRecipient risk review\n\nEntities:\n- Sender\n- Recipient\n- Device\n- Bank account\n- Phone number\n- Address\n- IP range\n\nSignals:\n- Many-to-one transfer pattern\n- Shared device across accounts\n- Repeated failed verification\n- High-risk geography\n- Prior confirmed fraud link\n\nReviewer view:\n- Network summary\n- Timeline\n- Top risk links\n- Source records\n- Confidence or rule source\n- Allowed actions\n\nGuardrails:\n- Human review before severe action\n- Avoid guilt by weak association alone\n- Log reason for decision\n```\n\nNetwork analysis should support investigation, not automatically punish every connection.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why can single-transaction review miss fraud?",
+      "What are nodes and edges?",
+      "Which network patterns are risky?",
+      "Why should weak associations not automatically block users?",
+      "What should the reviewer see?"
+    ],
+    "interviewAnswer": "I would design network analysis around entities, relationships, risky patterns, source records, reviewer views, confidence, allowed actions, human review, audit logs, and false-positive monitoring. The system should reveal suspicious networks while avoiding automatic harm from weak associations.\n\nA strong answer balances pattern detection with fairness and evidence.",
+    "sourceLinks": [
+      {
+        "label": "FFIEC: Suspicious Activity Reporting",
+        "url": "https://bsaaml.ffiec.gov/manual/AssessingComplianceWithBSARegulatoryRequirements/04"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "Suspicious recipient network analysis looks for risky patterns across connected senders, recipients, accounts, devices, bank accounts, phone numbers, or addresses.\n\nThe beginner mistake is looking only at one transaction at a time. Financial crime and fraud can appear as a network: many senders to one recipient, one device creating many accounts, or repeated small transfers through related identities.\n\nThe mental model:\n\n```txt\nNode:\nAn entity such as customer, recipient, device, bank account, or phone number.\n\nEdge:\nA relationship such as transfer, login, shared device, or shared bank account.\n\nPattern:\nA structure that may indicate risk.\n```\n\nThe TPM should make network signals understandable and reviewable.",
+    "example": "Imagine ten new customers send money to the same recipient within two days. Each transfer alone looks small. Together, the pattern may be suspicious.\n\nThe product should show:\n\n```txt\nRecipient received 10 transfers from 10 new senders\nAll senders created accounts in the last 48 hours\nFour share the same device fingerprint\nTwo attempted chargebacks before\n```\n\nNow the analyst sees the network, not isolated dots.",
+    "commonMistakes": "A common mistake is treating any shared attribute as proof of fraud. Families, businesses, and shared devices can create innocent connections.\n\nAnother mistake is hiding the source records. Analysts need to verify why entities are linked.\n\nA third mistake is not measuring false positives by community or user segment, which can reveal unfair impact."
   },
   {
     "id": "tpm-technical-debt",

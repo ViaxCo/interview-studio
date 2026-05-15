@@ -475,6 +475,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-audit-trail-product-requirements",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "What audit trail requirements would you define for a fintech workflow?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-build-versus-buy",
     "track": "TPM",
     "category": "Technical Strategy",
@@ -574,6 +585,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-data-retention-deletion-fintech",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you design data retention and deletion for a fintech product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-dependency-risk",
     "track": "TPM",
     "category": "Execution & Delivery",
@@ -612,6 +634,17 @@ export const questionSummaries: Question[] = [
     "category": "Metrics & Experimentation",
     "level": "Intermediate",
     "question": "How would you design an experiment when the product area has compliance or user-risk constraints?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-fee-transparency-disclosures",
+    "track": "TPM",
+    "category": "Compliance UX",
+    "level": "Intermediate",
+    "question": "How would you design fee transparency for a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -772,6 +805,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-negative-balance-recovery",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design negative balance recovery?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-onboarding-activation-metrics",
     "track": "TPM",
     "category": "Metrics",
@@ -794,11 +838,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-partner-bank-incident-comms",
+    "track": "TPM",
+    "category": "Observability & Operations",
+    "level": "Advanced",
+    "question": "How would you handle customer communications during a partner bank incident?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-partner-outage-fallback",
     "track": "TPM",
     "category": "Operations",
     "level": "Intermediate",
     "question": "How would you handle a critical partner API outage?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-partner-risk-scorecard",
+    "track": "TPM",
+    "category": "Vendor & Partner Management",
+    "level": "Advanced",
+    "question": "How would you build a partner risk scorecard for a fintech vendor?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -893,11 +959,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-privacy-request-dsar-fintech",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Intermediate",
+    "question": "How would you design a privacy data request workflow for fintech users?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-prompt-versioning-change-management",
     "track": "TPM",
     "category": "AI Product",
     "level": "Intermediate",
     "question": "How would you manage prompt changes and versioning in a production AI feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-regulatory-reporting-dashboard",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you design a regulatory reporting dashboard?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -981,6 +1069,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-settlement-cutoff-pending-states",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design pending states around settlement cutoffs?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-settlement-reconciliation-mismatches",
     "track": "TPM",
     "category": "Payments & Remittance",
@@ -1019,6 +1118,17 @@ export const questionSummaries: Question[] = [
     "category": "Discovery & Feedback",
     "level": "Foundational",
     "question": "How would you turn support tickets and customer feedback into product decisions?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-suspicious-recipient-network-analysis",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Advanced",
+    "question": "How would you design product requirements for suspicious recipient network analysis?",
     "answer": "",
     "reasoning": "",
     "tests": "",
