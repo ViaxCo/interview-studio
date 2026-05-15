@@ -839,6 +839,202 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
   },
   {
+    "id": "tpm-ai-credit-underwriting",
+    "track": "TPM",
+    "category": "AI & Fintech",
+    "level": "Intermediate",
+    "question": "How would you approach AI-assisted credit underwriting as a TPM?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Credit underwriting decides whether a customer qualifies for credit, how much, and on what terms. AI-assisted underwriting uses models to support that decision.\n\nThe beginner mistake is treating underwriting AI like a normal recommendation model. Credit decisions are high-stakes. They affect people's access to money, business growth, housing, and financial opportunity. They also come with regulatory, fairness, explainability, and model-risk obligations.\n\nThe TPM must ask:\n\n```txt\nWhat decision does the model support?\nWhat data is used?\nCan we explain adverse outcomes?\nHow do we test fairness and performance?\nWho can override the model?\nHow do we monitor drift?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a lender wants to use cash-flow data and machine learning to approve small-business loans.\n\nA weak product requirement says:\n\n```txt\nUse AI to approve loans faster.\n```\n\nA stronger requirement separates the system:\n\n```txt\nInputs:\nBank transactions, revenue trends, repayment history, business age, existing debt, fraud signals.\n\nModel output:\nRisk score and recommended limit.\n\nDecision:\nApprove, decline, request more info, or route to manual review.\n\nExplanation:\nSpecific principal reasons for adverse action.\n\nControls:\nFair lending review, model validation, override workflow, audit trail.\n```\n\nThe TPM should not let the product become a black box."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an underwriting requirements artifact:\n\n```txt\nFeature:\nAI-assisted small-business credit decisioning\n\nUser value:\nFaster decisions and fairer access for businesses with strong cash flow but limited traditional credit history.\n\nDecision states:\n- Approved\n- Approved with lower limit\n- More information needed\n- Manual review\n- Declined\n\nRequired evidence:\n- Model performance on historical data\n- Fairness analysis across protected or proxy groups where legally appropriate\n- Reason-code generation\n- Manual-review policy\n- Model monitoring dashboard\n- Adverse-action notice workflow\n\nMetrics:\n- Approval rate\n- Default rate\n- Manual review rate\n- Time to decision\n- Override rate\n- Adverse-action reason distribution\n- Model drift indicators\n```\n\nThe TPM should also define what the model cannot do:\n\n```txt\nNon-goals:\n- The model does not make unreviewable decisions.\n- The model does not use prohibited data.\n- The model does not generate vague decline reasons.\n- The model does not launch without validation and monitoring.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is optimizing approval speed without protecting decision quality.\n\nAnother mistake is ignoring explainability until legal review. If the team cannot explain declines, the product is not ready.\n\nA third mistake is not defining human oversight. Manual review and overrides need policy, permissions, and audit logs."
+      }
+    ],
+    "answer": "Credit underwriting decides whether a customer qualifies for credit, how much, and on what terms. AI-assisted underwriting uses models to support that decision.",
+    "reasoning": "Here is an underwriting requirements artifact:\n\n```txt\nFeature:\nAI-assisted small-business credit decisioning\n\nUser value:\nFaster decisions and fairer access for businesses with strong cash flow but limited traditional credit history.\n\nDecision states:\n- Approved\n- Approved with lower limit\n- More information needed\n- Manual review\n- Declined\n\nRequired evidence:\n- Model performance on historical data\n- Fairness analysis across protected or proxy groups where legally appropriate\n- Reason-code generation\n- Manual-review policy\n- Model monitoring dashboard\n- Adverse-action notice workflow\n\nMetrics:\n- Approval rate\n- Default rate\n- Manual review rate\n- Time to decision\n- Override rate\n- Adverse-action reason distribution\n- Model drift indicators\n```\n\nThe TPM should also define what the model cannot do:\n\n```txt\nNon-goals:\n- The model does not make unreviewable decisions.\n- The model does not use prohibited data.\n- The model does not generate vague decline reasons.\n- The model does not launch without validation and monitoring.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is credit underwriting high-stakes?",
+      "What is an adverse action notice?",
+      "Why does model validation matter?",
+      "What should be monitored after launch?",
+      "Why are vague decline reasons a problem?"
+    ],
+    "interviewAnswer": "I would approach AI-assisted underwriting by defining the decision, data inputs, model output, human review, explainability, adverse-action workflow, fairness testing, model validation, monitoring, overrides, and audit trail.\n\nA strong TPM answer shows that AI credit products must be fast, useful, explainable, governed, and fair enough to operate responsibly.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Adverse action notices and complex algorithms",
+        "url": "https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/"
+      },
+      {
+        "label": "Federal Reserve: SR 11-7 model risk management",
+        "url": "https://www.federalreserve.gov/boarddocs/srletters/2011/sr1107a1.pdf"
+      }
+    ],
+    "beginnerExplanation": "Credit underwriting decides whether a customer qualifies for credit, how much, and on what terms. AI-assisted underwriting uses models to support that decision.\n\nThe beginner mistake is treating underwriting AI like a normal recommendation model. Credit decisions are high-stakes. They affect people's access to money, business growth, housing, and financial opportunity. They also come with regulatory, fairness, explainability, and model-risk obligations.\n\nThe TPM must ask:\n\n```txt\nWhat decision does the model support?\nWhat data is used?\nCan we explain adverse outcomes?\nHow do we test fairness and performance?\nWho can override the model?\nHow do we monitor drift?\n```",
+    "example": "Imagine a lender wants to use cash-flow data and machine learning to approve small-business loans.\n\nA weak product requirement says:\n\n```txt\nUse AI to approve loans faster.\n```\n\nA stronger requirement separates the system:\n\n```txt\nInputs:\nBank transactions, revenue trends, repayment history, business age, existing debt, fraud signals.\n\nModel output:\nRisk score and recommended limit.\n\nDecision:\nApprove, decline, request more info, or route to manual review.\n\nExplanation:\nSpecific principal reasons for adverse action.\n\nControls:\nFair lending review, model validation, override workflow, audit trail.\n```\n\nThe TPM should not let the product become a black box.",
+    "commonMistakes": "A common mistake is optimizing approval speed without protecting decision quality.\n\nAnother mistake is ignoring explainability until legal review. If the team cannot explain declines, the product is not ready.\n\nA third mistake is not defining human oversight. Manual review and overrides need policy, permissions, and audit logs."
+  },
+  {
+    "id": "tpm-ai-fraud-detection",
+    "track": "TPM",
+    "category": "AI & Risk",
+    "level": "Intermediate",
+    "question": "How would you design an AI-assisted fraud detection product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AI-assisted fraud detection uses models to help identify risky behavior, suspicious transactions, or accounts that need review.\n\nThe beginner mistake is thinking the model is the product. The product is the full decision system: signals, model score, rules, human review, user action, appeals, monitoring, and feedback.\n\nFraud systems have two painful error types:\n\n```txt\nFalse negative:\nBad activity is allowed.\n\nFalse positive:\nA legitimate user is blocked, delayed, or reviewed.\n```\n\nThe TPM must care about both. A fraud model that blocks everyone may reduce fraud but destroy the product."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a payment app wants AI to detect suspicious transfers.\n\nA weak plan says:\n\n```txt\nUse a fraud model to block risky transfers.\n```\n\nA strong plan defines decisions:\n\n```txt\nLow risk:\nAllow automatically.\n\nMedium risk:\nStep-up verification or manual review.\n\nHigh risk:\nBlock or hold pending review.\n\nUnknown:\nUse conservative limits and gather more evidence.\n```\n\nThe model score should not be the only input. Rules, known fraud patterns, sanctions/compliance checks, user history, and operational capacity all matter."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an AI fraud product artifact:\n\n```txt\nGoal:\nReduce fraud loss without creating unacceptable false positives.\n\nInputs:\n- Transaction amount\n- Sender history\n- Recipient history\n- Device and IP signals\n- Velocity\n- Corridor risk\n- Failed verification attempts\n- Chargeback history\n\nDecision outputs:\n- Allow\n- Step-up verification\n- Manual review\n- Temporary hold\n- Block\n\nHuman review:\n- Show top risk signals\n- Show similar prior activity\n- Let analyst record decision reason\n- Feed confirmed outcomes back into evaluation\n\nGuardrail metrics:\n- Fraud loss\n- False-positive rate\n- Manual review backlog\n- Average review time\n- Legitimate users blocked\n- Support contacts\n```\n\nThe TPM also needs an evaluation plan:\n\n```txt\nBefore launch:\nBacktest on historical transactions.\n\nDuring beta:\nRun in shadow mode, compare model recommendation to current process.\n\nAfter launch:\nMonitor drift, false positives, fraud loss, and analyst overrides.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is optimizing only fraud loss. If false positives explode, the product harms good users.\n\nAnother mistake is launching without human review tooling. Fraud teams need explanations, queues, and decision recording.\n\nA third mistake is not monitoring model drift. Fraud patterns change as attackers adapt."
+      }
+    ],
+    "answer": "AI-assisted fraud detection uses models to help identify risky behavior, suspicious transactions, or accounts that need review.",
+    "reasoning": "Here is an AI fraud product artifact:\n\n```txt\nGoal:\nReduce fraud loss without creating unacceptable false positives.\n\nInputs:\n- Transaction amount\n- Sender history\n- Recipient history\n- Device and IP signals\n- Velocity\n- Corridor risk\n- Failed verification attempts\n- Chargeback history\n\nDecision outputs:\n- Allow\n- Step-up verification\n- Manual review\n- Temporary hold\n- Block\n\nHuman review:\n- Show top risk signals\n- Show similar prior activity\n- Let analyst record decision reason\n- Feed confirmed outcomes back into evaluation\n\nGuardrail metrics:\n- Fraud loss\n- False-positive rate\n- Manual review backlog\n- Average review time\n- Legitimate users blocked\n- Support contacts\n```\n\nThe TPM also needs an evaluation plan:\n\n```txt\nBefore launch:\nBacktest on historical transactions.\n\nDuring beta:\nRun in shadow mode, compare model recommendation to current process.\n\nAfter launch:\nMonitor drift, false positives, fraud loss, and analyst overrides.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is the model not the whole product?",
+      "What is a false positive in fraud detection?",
+      "What decisions can sit between allow and block?",
+      "Why is shadow mode useful?",
+      "What should human reviewers see?"
+    ],
+    "interviewAnswer": "I would design AI fraud detection as a decision system: risk signals, model scoring, rules, human review, user actions, feedback loops, monitoring, and guardrails. I would backtest, use shadow mode, launch gradually, and track fraud loss, false positives, review backlog, drift, and customer harm.\n\nA strong answer balances risk reduction with legitimate-user experience.",
+    "sourceLinks": [
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      },
+      {
+        "label": "Stripe Docs: Fraud prevention rules",
+        "url": "https://docs.stripe.com/radar/rules"
+      }
+    ],
+    "beginnerExplanation": "AI-assisted fraud detection uses models to help identify risky behavior, suspicious transactions, or accounts that need review.\n\nThe beginner mistake is thinking the model is the product. The product is the full decision system: signals, model score, rules, human review, user action, appeals, monitoring, and feedback.\n\nFraud systems have two painful error types:\n\n```txt\nFalse negative:\nBad activity is allowed.\n\nFalse positive:\nA legitimate user is blocked, delayed, or reviewed.\n```\n\nThe TPM must care about both. A fraud model that blocks everyone may reduce fraud but destroy the product.",
+    "example": "Imagine a payment app wants AI to detect suspicious transfers.\n\nA weak plan says:\n\n```txt\nUse a fraud model to block risky transfers.\n```\n\nA strong plan defines decisions:\n\n```txt\nLow risk:\nAllow automatically.\n\nMedium risk:\nStep-up verification or manual review.\n\nHigh risk:\nBlock or hold pending review.\n\nUnknown:\nUse conservative limits and gather more evidence.\n```\n\nThe model score should not be the only input. Rules, known fraud patterns, sanctions/compliance checks, user history, and operational capacity all matter.",
+    "commonMistakes": "A common mistake is optimizing only fraud loss. If false positives explode, the product harms good users.\n\nAnother mistake is launching without human review tooling. Fraud teams need explanations, queues, and decision recording.\n\nA third mistake is not monitoring model drift. Fraud patterns change as attackers adapt."
+  },
+  {
+    "id": "tpm-ai-model-evaluation",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you evaluate whether an AI feature is ready to launch?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AI evaluation is how the team checks whether an AI feature behaves well enough for its intended use. It is not just \"does the model seem smart?\" It is \"does the system reliably produce acceptable outputs for the real workflow, including edge cases and failures?\"\n\nThe beginner mistake is testing a few happy-path prompts and calling it done. AI systems can fail inconsistently. They can hallucinate, refuse when they should answer, answer when they should refuse, use stale context, expose sensitive data, or produce different outputs for similar inputs.\n\nA TPM should evaluate the product behavior, not just the model."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI assistant that summarizes customer complaints for a fintech support team.\n\nA weak evaluation says:\n\n```txt\nTry 20 examples. Looks good.\n```\n\nA stronger evaluation defines success:\n\n```txt\nThe summary must:\n- Identify the customer's issue\n- Preserve amount, date, and transfer ID accurately\n- Avoid inventing facts\n- Flag complaint language\n- Exclude sensitive internal-only fraud notes\n- Be short enough for an agent to scan\n```\n\nNow the team can test outputs against criteria."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an evaluation plan:\n\n```txt\nFeature:\nAI support case summarizer\n\nDataset:\n- 200 historical support cases\n- 50 payment delay cases\n- 50 failed verification cases\n- 50 refund or dispute cases\n- 25 angry customer cases\n- 25 cases with sensitive internal notes\n\nEvaluation criteria:\n- Factual accuracy\n- Missing critical detail\n- Hallucinated detail\n- Sensitive information leakage\n- Complaint detection\n- Clarity for support agent\n- Correct escalation flag\n\nLaunch threshold:\n- 95 percent factual accuracy on critical fields\n- 0 severe sensitive-data leaks\n- 90 percent complaint detection recall\n- Human agents prefer AI summary over current workflow in beta\n```\n\nThe TPM should also define monitoring:\n\n```txt\nPost-launch:\n- Agent edit rate\n- Agent thumbs-down rate\n- Escalation miss rate\n- Complaint miss rate\n- Sensitive leakage reports\n- Latency\n- Cost per summary\n```\n\nIf the feature is high-risk, use human approval before outputs reach customers."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is evaluating only average quality. A small number of severe failures can make the product unsafe.\n\nAnother mistake is using synthetic examples only. Real messy cases reveal issues polished examples miss.\n\nA third mistake is not refreshing evals after prompts, models, tools, or policies change."
+      }
+    ],
+    "answer": "AI evaluation is how the team checks whether an AI feature behaves well enough for its intended use. It is not just \"does the model seem smart?\" It is \"does the system reliably produce acceptable outputs for the real workflow, including edge cases and failures?\"",
+    "reasoning": "Here is an evaluation plan:\n\n```txt\nFeature:\nAI support case summarizer\n\nDataset:\n- 200 historical support cases\n- 50 payment delay cases\n- 50 failed verification cases\n- 50 refund or dispute cases\n- 25 angry customer cases\n- 25 cases with sensitive internal notes\n\nEvaluation criteria:\n- Factual accuracy\n- Missing critical detail\n- Hallucinated detail\n- Sensitive information leakage\n- Complaint detection\n- Clarity for support agent\n- Correct escalation flag\n\nLaunch threshold:\n- 95 percent factual accuracy on critical fields\n- 0 severe sensitive-data leaks\n- 90 percent complaint detection recall\n- Human agents prefer AI summary over current workflow in beta\n```\n\nThe TPM should also define monitoring:\n\n```txt\nPost-launch:\n- Agent edit rate\n- Agent thumbs-down rate\n- Escalation miss rate\n- Complaint miss rate\n- Sensitive leakage reports\n- Latency\n- Cost per summary\n```\n\nIf the feature is high-risk, use human approval before outputs reach customers.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is AI evaluation more than trying a few prompts?",
+      "What is a launch threshold?",
+      "Why should evals include edge cases?",
+      "What should be monitored after launch?",
+      "Why might human approval be needed?"
+    ],
+    "interviewAnswer": "I would evaluate an AI feature by defining the intended workflow, creating representative and edge-case test sets, setting criteria and launch thresholds, measuring severe failures, testing human review, and monitoring post-launch quality, latency, cost, and harm signals.\n\nA strong TPM answer shows that AI readiness is evidence-based and workflow-specific.",
+    "sourceLinks": [
+      {
+        "label": "OpenAI Docs: Working with evals",
+        "url": "https://platform.openai.com/docs/guides/evals"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "AI evaluation is how the team checks whether an AI feature behaves well enough for its intended use. It is not just \"does the model seem smart?\" It is \"does the system reliably produce acceptable outputs for the real workflow, including edge cases and failures?\"\n\nThe beginner mistake is testing a few happy-path prompts and calling it done. AI systems can fail inconsistently. They can hallucinate, refuse when they should answer, answer when they should refuse, use stale context, expose sensitive data, or produce different outputs for similar inputs.\n\nA TPM should evaluate the product behavior, not just the model.",
+    "example": "Imagine an AI assistant that summarizes customer complaints for a fintech support team.\n\nA weak evaluation says:\n\n```txt\nTry 20 examples. Looks good.\n```\n\nA stronger evaluation defines success:\n\n```txt\nThe summary must:\n- Identify the customer's issue\n- Preserve amount, date, and transfer ID accurately\n- Avoid inventing facts\n- Flag complaint language\n- Exclude sensitive internal-only fraud notes\n- Be short enough for an agent to scan\n```\n\nNow the team can test outputs against criteria.",
+    "commonMistakes": "A common mistake is evaluating only average quality. A small number of severe failures can make the product unsafe.\n\nAnother mistake is using synthetic examples only. Real messy cases reveal issues polished examples miss.\n\nA third mistake is not refreshing evals after prompts, models, tools, or policies change."
+  },
+  {
+    "id": "tpm-ai-support-agent-regulated-fintech",
+    "track": "TPM",
+    "category": "AI & Customer Operations",
+    "level": "Intermediate",
+    "question": "How would you launch an AI support agent in a regulated fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An AI support agent can answer customer questions, summarize cases, draft replies, or help support agents work faster.\n\nIn regulated fintech, support answers can affect money, identity, fraud, compliance, account access, and customer trust. The beginner mistake is launching a chatbot as if wrong answers are just a UX issue. In fintech, a wrong answer can tell a user the wrong payment status, expose sensitive data, promise a refund, or mishandle a complaint.\n\nThe TPM should decide where AI is allowed to act:\n\n```txt\nAnswer only:\nAI gives general information.\n\nDraft only:\nAI drafts for a human agent.\n\nAssist:\nAI summarizes and suggests next steps.\n\nAct:\nAI changes account state or triggers workflows.\n```\n\nThe risk increases sharply as the AI moves from answering to acting."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a customer asks: \"Where is my transfer?\"\n\nA weak AI agent might respond from generic policy:\n\n```txt\nMost transfers arrive in 1-3 days.\n```\n\nBut this customer's transfer may be failed, pending compliance review, delayed by a partner, or already paid. The AI must use trusted system data and know what it is allowed to say.\n\nA safer version:\n\n```txt\nI found your transfer. It is still pending with our payout partner.\nYou do not need to send it again. We will update the status here when the partner confirms the final result.\n```\n\nThat answer needs retrieval, permissions, state awareness, and safety rules."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a launch artifact:\n\n```txt\nUse case:\nAI support assistant for transfer status questions\n\nAllowed:\n- Explain visible transfer status\n- Summarize support case history\n- Draft replies for human approval\n- Link to help articles\n\nNot allowed:\n- Promise refunds\n- Explain suspicious activity rules\n- Reveal fraud or sanctions logic\n- Change KYC status\n- Close complaints\n- Move money\n\nRequired data:\n- Transfer status\n- Public status reason\n- Expected next update\n- Support-safe macro\n- User authentication state\n\nGuardrails:\n- Use only approved knowledge sources\n- Refuse account-specific answers if user is not authenticated\n- Escalate compliance, fraud, legal, or complaint cases to humans\n- Log AI response, sources, and confidence\n```\n\nEvaluation should include real support scenarios:\n\n```txt\nTest cases:\n- Pending transfer\n- Failed transfer\n- Possible duplicate payment\n- KYC review\n- Sanctions review\n- Refund request\n- Complaint language\n- Angry customer\n- Unauthenticated account question\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is measuring only deflection. If the bot reduces tickets by giving wrong answers, that is not success.\n\nAnother mistake is letting AI answer from stale or generic knowledge when account state matters.\n\nA third mistake is skipping escalation design. Regulated support needs clear human handoff paths."
+      }
+    ],
+    "answer": "An AI support agent can answer customer questions, summarize cases, draft replies, or help support agents work faster.",
+    "reasoning": "Here is a launch artifact:\n\n```txt\nUse case:\nAI support assistant for transfer status questions\n\nAllowed:\n- Explain visible transfer status\n- Summarize support case history\n- Draft replies for human approval\n- Link to help articles\n\nNot allowed:\n- Promise refunds\n- Explain suspicious activity rules\n- Reveal fraud or sanctions logic\n- Change KYC status\n- Close complaints\n- Move money\n\nRequired data:\n- Transfer status\n- Public status reason\n- Expected next update\n- Support-safe macro\n- User authentication state\n\nGuardrails:\n- Use only approved knowledge sources\n- Refuse account-specific answers if user is not authenticated\n- Escalate compliance, fraud, legal, or complaint cases to humans\n- Log AI response, sources, and confidence\n```\n\nEvaluation should include real support scenarios:\n\n```txt\nTest cases:\n- Pending transfer\n- Failed transfer\n- Possible duplicate payment\n- KYC review\n- Sanctions review\n- Refund request\n- Complaint language\n- Angry customer\n- Unauthenticated account question\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is fintech support higher risk than generic support?",
+      "What is the difference between draft-only and act?",
+      "What should the AI support agent not be allowed to do?",
+      "Why does authentication matter?",
+      "What metrics should be watched besides ticket deflection?"
+    ],
+    "interviewAnswer": "I would launch an AI support agent by choosing a narrow use case, defining allowed and prohibited actions, grounding answers in trusted data, adding human escalation, testing risky scenarios, logging outputs, and monitoring accuracy, escalation rate, complaints, and customer harm.\n\nA strong TPM answer treats AI support as an operating system with permissions, not just a chatbot.",
+    "sourceLinks": [
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      },
+      {
+        "label": "Microsoft: Responsible AI principles",
+        "url": "https://www.microsoft.com/en-us/ai/principles-and-approach/"
+      }
+    ],
+    "beginnerExplanation": "An AI support agent can answer customer questions, summarize cases, draft replies, or help support agents work faster.\n\nIn regulated fintech, support answers can affect money, identity, fraud, compliance, account access, and customer trust. The beginner mistake is launching a chatbot as if wrong answers are just a UX issue. In fintech, a wrong answer can tell a user the wrong payment status, expose sensitive data, promise a refund, or mishandle a complaint.\n\nThe TPM should decide where AI is allowed to act:\n\n```txt\nAnswer only:\nAI gives general information.\n\nDraft only:\nAI drafts for a human agent.\n\nAssist:\nAI summarizes and suggests next steps.\n\nAct:\nAI changes account state or triggers workflows.\n```\n\nThe risk increases sharply as the AI moves from answering to acting.",
+    "example": "Imagine a customer asks: \"Where is my transfer?\"\n\nA weak AI agent might respond from generic policy:\n\n```txt\nMost transfers arrive in 1-3 days.\n```\n\nBut this customer's transfer may be failed, pending compliance review, delayed by a partner, or already paid. The AI must use trusted system data and know what it is allowed to say.\n\nA safer version:\n\n```txt\nI found your transfer. It is still pending with our payout partner.\nYou do not need to send it again. We will update the status here when the partner confirms the final result.\n```\n\nThat answer needs retrieval, permissions, state awareness, and safety rules.",
+    "commonMistakes": "A common mistake is measuring only deflection. If the bot reduces tickets by giving wrong answers, that is not success.\n\nAnother mistake is letting AI answer from stale or generic knowledge when account state matters.\n\nA third mistake is skipping escalation design. Regulated support needs clear human handoff paths."
+  },
+  {
     "id": "tpm-ambiguous-executive-ask",
     "track": "TPM",
     "category": "Product Strategy",
@@ -886,6 +1082,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "An ambiguous executive request is a direction from leadership that sounds important but is not yet specific enough to build.\n\nExamples:\n\n```txt\n\"We need an AI strategy.\"\n\"Make onboarding enterprise-ready.\"\n\"Improve reliability.\"\n\"Monetize the API.\"\n\"Reduce operational risk.\"\n```\n\nThe beginner mistake is either obeying literally or pushing back too quickly. A stronger TPM treats the request as a signal. The executive may be pointing at a real business concern, but the team still needs clarity before committing roadmap capacity.\n\nThe TPM's job is to turn ambiguity into a decision:\n\n```txt\nWhat outcome are we trying to create?\nWhy now?\nFor whom?\nWhat evidence do we have?\nWhat options exist?\nWhat tradeoffs are acceptable?\nHow will we know it worked?\n```",
     "example": "Imagine the CEO says, \"We need to make the product enterprise-ready this quarter.\"\n\nA weak response is:\n\n```txt\nAdd SSO, audit logs, custom roles, and admin dashboard.\n```\n\nThose may be useful, but the team does not yet know the goal. Enterprise-ready for whom? A bank? A startup with 20 employees? A procurement checklist? A signed customer?\n\nA stronger TPM clarifies:\n\n```txt\nPossible meanings:\n- Close one named enterprise deal\n- Pass security review\n- Support teams and permissions\n- Improve admin controls\n- Meet compliance procurement requirements\n- Support higher-volume usage\n```\n\nEach meaning leads to a different plan.",
     "commonMistakes": "A common mistake is pretending ambiguity is clarity because the request came from an executive.\n\nAnother mistake is asking only \"what do you want us to build?\" Better questions uncover the business outcome and constraint.\n\nA third mistake is turning every executive request into an emergency. Some are urgent. Some need discovery. Some should be declined or reframed."
+  },
+  {
+    "id": "tpm-aml-transaction-monitoring",
+    "track": "TPM",
+    "category": "Compliance & Risk",
+    "level": "Intermediate",
+    "question": "How would you define requirements for AML transaction monitoring?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AML transaction monitoring is the process of detecting activity that may indicate money laundering, fraud, sanctions evasion, or other financial crime.\n\nThe beginner mistake is thinking monitoring is just a list of rules like \"flag transactions over $10,000.\" Real monitoring looks for patterns, context, risk, customer history, geography, velocity, counterparties, and unusual behavior.\n\nA TPM does not decide legal obligations alone. Compliance owns policy. But the TPM helps turn policy into a product and system workflow that can be built, tested, operated, and audited."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a remittance product. A user sends five transfers just below a review threshold to different recipients in a short period.\n\nThat pattern may be normal for a business user, suspicious for a new consumer, or explainable during a family emergency. The product must route it to the right review, not automatically accuse the user.\n\nA monitoring system needs:\n\n```txt\nSignals:\nAmount, velocity, corridor, recipient count, device, funding source, user age, risk tier.\n\nRules:\nThresholds, combinations, patterns, and escalation logic.\n\nCases:\nA place for analysts to review alerts and record decisions.\n\nOutcomes:\nClear, release, request information, limit account, file report, or escalate.\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a requirements artifact:\n\n```txt\nFeature:\nAML transaction monitoring for remittance\n\nAlert examples:\n- Rapid increase in transfer volume\n- Multiple recipients added in one day\n- Repeated transfers just below review threshold\n- High-risk corridor plus new device\n- Sender and recipient data mismatch\n\nCase workflow:\n1. Alert generated\n2. Analyst reviews customer profile and transaction history\n3. Analyst records disposition\n4. Product action applied if needed\n5. Audit trail preserved\n\nAnalyst tools:\n- User profile\n- KYC/KYB status\n- Transaction history\n- Recipient graph\n- Device and IP signals\n- Previous alerts\n- Notes and evidence\n```\n\nThe TPM also needs to define metrics:\n\n```txt\nOperational metrics:\n- Alert volume\n- Case backlog\n- Average review time\n- Escalation rate\n- False-positive rate\n- Repeat alert rate\n\nRisk metrics:\n- Confirmed suspicious cases\n- Loss prevented\n- Policy breaches\n- Late review count\n```\n\nThe product should avoid telling users \"you triggered AML monitoring.\" User-facing copy should be safe and plain, such as: \"We need more information before this transfer can continue.\""
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is creating too many alerts. If analysts drown in low-quality alerts, real risk may be missed.\n\nAnother mistake is not designing case management. Detection without review workflow is not operationally useful.\n\nA third mistake is exposing sensitive compliance logic to users. The product can explain next steps without revealing monitoring rules."
+      }
+    ],
+    "answer": "AML transaction monitoring is the process of detecting activity that may indicate money laundering, fraud, sanctions evasion, or other financial crime.",
+    "reasoning": "Here is a requirements artifact:\n\n```txt\nFeature:\nAML transaction monitoring for remittance\n\nAlert examples:\n- Rapid increase in transfer volume\n- Multiple recipients added in one day\n- Repeated transfers just below review threshold\n- High-risk corridor plus new device\n- Sender and recipient data mismatch\n\nCase workflow:\n1. Alert generated\n2. Analyst reviews customer profile and transaction history\n3. Analyst records disposition\n4. Product action applied if needed\n5. Audit trail preserved\n\nAnalyst tools:\n- User profile\n- KYC/KYB status\n- Transaction history\n- Recipient graph\n- Device and IP signals\n- Previous alerts\n- Notes and evidence\n```\n\nThe TPM also needs to define metrics:\n\n```txt\nOperational metrics:\n- Alert volume\n- Case backlog\n- Average review time\n- Escalation rate\n- False-positive rate\n- Repeat alert rate\n\nRisk metrics:\n- Confirmed suspicious cases\n- Loss prevented\n- Policy breaches\n- Late review count\n```\n\nThe product should avoid telling users \"you triggered AML monitoring.\" User-facing copy should be safe and plain, such as: \"We need more information before this transfer can continue.\"",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does AML transaction monitoring try to detect?",
+      "Why are patterns more useful than single thresholds?",
+      "What should an analyst case view include?",
+      "Why is false-positive rate important?",
+      "Why should user-facing copy avoid exposing monitoring logic?"
+    ],
+    "interviewAnswer": "I would define AML monitoring requirements with compliance by mapping risk signals, alert rules, case workflow, analyst tools, dispositions, user actions, audit trail, and metrics like alert volume, backlog, review time, false positives, and confirmed suspicious cases.\n\nA strong TPM answer shows that monitoring is both a detection system and an operations product.",
+    "sourceLinks": [
+      {
+        "label": "eCFR: MSB suspicious activity reporting",
+        "url": "https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1022/subpart-C/section-1022.320"
+      },
+      {
+        "label": "eCFR: Reports by financial institutions of suspicious transactions",
+        "url": "https://www.ecfr.gov/current/title-31/subtitle-B/chapter-X/part-1010/subpart-D/section-1010.320"
+      }
+    ],
+    "beginnerExplanation": "AML transaction monitoring is the process of detecting activity that may indicate money laundering, fraud, sanctions evasion, or other financial crime.\n\nThe beginner mistake is thinking monitoring is just a list of rules like \"flag transactions over $10,000.\" Real monitoring looks for patterns, context, risk, customer history, geography, velocity, counterparties, and unusual behavior.\n\nA TPM does not decide legal obligations alone. Compliance owns policy. But the TPM helps turn policy into a product and system workflow that can be built, tested, operated, and audited.",
+    "example": "Imagine a remittance product. A user sends five transfers just below a review threshold to different recipients in a short period.\n\nThat pattern may be normal for a business user, suspicious for a new consumer, or explainable during a family emergency. The product must route it to the right review, not automatically accuse the user.\n\nA monitoring system needs:\n\n```txt\nSignals:\nAmount, velocity, corridor, recipient count, device, funding source, user age, risk tier.\n\nRules:\nThresholds, combinations, patterns, and escalation logic.\n\nCases:\nA place for analysts to review alerts and record decisions.\n\nOutcomes:\nClear, release, request information, limit account, file report, or escalate.\n```",
+    "commonMistakes": "A common mistake is creating too many alerts. If analysts drown in low-quality alerts, real risk may be missed.\n\nAnother mistake is not designing case management. Detection without review workflow is not operationally useful.\n\nA third mistake is exposing sensitive compliance logic to users. The product can explain next steps without revealing monitoring rules."
   },
   {
     "id": "tpm-api-integration",
@@ -1082,6 +1327,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A build versus buy decision asks whether the team should create a capability itself, buy a vendor product, use open source, or combine approaches.\n\nThe beginner mistake is reducing the decision to cost. Buying can look cheaper because the first invoice is smaller than a build estimate. Building can look cheaper because the team ignores maintenance, support, compliance, uptime, security, and opportunity cost.\n\nThe better question is: what capability should this company own, and what capability should it rent?\n\nIf the capability differentiates the product, gives strategic control, or is tightly tied to the customer promise, building may make sense. If it is a commodity capability where vendors are mature and switching risk is manageable, buying may be better.",
     "example": "Imagine a fintech company deciding whether to build identity verification or buy a vendor.\n\nBuying may give faster launch, tested document capture, global coverage, fraud signals, compliance reporting, and operational tooling. But it creates vendor dependency, cost at scale, less customization, and potential data-sharing concerns.\n\nBuilding may give control, custom risk logic, tailored UX, and long-term differentiation. But it requires engineering, fraud expertise, compliance review, document processing, support tooling, monitoring, and ongoing regulatory updates.\n\nThe decision is not emotional. It is a tradeoff.\n\n```txt\nBuild if:\n- The capability differentiates the product.\n- Requirements are unusual or deeply tied to strategy.\n- Vendor limitations would block the roadmap.\n- Data control or compliance needs require ownership.\n- The team can maintain it responsibly.\n\nBuy if:\n- The capability is common and vendors are mature.\n- Speed matters more than customization.\n- Internal expertise is limited.\n- Compliance or operational burden is high.\n- Switching risk is acceptable.\n```",
     "commonMistakes": "A common mistake is comparing vendor price to only initial build cost. The real comparison is total cost of ownership.\n\nAnother mistake is ignoring exit risk. If leaving a vendor later would be painful, that cost belongs in the decision.\n\nA third mistake is building a commodity capability because the team enjoys technical control. Product strategy should drive ownership, not engineering pride."
+  },
+  {
+    "id": "tpm-chargebacks-disputes",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design a product workflow for chargebacks and payment disputes?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A dispute happens when a cardholder challenges a payment with their issuer. A chargeback is the money reversal that can happen through the dispute process.\n\nThe beginner mistake is thinking disputes are only a finance problem. Disputes affect risk, customer experience, merchant trust, support, evidence collection, product policy, and account health.\n\nThe product must answer:\n\n```txt\nWho is notified?\nWhat evidence is needed?\nWho decides whether to fight or accept?\nWhat deadlines apply?\nHow does the disputed amount affect balances?\nWhat happens if the dispute is won or lost?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a marketplace seller receives a $500 order. Two weeks later, the buyer disputes the payment as unauthorized.\n\nThe product cannot simply show \"payment failed.\" The seller needs to know money is being held, what the reason is, what evidence is needed, and when a response is due.\n\nA weak workflow says:\n\n```txt\nSend dispute email. Let support handle it.\n```\n\nA stronger workflow has states:\n\n```txt\nDispute opened\n-> Evidence needed\n-> Evidence submitted\n-> Under review\n-> Won\nor\n-> Lost\nor\n-> Accepted\n```\n\nEach state needs UI, notifications, support visibility, ledger impact, and audit history."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a dispute workflow artifact:\n\n```txt\nDispute intake:\n- Dispute ID\n- Payment ID\n- Amount\n- Currency\n- Reason code\n- Evidence deadline\n- Current balance impact\n- Seller account\n- Buyer transaction details\n\nEvidence checklist:\n- Receipt\n- Delivery proof\n- Customer communication\n- Login or device evidence\n- Refund policy acceptance\n- Service usage logs\n- Identity verification evidence, if relevant\n\nDecision rules:\n- Auto-accept low-value disputes below cost threshold.\n- Fight disputes with strong evidence and high value.\n- Escalate repeat buyer abuse.\n- Block seller payouts if dispute risk exceeds threshold.\n```\n\nThe TPM also needs balance behavior:\n\n```txt\nWhen dispute opens:\nMove disputed amount from available balance to held/disputed balance.\n\nIf won:\nRelease funds back to available balance.\n\nIf lost:\nRecord loss, fee, and final ledger adjustment.\n```\n\nThis protects both accounting accuracy and user understanding."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is not collecting evidence before disputes happen. If logs and receipts are missing, the team cannot reconstruct the story later.\n\nAnother mistake is treating dispute response as purely manual. The product can pre-fill evidence and guide the user.\n\nA third mistake is hiding deadlines. Missing a response deadline can turn a possibly winnable dispute into a loss."
+      }
+    ],
+    "answer": "A dispute happens when a cardholder challenges a payment with their issuer. A chargeback is the money reversal that can happen through the dispute process.",
+    "reasoning": "Here is a dispute workflow artifact:\n\n```txt\nDispute intake:\n- Dispute ID\n- Payment ID\n- Amount\n- Currency\n- Reason code\n- Evidence deadline\n- Current balance impact\n- Seller account\n- Buyer transaction details\n\nEvidence checklist:\n- Receipt\n- Delivery proof\n- Customer communication\n- Login or device evidence\n- Refund policy acceptance\n- Service usage logs\n- Identity verification evidence, if relevant\n\nDecision rules:\n- Auto-accept low-value disputes below cost threshold.\n- Fight disputes with strong evidence and high value.\n- Escalate repeat buyer abuse.\n- Block seller payouts if dispute risk exceeds threshold.\n```\n\nThe TPM also needs balance behavior:\n\n```txt\nWhen dispute opens:\nMove disputed amount from available balance to held/disputed balance.\n\nIf won:\nRelease funds back to available balance.\n\nIf lost:\nRecord loss, fee, and final ledger adjustment.\n```\n\nThis protects both accounting accuracy and user understanding.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why are disputes a product problem?",
+      "What states should a dispute workflow have?",
+      "What evidence might be needed?",
+      "How should disputes affect available balance?",
+      "Why do deadlines matter?"
+    ],
+    "interviewAnswer": "I would design disputes around lifecycle states, evidence collection, deadlines, balance impact, decision rules, notifications, support tooling, and audit history.\n\nA strong TPM answer shows that disputes are not just finance operations. They are a risk and trust workflow that needs product design.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Docs: Disputes",
+        "url": "https://docs.stripe.com/disputes"
+      },
+      {
+        "label": "Stripe Docs: How disputes work",
+        "url": "https://docs.stripe.com/disputes/how-disputes-work"
+      }
+    ],
+    "beginnerExplanation": "A dispute happens when a cardholder challenges a payment with their issuer. A chargeback is the money reversal that can happen through the dispute process.\n\nThe beginner mistake is thinking disputes are only a finance problem. Disputes affect risk, customer experience, merchant trust, support, evidence collection, product policy, and account health.\n\nThe product must answer:\n\n```txt\nWho is notified?\nWhat evidence is needed?\nWho decides whether to fight or accept?\nWhat deadlines apply?\nHow does the disputed amount affect balances?\nWhat happens if the dispute is won or lost?\n```",
+    "example": "Imagine a marketplace seller receives a $500 order. Two weeks later, the buyer disputes the payment as unauthorized.\n\nThe product cannot simply show \"payment failed.\" The seller needs to know money is being held, what the reason is, what evidence is needed, and when a response is due.\n\nA weak workflow says:\n\n```txt\nSend dispute email. Let support handle it.\n```\n\nA stronger workflow has states:\n\n```txt\nDispute opened\n-> Evidence needed\n-> Evidence submitted\n-> Under review\n-> Won\nor\n-> Lost\nor\n-> Accepted\n```\n\nEach state needs UI, notifications, support visibility, ledger impact, and audit history.",
+    "commonMistakes": "A common mistake is not collecting evidence before disputes happen. If logs and receipts are missing, the team cannot reconstruct the story later.\n\nAnother mistake is treating dispute response as purely manual. The product can pre-fill evidence and guide the user.\n\nA third mistake is hiding deadlines. Missing a response deadline can turn a possibly winnable dispute into a loss."
   },
   {
     "id": "tpm-compliance-ux",
@@ -1378,6 +1672,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is optimizing only for conversion. In regulated or fraud-heavy products, unsafe growth can create major losses.\n\nAnother mistake is optimizing only for blocking. Blocking many good users is also product harm.\n\nA third mistake is hiding decisions from users. You may not be able to reveal fraud logic, but users still need clear, safe explanations and next steps."
   },
   {
+    "id": "tpm-fx-liquidity-remittance",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you think about FX, liquidity, and payout reliability in a remittance product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Remittance products move money across people, currencies, countries, banks, and partners. FX is the currency conversion. Liquidity is having enough funds in the right place and currency to complete payouts. Payout reliability is whether recipients actually receive money as promised.\n\nThe beginner mistake is thinking the product is done when the sender pays. The sender payment is only one side. The product still has to convert currency, manage settlement timing, fund payout accounts, route to partners, and reconcile what happened.\n\nThe user sees one promise:\n\n```txt\nSend $100. Recipient gets ₦150,000 today.\n```\n\nBehind that promise are many operational requirements."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user sends money from the US to Nigeria.\n\nThe app needs to know:\n\n```txt\nFunding:\nHas the sender payment settled or is it still pending?\n\nFX:\nWhat rate is shown? How long is it locked?\n\nLiquidity:\nDo we have enough local currency to pay the recipient?\n\nRouting:\nWhich payout partner should be used?\n\nReliability:\nWhat happens if the partner is slow or down?\n\nReconciliation:\nDid the recipient get paid, and did our records match partner records?\n```\n\nA TPM does not need to be a treasury trader, but they must understand that product promises depend on money operations."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a requirements artifact:\n\n```txt\nFeature:\nSame-day USD to NGN remittance\n\nUser-facing promise:\nShow recipient amount, fee, expected delivery time, and exchange rate lock window.\n\nFX requirements:\n- Rate source defined\n- Rate lock duration shown\n- Expired quote requires refresh\n- Margin and fee separated or clearly explained\n\nLiquidity requirements:\n- Corridor balance monitored\n- Minimum balance threshold\n- Alert before liquidity shortage\n- Fallback route if primary payout balance is low\n\nPayout requirements:\n- Partner status checked before submission\n- Payout status visible to support\n- Delayed payouts get user-safe status copy\n- Failed payouts trigger retry or refund rules\n\nMetrics:\n- Quote-to-submit conversion\n- Payout success rate\n- Time to final status\n- Liquidity shortage incidents\n- FX quote expiry rate\n- Support contacts by corridor\n```\n\nThe TPM should also define risk scenarios:\n\n```txt\nIf liquidity is low:\nLimit transaction size, switch route, or pause corridor.\n\nIf FX moves before payment is submitted:\nRefresh quote before user confirms.\n\nIf partner is down:\nRoute to backup partner or show delayed delivery before payment.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is promising delivery speed without confirming payout capacity.\n\nAnother mistake is hiding rate expiry. Users get angry if the recipient amount changes after they thought the quote was locked.\n\nA third mistake is not monitoring corridor-level health. Global averages can hide one broken country corridor."
+      }
+    ],
+    "answer": "Remittance products move money across people, currencies, countries, banks, and partners. FX is the currency conversion. Liquidity is having enough funds in the right place and currency to complete payouts. Payout reliability is whether recipients actually receive money as promised.",
+    "reasoning": "Here is a requirements artifact:\n\n```txt\nFeature:\nSame-day USD to NGN remittance\n\nUser-facing promise:\nShow recipient amount, fee, expected delivery time, and exchange rate lock window.\n\nFX requirements:\n- Rate source defined\n- Rate lock duration shown\n- Expired quote requires refresh\n- Margin and fee separated or clearly explained\n\nLiquidity requirements:\n- Corridor balance monitored\n- Minimum balance threshold\n- Alert before liquidity shortage\n- Fallback route if primary payout balance is low\n\nPayout requirements:\n- Partner status checked before submission\n- Payout status visible to support\n- Delayed payouts get user-safe status copy\n- Failed payouts trigger retry or refund rules\n\nMetrics:\n- Quote-to-submit conversion\n- Payout success rate\n- Time to final status\n- Liquidity shortage incidents\n- FX quote expiry rate\n- Support contacts by corridor\n```\n\nThe TPM should also define risk scenarios:\n\n```txt\nIf liquidity is low:\nLimit transaction size, switch route, or pause corridor.\n\nIf FX moves before payment is submitted:\nRefresh quote before user confirms.\n\nIf partner is down:\nRoute to backup partner or show delayed delivery before payment.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is liquidity in a remittance product?",
+      "Why is sender payment not the end of the money movement?",
+      "What does an FX rate lock protect?",
+      "What metrics show payout reliability?",
+      "What can the product do if liquidity is low?"
+    ],
+    "interviewAnswer": "I would think about remittance as a full money-movement promise: funding, FX quote, liquidity, payout routing, partner reliability, user communication, and reconciliation. I would define rate-lock rules, corridor liquidity thresholds, fallback routes, payout states, and metrics like payout success, time to final status, quote expiry, and support contacts.\n\nA strong TPM answer connects customer promise to treasury and operations reality.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Docs: Balances and settlement time",
+        "url": "https://docs.stripe.com/payments/balances"
+      },
+      {
+        "label": "Stripe Docs: Payout reconciliation report",
+        "url": "https://docs.stripe.com/reports/payout-reconciliation"
+      }
+    ],
+    "beginnerExplanation": "Remittance products move money across people, currencies, countries, banks, and partners. FX is the currency conversion. Liquidity is having enough funds in the right place and currency to complete payouts. Payout reliability is whether recipients actually receive money as promised.\n\nThe beginner mistake is thinking the product is done when the sender pays. The sender payment is only one side. The product still has to convert currency, manage settlement timing, fund payout accounts, route to partners, and reconcile what happened.\n\nThe user sees one promise:\n\n```txt\nSend $100. Recipient gets ₦150,000 today.\n```\n\nBehind that promise are many operational requirements.",
+    "example": "Imagine a user sends money from the US to Nigeria.\n\nThe app needs to know:\n\n```txt\nFunding:\nHas the sender payment settled or is it still pending?\n\nFX:\nWhat rate is shown? How long is it locked?\n\nLiquidity:\nDo we have enough local currency to pay the recipient?\n\nRouting:\nWhich payout partner should be used?\n\nReliability:\nWhat happens if the partner is slow or down?\n\nReconciliation:\nDid the recipient get paid, and did our records match partner records?\n```\n\nA TPM does not need to be a treasury trader, but they must understand that product promises depend on money operations.",
+    "commonMistakes": "A common mistake is promising delivery speed without confirming payout capacity.\n\nAnother mistake is hiding rate expiry. Users get angry if the recipient amount changes after they thought the quote was locked.\n\nA third mistake is not monitoring corridor-level health. Global averages can hide one broken country corridor."
+  },
+  {
     "id": "tpm-incident-management",
     "track": "TPM",
     "category": "Operations",
@@ -1474,6 +1817,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "An internal tool is still a product. Its users may be support agents, compliance reviewers, operations specialists, sales teams, finance teams, or engineers.\n\nThe beginner mistake is treating internal users as if their pain matters less because they are employees. But internal tool problems can become customer problems. If support cannot investigate a failed payout, the customer waits. If compliance reviewers lack context, safe users may be blocked. If operations relies on spreadsheets, mistakes become expensive.\n\nThe mental model is:\n\n```txt\nExternal product:\nHelps customers complete jobs.\n\nInternal tool:\nHelps the company complete the work needed to serve customers.\n```",
     "example": "Imagine support agents need a tool to investigate payment failures.\n\nA weak requirement says:\n\n```txt\nBuild support dashboard.\n```\n\nThat is too vague. A useful TPM asks what job the agent is trying to do.\n\n```txt\nSupport agent job:\nWhen a customer says \"my payment failed,\" the agent needs to identify the payment, understand the current status, know whether money moved, see the reason for failure, choose the right next action, and explain it clearly to the customer.\n```\n\nNow the product shape is clearer.\n\n```txt\nMinimum useful internal tool\n\nSearch:\n- Customer email\n- Transaction ID\n- Recipient phone\n- Partner reference\n\nPayment view:\n- Current status\n- Status history\n- Failure reason\n- Partner response\n- Retry eligibility\n- Refund or reversal state\n\nAgent guidance:\n- What this status means\n- What action is allowed\n- What the agent should tell the customer\n- When to escalate\n```\n\nThis is much better than a generic admin table.",
     "commonMistakes": "A common mistake is copying database fields into a UI and calling it a tool. Internal users need workflow support, not raw data dumps.\n\nAnother mistake is skipping research because the users are coworkers. Watching five agents do the job can reveal more than a week of guessing.\n\nA third mistake is ignoring governance. Internal tools need permissions, audit logs, and clear rules about who can take risky actions."
+  },
+  {
+    "id": "tpm-ledger-balances-holds",
+    "track": "TPM",
+    "category": "Fintech Infrastructure",
+    "level": "Intermediate",
+    "question": "How would you define product requirements for a ledger, balances, and holds system?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A ledger is the system of record for money movement. It answers: how much money is available, where did it come from, where did it go, what is pending, and what can be proven later?\n\nThe beginner mistake is thinking a balance is just one number in a database row. In fintech, a user can have several balance concepts at the same time.\n\n```txt\nCurrent balance:\nAll funds recorded in the account.\n\nAvailable balance:\nFunds the user can actually spend or withdraw.\n\nPending balance:\nFunds not final yet, such as incoming settlement or card authorization.\n\nHeld balance:\nFunds reserved for risk, dispute, compliance, or operational reasons.\n```\n\nIf the product mixes these up, users may spend money they should not spend, support may give wrong answers, and finance may fail reconciliation."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a marketplace wallet. A seller receives a $100 payment. The platform holds $10 as a risk reserve, charges a $3 fee, and makes $87 available for payout after settlement.\n\nA weak requirement says:\n\n```txt\nShow seller balance.\n```\n\nA strong requirement asks:\n\n```txt\nWhich balance is shown?\nWhen does it become available?\nWhat is held and why?\nCan the hold expire?\nWho can override it?\nWhat audit trail proves the calculation?\nWhat happens if the payment is reversed?\n```\n\nThe product needs to explain money states without exposing accounting internals to the user."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a requirements artifact:\n\n```txt\nFeature:\nSeller wallet balance\n\nUser-facing balances:\n- Available for payout\n- Pending settlement\n- Held in reserve\n\nLedger events:\n- Payment received\n- Platform fee assessed\n- Risk reserve hold created\n- Funds settled\n- Payout initiated\n- Payout completed\n- Dispute opened\n- Hold released or extended\n\nRules:\n- Users can only withdraw available balance.\n- Pending funds become available after settlement.\n- Risk holds reduce available balance.\n- Every balance change must be traceable to a ledger event.\n- Manual adjustments require reason code, approver, and audit log.\n\nSupport view:\n- Current balance\n- Available balance\n- Pending amount\n- Held amount\n- Hold reason\n- Expected release date\n- Related transaction IDs\n```\n\nThe TPM also needs to define user copy:\n\n```txt\n$87.00 available\n$10.00 held until June 2 for standard risk review\n$100.00 payment received, $3.00 platform fee applied\n```\n\nThat copy is short, but it is backed by a precise ledger model."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is letting engineers build ledger states without product definitions. That leads to support and UI confusion later.\n\nAnother mistake is hiding holds from users. If money is unavailable, the product should explain why and what happens next where legally and operationally safe.\n\nA third mistake is allowing manual adjustments without auditability. In money systems, manual fixes need controls."
+      }
+    ],
+    "answer": "A ledger is the system of record for money movement. It answers: how much money is available, where did it come from, where did it go, what is pending, and what can be proven later?",
+    "reasoning": "Here is a requirements artifact:\n\n```txt\nFeature:\nSeller wallet balance\n\nUser-facing balances:\n- Available for payout\n- Pending settlement\n- Held in reserve\n\nLedger events:\n- Payment received\n- Platform fee assessed\n- Risk reserve hold created\n- Funds settled\n- Payout initiated\n- Payout completed\n- Dispute opened\n- Hold released or extended\n\nRules:\n- Users can only withdraw available balance.\n- Pending funds become available after settlement.\n- Risk holds reduce available balance.\n- Every balance change must be traceable to a ledger event.\n- Manual adjustments require reason code, approver, and audit log.\n\nSupport view:\n- Current balance\n- Available balance\n- Pending amount\n- Held amount\n- Hold reason\n- Expected release date\n- Related transaction IDs\n```\n\nThe TPM also needs to define user copy:\n\n```txt\n$87.00 available\n$10.00 held until June 2 for standard risk review\n$100.00 payment received, $3.00 platform fee applied\n```\n\nThat copy is short, but it is backed by a precise ledger model.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is available balance different from current balance?",
+      "What is a hold?",
+      "Why does every balance change need an event?",
+      "What should support see when a user asks about missing money?",
+      "Why are manual adjustments risky?"
+    ],
+    "interviewAnswer": "I would define ledger requirements by separating current, available, pending, and held balances; mapping every balance change to immutable events; defining hold reasons and release rules; adding support visibility; and requiring audit logs for manual changes.\n\nA strong TPM answer shows that balances are product promises backed by accounting-grade system behavior.",
+    "sourceLinks": [
+      {
+        "label": "Modern Treasury: Ledgers",
+        "url": "https://www.moderntreasury.com/ledgers"
+      },
+      {
+        "label": "Stripe Treasury: Working with balances and transactions",
+        "url": "https://docs.stripe.com/treasury/account-management/working-with-balances-and-transactions"
+      }
+    ],
+    "beginnerExplanation": "A ledger is the system of record for money movement. It answers: how much money is available, where did it come from, where did it go, what is pending, and what can be proven later?\n\nThe beginner mistake is thinking a balance is just one number in a database row. In fintech, a user can have several balance concepts at the same time.\n\n```txt\nCurrent balance:\nAll funds recorded in the account.\n\nAvailable balance:\nFunds the user can actually spend or withdraw.\n\nPending balance:\nFunds not final yet, such as incoming settlement or card authorization.\n\nHeld balance:\nFunds reserved for risk, dispute, compliance, or operational reasons.\n```\n\nIf the product mixes these up, users may spend money they should not spend, support may give wrong answers, and finance may fail reconciliation.",
+    "example": "Imagine a marketplace wallet. A seller receives a $100 payment. The platform holds $10 as a risk reserve, charges a $3 fee, and makes $87 available for payout after settlement.\n\nA weak requirement says:\n\n```txt\nShow seller balance.\n```\n\nA strong requirement asks:\n\n```txt\nWhich balance is shown?\nWhen does it become available?\nWhat is held and why?\nCan the hold expire?\nWho can override it?\nWhat audit trail proves the calculation?\nWhat happens if the payment is reversed?\n```\n\nThe product needs to explain money states without exposing accounting internals to the user.",
+    "commonMistakes": "A common mistake is letting engineers build ledger states without product definitions. That leads to support and UI confusion later.\n\nAnother mistake is hiding holds from users. If money is unavailable, the product should explain why and what happens next where legally and operationally safe.\n\nA third mistake is allowing manual adjustments without auditability. In money systems, manual fixes need controls."
   },
   {
     "id": "tpm-migration-communications",
@@ -2064,6 +2456,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is ranking stakeholder requests without translating them into outcomes and risks.\n\nAnother mistake is treating roadmap dates as promises before dependencies are understood.\n\nA third mistake is hiding the reason for tradeoffs. If stakeholders only hear \"not now,\" they may assume their request was ignored."
   },
   {
+    "id": "tpm-sanctions-screening-false-positives",
+    "track": "TPM",
+    "category": "Compliance & Risk",
+    "level": "Intermediate",
+    "question": "How would you design sanctions screening while managing false positives?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Sanctions screening checks whether a person, business, country, wallet, vessel, or other party may match a sanctions list.\n\nThe beginner mistake is thinking screening is a simple yes/no name match. Names are messy. People share names. Names can be transliterated. Addresses may be incomplete. Businesses may have beneficial owners. A match may be a true hit or a false positive.\n\nThe product challenge is serious:\n\n```txt\nIf the system misses a true hit:\nThe company may violate sanctions obligations.\n\nIf the system blocks too many false positives:\nLegitimate users are harmed, support gets flooded, and conversion suffers.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user named \"Mohammed Ali\" signs up. The name may produce a potential match against a sanctions list, but that does not mean the user is sanctioned.\n\nA weak product blocks the user with vague copy:\n\n```txt\nYour account is banned.\n```\n\nA stronger product creates a review workflow:\n\n```txt\nPotential match found\n-> Account action limited\n-> Compliance review opened\n-> Additional identifiers compared\n-> Cleared, blocked, or escalated\n```\n\nThe system should compare more than name: date of birth, address, nationality, document ID, business ownership, and other identifiers where available and allowed."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a sanctions screening requirements artifact:\n\n```txt\nScreening moments:\n- Account creation\n- Recipient creation\n- Business owner update\n- Large transfer\n- List update rescreening\n\nMatch data:\n- Name\n- Aliases\n- Date of birth\n- Country\n- Address\n- Document number\n- Business registration\n- Beneficial owner\n\nReview outcomes:\n- Cleared false positive\n- True hit\n- Need more information\n- Escalate to compliance lead\n\nUser actions while pending:\n- Allow account browsing\n- Block money movement\n- Prevent payout or transfer submission\n- Show safe copy\n```\n\nSafe user copy:\n\n```txt\nWe need to review your information before you can send money.\n\nThis usually takes one business day. We will contact you if we need more information.\n```\n\nDo not tell the user exactly which list or rule was triggered if that creates compliance or evasion risk."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is auto-blocking every name match. That creates unnecessary user harm and operational noise.\n\nAnother mistake is permanently clearing a false positive without rescreening when lists or user details change.\n\nA third mistake is exposing sensitive screening logic in customer copy or support macros."
+      }
+    ],
+    "answer": "Sanctions screening checks whether a person, business, country, wallet, vessel, or other party may match a sanctions list.",
+    "reasoning": "Here is a sanctions screening requirements artifact:\n\n```txt\nScreening moments:\n- Account creation\n- Recipient creation\n- Business owner update\n- Large transfer\n- List update rescreening\n\nMatch data:\n- Name\n- Aliases\n- Date of birth\n- Country\n- Address\n- Document number\n- Business registration\n- Beneficial owner\n\nReview outcomes:\n- Cleared false positive\n- True hit\n- Need more information\n- Escalate to compliance lead\n\nUser actions while pending:\n- Allow account browsing\n- Block money movement\n- Prevent payout or transfer submission\n- Show safe copy\n```\n\nSafe user copy:\n\n```txt\nWe need to review your information before you can send money.\n\nThis usually takes one business day. We will contact you if we need more information.\n```\n\nDo not tell the user exactly which list or rule was triggered if that creates compliance or evasion risk.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is sanctions screening not just a name match?",
+      "What is a false positive?",
+      "When should users be rescreened?",
+      "What actions might be blocked during review?",
+      "Why must customer copy be careful?"
+    ],
+    "interviewAnswer": "I would design sanctions screening around screening events, match data, review workflow, user-state restrictions, false-positive handling, rescreening, audit logs, and safe customer communication.\n\nA strong TPM answer balances compliance protection with legitimate-user harm and operational review quality.",
+    "sourceLinks": [
+      {
+        "label": "OFAC: Sanctions List Search FAQs",
+        "url": "https://ofac.treasury.gov/faqs/search"
+      },
+      {
+        "label": "OFAC: False hit lists guidance",
+        "url": "https://ofac.treasury.gov/system/files/126/false_hit.pdf"
+      }
+    ],
+    "beginnerExplanation": "Sanctions screening checks whether a person, business, country, wallet, vessel, or other party may match a sanctions list.\n\nThe beginner mistake is thinking screening is a simple yes/no name match. Names are messy. People share names. Names can be transliterated. Addresses may be incomplete. Businesses may have beneficial owners. A match may be a true hit or a false positive.\n\nThe product challenge is serious:\n\n```txt\nIf the system misses a true hit:\nThe company may violate sanctions obligations.\n\nIf the system blocks too many false positives:\nLegitimate users are harmed, support gets flooded, and conversion suffers.\n```",
+    "example": "Imagine a user named \"Mohammed Ali\" signs up. The name may produce a potential match against a sanctions list, but that does not mean the user is sanctioned.\n\nA weak product blocks the user with vague copy:\n\n```txt\nYour account is banned.\n```\n\nA stronger product creates a review workflow:\n\n```txt\nPotential match found\n-> Account action limited\n-> Compliance review opened\n-> Additional identifiers compared\n-> Cleared, blocked, or escalated\n```\n\nThe system should compare more than name: date of birth, address, nationality, document ID, business ownership, and other identifiers where available and allowed.",
+    "commonMistakes": "A common mistake is auto-blocking every name match. That creates unnecessary user harm and operational noise.\n\nAnother mistake is permanently clearing a false positive without rescreening when lists or user details change.\n\nA third mistake is exposing sensitive screening logic in customer copy or support macros."
+  },
+  {
     "id": "tpm-security-review-product-manager",
     "track": "TPM",
     "category": "Security & Compliance",
@@ -2111,6 +2552,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Security review is how the team identifies and reduces security risk before a feature creates harm.\n\nThe beginner mistake is treating security as a gatekeeper that says yes or no at the end. A better TPM brings security into the product conversation early enough to shape requirements, design, rollout, and operations.\n\nThe TPM does not need to be the security engineer. But they should understand what kind of feature increases security risk:\n\n```txt\n- Authentication or login\n- Permissions and roles\n- Payments or money movement\n- Sensitive data\n- File upload\n- Public APIs\n- Webhooks\n- Admin tools\n- Exports\n- Third-party integrations\n- User-generated content\n```\n\nIf a feature touches one of these areas, security review is not optional polish. It is part of readiness.",
     "example": "Imagine the team is adding API keys for partners.\n\nA weak TPM says:\n\n```txt\nEngineering will make API keys secure.\n```\n\nA stronger TPM asks product-level security questions:\n\n```txt\nWho can create an API key?\nCan keys be scoped?\nCan keys expire?\nCan keys be revoked?\nCan users see the key again after creation?\nHow are keys stored?\nAre key creation and deletion audited?\nCan support see keys?\nWhat rate limits apply?\nWhat happens if a key is leaked?\n```\n\nThose questions shape the product requirements before implementation.",
     "commonMistakes": "A common mistake is bringing security in after the UX and engineering plan are fixed. That creates conflict and rework.\n\nAnother mistake is treating security requirements as invisible. Many controls need product decisions: copy, permissions, admin UI, alerts, logs, and recovery.\n\nA third mistake is accepting risk without naming it. If a security issue is deferred, the approver, reason, mitigation, and revisit date should be clear."
+  },
+  {
+    "id": "tpm-settlement-reconciliation-mismatches",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you handle settlement and reconciliation mismatches in a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Settlement is when money actually moves or becomes final between financial parties. Reconciliation is the process of proving that your internal records match external records from banks, processors, partners, or payment networks.\n\nThe beginner mistake is assuming a successful payment means the money story is finished. In real fintech systems, the product may show success before funds settle. Fees, reversals, retries, settlement timing, FX, chargebacks, and partner reports can all create mismatches.\n\nReconciliation answers:\n\n```txt\nWhat did we think happened?\nWhat did the bank or partner say happened?\nWhere do they differ?\nWho owns fixing the difference?\nWhat customer or financial impact exists?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine your app shows 10,000 successful card payments yesterday, but the payout file from the processor only includes 9,980 payments. That does not automatically mean 20 payments are lost. They may be delayed, reversed, fee-adjusted, settled in a later batch, or reported under another identifier.\n\nA weak TPM says, \"Ask engineering to fix reconciliation.\"\n\nA strong TPM defines the product and operational workflow:\n\n```txt\nMismatch types:\n- Missing transaction\n- Duplicate transaction\n- Amount mismatch\n- Fee mismatch\n- Currency or FX mismatch\n- Status mismatch\n- Settlement-date mismatch\n- Unknown partner reference\n\nSeverity:\n- Customer money affected\n- Internal accounting only\n- Report delay only\n- Partner data missing\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a reconciliation requirements artifact:\n\n```txt\nFeature:\nDaily settlement reconciliation\n\nInputs:\n- Internal ledger events\n- Processor payout report\n- Bank statement\n- Fee report\n- Dispute and refund report\n\nMatching keys:\n- Internal transaction ID\n- Processor charge ID\n- Payout ID\n- Bank reference\n- Amount\n- Currency\n- Settlement date\n\nOutput states:\n- Matched\n- Pending external settlement\n- Internal-only\n- External-only\n- Amount mismatch\n- Duplicate candidate\n- Needs manual review\n\nOperations workflow:\n- Show mismatch reason\n- Assign owner\n- Add notes\n- Mark resolved\n- Export audit report\n```\n\nThe TPM should also define customer impact rules:\n\n```txt\nIf mismatch affects customer-visible balance:\nEscalate same day.\n\nIf mismatch is only report timing:\nKeep operations informed but do not message customers.\n\nIf mismatch suggests duplicate debit or missing payout:\nPause related automation until reviewed.\n```\n\nThat is how reconciliation becomes a product capability, not a spreadsheet ritual."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is building reconciliation as an internal afterthought. If money moves, reconciliation is part of product safety.\n\nAnother mistake is not preserving identifiers across systems. Without shared IDs, operations waste hours manually matching records.\n\nA third mistake is treating every mismatch equally. A delayed report and a missing customer payout need different urgency."
+      }
+    ],
+    "answer": "Settlement is when money actually moves or becomes final between financial parties. Reconciliation is the process of proving that your internal records match external records from banks, processors, partners, or payment networks.",
+    "reasoning": "Here is a reconciliation requirements artifact:\n\n```txt\nFeature:\nDaily settlement reconciliation\n\nInputs:\n- Internal ledger events\n- Processor payout report\n- Bank statement\n- Fee report\n- Dispute and refund report\n\nMatching keys:\n- Internal transaction ID\n- Processor charge ID\n- Payout ID\n- Bank reference\n- Amount\n- Currency\n- Settlement date\n\nOutput states:\n- Matched\n- Pending external settlement\n- Internal-only\n- External-only\n- Amount mismatch\n- Duplicate candidate\n- Needs manual review\n\nOperations workflow:\n- Show mismatch reason\n- Assign owner\n- Add notes\n- Mark resolved\n- Export audit report\n```\n\nThe TPM should also define customer impact rules:\n\n```txt\nIf mismatch affects customer-visible balance:\nEscalate same day.\n\nIf mismatch is only report timing:\nKeep operations informed but do not message customers.\n\nIf mismatch suggests duplicate debit or missing payout:\nPause related automation until reviewed.\n```\n\nThat is how reconciliation becomes a product capability, not a spreadsheet ritual.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between settlement and reconciliation?",
+      "Why can a successful payment still create reconciliation work?",
+      "What identifiers help match records?",
+      "Which mismatch types are most urgent?",
+      "What should operations be able to do in a reconciliation tool?"
+    ],
+    "interviewAnswer": "I would handle settlement and reconciliation by defining data sources, matching keys, mismatch types, severity levels, operational workflow, customer-impact rules, and audit reporting.\n\nA strong TPM answer shows that reconciliation protects customer trust, finance accuracy, and operational control.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Docs: Bank reconciliation",
+        "url": "https://docs.stripe.com/reconciliation"
+      },
+      {
+        "label": "Stripe Docs: Payout reconciliation",
+        "url": "https://docs.stripe.com/payouts/reconciliation"
+      }
+    ],
+    "beginnerExplanation": "Settlement is when money actually moves or becomes final between financial parties. Reconciliation is the process of proving that your internal records match external records from banks, processors, partners, or payment networks.\n\nThe beginner mistake is assuming a successful payment means the money story is finished. In real fintech systems, the product may show success before funds settle. Fees, reversals, retries, settlement timing, FX, chargebacks, and partner reports can all create mismatches.\n\nReconciliation answers:\n\n```txt\nWhat did we think happened?\nWhat did the bank or partner say happened?\nWhere do they differ?\nWho owns fixing the difference?\nWhat customer or financial impact exists?\n```",
+    "example": "Imagine your app shows 10,000 successful card payments yesterday, but the payout file from the processor only includes 9,980 payments. That does not automatically mean 20 payments are lost. They may be delayed, reversed, fee-adjusted, settled in a later batch, or reported under another identifier.\n\nA weak TPM says, \"Ask engineering to fix reconciliation.\"\n\nA strong TPM defines the product and operational workflow:\n\n```txt\nMismatch types:\n- Missing transaction\n- Duplicate transaction\n- Amount mismatch\n- Fee mismatch\n- Currency or FX mismatch\n- Status mismatch\n- Settlement-date mismatch\n- Unknown partner reference\n\nSeverity:\n- Customer money affected\n- Internal accounting only\n- Report delay only\n- Partner data missing\n```",
+    "commonMistakes": "A common mistake is building reconciliation as an internal afterthought. If money moves, reconciliation is part of product safety.\n\nAnother mistake is not preserving identifiers across systems. Without shared IDs, operations waste hours manually matching records.\n\nA third mistake is treating every mismatch equally. A delayed report and a missing customer payout need different urgency."
   },
   {
     "id": "tpm-stakeholder-alignment",

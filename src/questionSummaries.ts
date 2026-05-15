@@ -189,11 +189,66 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-credit-underwriting",
+    "track": "TPM",
+    "category": "AI & Fintech",
+    "level": "Intermediate",
+    "question": "How would you approach AI-assisted credit underwriting as a TPM?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-fraud-detection",
+    "track": "TPM",
+    "category": "AI & Risk",
+    "level": "Intermediate",
+    "question": "How would you design an AI-assisted fraud detection product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-model-evaluation",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you evaluate whether an AI feature is ready to launch?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-support-agent-regulated-fintech",
+    "track": "TPM",
+    "category": "AI & Customer Operations",
+    "level": "Intermediate",
+    "question": "How would you launch an AI support agent in a regulated fintech product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ambiguous-executive-ask",
     "track": "TPM",
     "category": "Product Strategy",
     "level": "Intermediate",
     "question": "How would you handle an ambiguous executive request?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-aml-transaction-monitoring",
+    "track": "TPM",
+    "category": "Compliance & Risk",
+    "level": "Intermediate",
+    "question": "How would you define requirements for AML transaction monitoring?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -238,6 +293,17 @@ export const questionSummaries: Question[] = [
     "category": "Technical Strategy",
     "level": "Intermediate",
     "question": "How would you make a build versus buy decision?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-chargebacks-disputes",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design a product workflow for chargebacks and payment disputes?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -310,6 +376,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-fx-liquidity-remittance",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you think about FX, liquidity, and payout reliability in a remittance product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-incident-management",
     "track": "TPM",
     "category": "Operations",
@@ -326,6 +403,17 @@ export const questionSummaries: Question[] = [
     "category": "Internal Tools",
     "level": "Foundational",
     "question": "How would you prioritize and build an internal tool for operations or support teams?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ledger-balances-holds",
+    "track": "TPM",
+    "category": "Fintech Infrastructure",
+    "level": "Intermediate",
+    "question": "How would you define product requirements for a ledger, balances, and holds system?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -464,11 +552,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-sanctions-screening-false-positives",
+    "track": "TPM",
+    "category": "Compliance & Risk",
+    "level": "Intermediate",
+    "question": "How would you design sanctions screening while managing false positives?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-security-review-product-manager",
     "track": "TPM",
     "category": "Security & Compliance",
     "level": "Intermediate",
     "question": "How should a product manager work with security review?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-settlement-reconciliation-mismatches",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you handle settlement and reconciliation mismatches in a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",
