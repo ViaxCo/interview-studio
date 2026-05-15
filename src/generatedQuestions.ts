@@ -1770,6 +1770,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is not collecting evidence before disputes happen. If logs and receipts are missing, the team cannot reconstruct the story later.\n\nAnother mistake is treating dispute response as purely manual. The product can pre-fill evidence and guide the user.\n\nA third mistake is hiding deadlines. Missing a response deadline can turn a possibly winnable dispute into a loss."
   },
   {
+    "id": "tpm-collections-hardship-repayment",
+    "track": "TPM",
+    "category": "Credit & Lending",
+    "level": "Intermediate",
+    "question": "How would you design a collections and hardship repayment experience?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Collections is the process of helping a lender recover unpaid debt. Hardship is the user situation where repayment is difficult because of income loss, illness, emergency, or other financial stress.\n\nThe beginner mistake is designing collections like a punishment system. A good fintech product needs to recover money, but it also needs clear communication, fair options, regulatory review, accurate balances, and humane paths for people who are trying to pay.\n\nThe mental model:\n\n```txt\nDelinquency:\nPayment is late.\n\nCollections:\nThe company tries to resolve the unpaid balance.\n\nHardship:\nThe customer may need a different plan.\n```\n\nThe TPM should design options that are operationally real, not just comforting copy."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a borrower misses two payments and says they lost their job.\n\nA poor experience sends escalating threats and confusing fees.\n\nA better experience offers structured paths:\n\n```txt\nConfirm the amount owed.\nExplain fees and due dates.\nOffer payment plan options.\nLet the user request hardship review.\nShow what happens if they miss the plan.\nSend confirmations in writing.\n```\n\nThis helps the customer understand the situation and helps the company keep records."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a hardship repayment artifact:\n\n```txt\nCustomer state:\n30 days past due\n\nAvailable options:\n- Pay full amount\n- Pay minimum amount\n- Set up repayment plan\n- Request hardship review\n- Contact support\n\nHardship intake:\n- Reason for hardship\n- Temporary or long-term\n- Affordable payment amount\n- Preferred contact method\n- Supporting documents if required\n\nPlan requirements:\n- Start date\n- Payment amount\n- Number of payments\n- Fees or interest treatment\n- Credit reporting impact if applicable\n- Confirmation message\n- Missed-plan consequences\n```\n\nThe experience should be clear enough that the customer knows what they agreed to."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is hiding the balance breakdown. Customers need to understand principal, fees, interest, and due dates.\n\nAnother mistake is offering plans that operations cannot service. A plan is not real unless billing, reminders, support, and reporting can handle it.\n\nA third mistake is using aggressive copy that creates complaints and compliance risk."
+      }
+    ],
+    "answer": "Collections is the process of helping a lender recover unpaid debt. Hardship is the user situation where repayment is difficult because of income loss, illness, emergency, or other financial stress.",
+    "reasoning": "Here is a hardship repayment artifact:\n\n```txt\nCustomer state:\n30 days past due\n\nAvailable options:\n- Pay full amount\n- Pay minimum amount\n- Set up repayment plan\n- Request hardship review\n- Contact support\n\nHardship intake:\n- Reason for hardship\n- Temporary or long-term\n- Affordable payment amount\n- Preferred contact method\n- Supporting documents if required\n\nPlan requirements:\n- Start date\n- Payment amount\n- Number of payments\n- Fees or interest treatment\n- Credit reporting impact if applicable\n- Confirmation message\n- Missed-plan consequences\n```\n\nThe experience should be clear enough that the customer knows what they agreed to.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why should collections not feel like a punishment system?",
+      "What information should hardship intake collect?",
+      "What should a repayment plan confirmation include?",
+      "Why do support and billing systems need to understand the plan?",
+      "What metrics would show whether hardship options are working?"
+    ],
+    "interviewAnswer": "I would design collections and hardship around clear balance details, repayment options, hardship intake, plan terms, confirmations, reminders, support visibility, compliance-approved messaging, credit reporting considerations, and metrics for cure rate, complaints, broken plans, and customer harm.\n\nA strong answer balances recovery, compliance, and humane user experience.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Debt collection rule FAQs",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/other-applicable-requirements/debt-collection/debt-collection-rule-faqs/"
+      },
+      {
+        "label": "CFPB: Negotiating with a debt collector",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-negotiate-a-settlement-with-a-debt-collector-en-1447/"
+      }
+    ],
+    "beginnerExplanation": "Collections is the process of helping a lender recover unpaid debt. Hardship is the user situation where repayment is difficult because of income loss, illness, emergency, or other financial stress.\n\nThe beginner mistake is designing collections like a punishment system. A good fintech product needs to recover money, but it also needs clear communication, fair options, regulatory review, accurate balances, and humane paths for people who are trying to pay.\n\nThe mental model:\n\n```txt\nDelinquency:\nPayment is late.\n\nCollections:\nThe company tries to resolve the unpaid balance.\n\nHardship:\nThe customer may need a different plan.\n```\n\nThe TPM should design options that are operationally real, not just comforting copy.",
+    "example": "Imagine a borrower misses two payments and says they lost their job.\n\nA poor experience sends escalating threats and confusing fees.\n\nA better experience offers structured paths:\n\n```txt\nConfirm the amount owed.\nExplain fees and due dates.\nOffer payment plan options.\nLet the user request hardship review.\nShow what happens if they miss the plan.\nSend confirmations in writing.\n```\n\nThis helps the customer understand the situation and helps the company keep records.",
+    "commonMistakes": "A common mistake is hiding the balance breakdown. Customers need to understand principal, fees, interest, and due dates.\n\nAnother mistake is offering plans that operations cannot service. A plan is not real unless billing, reminders, support, and reporting can handle it.\n\nA third mistake is using aggressive copy that creates complaints and compliance risk."
+  },
+  {
     "id": "tpm-complaints-risk-feedback-loop",
     "track": "TPM",
     "category": "Product Strategy",
@@ -1866,6 +1915,104 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Compliance and conversion often feel like enemies, but a strong Technical Product Manager does not treat it that way. The real job is to help legitimate users complete the journey while preventing legal, fraud, security, and operational risk.\n\nFor onboarding, compliance may require collecting identity information, verifying documents, screening against watchlists, understanding user risk, or applying extra checks for certain countries, products, limits, or customer types.\n\nThe beginner mistake is to ask, \"How do we make KYC shorter?\" The better question is, \"What risk are we trying to control, and where can we reduce friction without weakening the control?\"\n\nThat is why a risk-based approach matters. Not every user or action has the same risk. A user signing up to browse a product may not need the same checks as a user moving a large amount of money. A low-risk domestic flow may not need the same review as a high-risk cross-border flow.",
     "example": "Imagine a remittance app. A new customer wants to send money.\n\nThe product team wants fewer drop-offs. Compliance wants enough information to satisfy policy and regulation. Engineering wants clear rules. Support wants fewer confused users. Operations wants fewer manual reviews.\n\nA weak TPM frames this as a fight: \"Compliance is blocking growth.\"\n\nA strong TPM frames it as a system:\n\n1. What minimum information is required before the user can start?\n2. What extra checks are required before the user can send money?\n3. Which users need enhanced due diligence?\n4. What happens when verification fails or is pending?\n5. How do we explain the request without scaring the user?\n6. What evidence do we need for audit and monitoring?\n\nThe product answer may be progressive onboarding. Ask for only the information needed at each stage. Let users understand value before asking for sensitive information, but do not allow risky actions before required checks are complete.\n\nHere is a simple risk-tier model:\n\n```txt\nLow risk\n- User can create an account and explore the product.\n- Basic identity data is collected.\n- No money movement or high-risk action is allowed yet.\n\nMedium risk\n- User wants to send money, raise a limit, or use a regulated product.\n- Identity verification is required.\n- Screening, document checks, and basic transaction monitoring apply.\n\nHigh risk\n- User has risk flags: high-risk country, suspicious behavior, unusual volume, sanctions match, business account, or manual-review trigger.\n- Enhanced due diligence may be required.\n- Extra documents, source-of-funds questions, manual review, or lower limits may apply.\n```\n\nThis kind of model helps the TPM avoid two bad extremes: asking every user for everything immediately, or letting risky users complete sensitive actions too early.",
     "commonMistakes": "A common mistake is hiding compliance requirements until the end of the flow. Users feel tricked when they invest effort and then hit an unexplained wall.\n\nAnother mistake is asking every user for the maximum amount of information immediately. That may satisfy a checklist, but it can destroy trust and conversion.\n\nA third mistake is treating vendor approval as the full product state. The product still needs to explain what happened, what the user can do next, what support can see, and how the business handles edge cases."
+  },
+  {
+    "id": "tpm-credit-bureau-dispute-workflow",
+    "track": "TPM",
+    "category": "Credit & Lending",
+    "level": "Advanced",
+    "question": "How would you design a credit bureau dispute workflow?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A credit bureau dispute workflow helps a company investigate when a consumer says reported credit information is wrong.\n\nThe beginner mistake is treating credit reporting as a one-way export. If the company furnishes data, it also needs a way to investigate disputes, review relevant information, correct errors, and communicate outcomes through the proper channel.\n\nThe mental model:\n\n```txt\nReported data:\nWhat the company sent to credit bureaus.\n\nDispute:\nThe consumer says some reported data is inaccurate.\n\nInvestigation:\nThe company checks its records and decides whether to update, delete, verify, or correct.\n```\n\nThis workflow needs precision because bad credit data can affect someone's ability to borrow, rent, or get services."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a borrower says their account is incorrectly reported as 30 days late.\n\nThe company needs to check:\n\n```txt\nWas the payment due date correct?\nWhen did payment arrive?\nWas there a payment processing delay?\nWas a hardship plan active?\nWas the account already corrected internally?\nDid the bureau receive an old file?\n```\n\nThe investigation should be evidence-based, not just \"our system says it is right.\""
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a dispute workflow artifact:\n\n```txt\nDispute type:\nIncorrect delinquency status\n\nCase data:\n- Consumer identifier\n- Account identifier\n- Bureau dispute code\n- Reported field being disputed\n- Payment history\n- Due dates and grace periods\n- Hardship or deferment status\n- Prior corrections\n- Supporting documents\n\nDecision outcomes:\n- Verify as accurate\n- Correct reported value\n- Delete disputed item\n- Mark as disputed\n- Request more information if allowed\n\nOperational controls:\n- SLA tracking\n- Reviewer assignment\n- Evidence checklist\n- Bureau update file\n- Consumer response record\n- Quality review sampling\n```\n\nThe TPM should make it hard to close a dispute without reviewing the relevant facts."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is designing the workflow around internal convenience instead of the disputed field. The reviewer needs the facts that explain that exact field.\n\nAnother mistake is failing to reconcile bureau files after a correction. A fix that does not reach the bureau is not a real fix.\n\nA third mistake is not tracking repeat disputes. Repeated complaints about the same field may indicate a systemic reporting bug."
+      }
+    ],
+    "answer": "A credit bureau dispute workflow helps a company investigate when a consumer says reported credit information is wrong.",
+    "reasoning": "Here is a dispute workflow artifact:\n\n```txt\nDispute type:\nIncorrect delinquency status\n\nCase data:\n- Consumer identifier\n- Account identifier\n- Bureau dispute code\n- Reported field being disputed\n- Payment history\n- Due dates and grace periods\n- Hardship or deferment status\n- Prior corrections\n- Supporting documents\n\nDecision outcomes:\n- Verify as accurate\n- Correct reported value\n- Delete disputed item\n- Mark as disputed\n- Request more information if allowed\n\nOperational controls:\n- SLA tracking\n- Reviewer assignment\n- Evidence checklist\n- Bureau update file\n- Consumer response record\n- Quality review sampling\n```\n\nThe TPM should make it hard to close a dispute without reviewing the relevant facts.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What makes credit reporting disputes high stakes?",
+      "What data should a reviewer see for a delinquency dispute?",
+      "Why should the disputed field drive the evidence checklist?",
+      "How would you detect a systemic reporting error?",
+      "What should happen after a correction is approved?"
+    ],
+    "interviewAnswer": "I would design credit bureau disputes as structured investigations with disputed-field mapping, evidence checklists, SLA tracking, reviewer ownership, decision outcomes, bureau correction files, consumer response records, and quality review. I would also monitor repeat disputes to find systemic reporting issues.\n\nA strong TPM answer shows that furnishing data creates responsibility for corrections, not just export jobs.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Dispute credit report errors",
+        "url": "https://www.consumerfinance.gov/askcfpb/1303"
+      },
+      {
+        "label": "CFPB: Furnisher investigation bulletin",
+        "url": "https://www.consumerfinance.gov/compliance/supervisory-guidance/bulletin-fcra-requirement-furnishers-conduct-investigations/"
+      }
+    ],
+    "beginnerExplanation": "A credit bureau dispute workflow helps a company investigate when a consumer says reported credit information is wrong.\n\nThe beginner mistake is treating credit reporting as a one-way export. If the company furnishes data, it also needs a way to investigate disputes, review relevant information, correct errors, and communicate outcomes through the proper channel.\n\nThe mental model:\n\n```txt\nReported data:\nWhat the company sent to credit bureaus.\n\nDispute:\nThe consumer says some reported data is inaccurate.\n\nInvestigation:\nThe company checks its records and decides whether to update, delete, verify, or correct.\n```\n\nThis workflow needs precision because bad credit data can affect someone's ability to borrow, rent, or get services.",
+    "example": "Imagine a borrower says their account is incorrectly reported as 30 days late.\n\nThe company needs to check:\n\n```txt\nWas the payment due date correct?\nWhen did payment arrive?\nWas there a payment processing delay?\nWas a hardship plan active?\nWas the account already corrected internally?\nDid the bureau receive an old file?\n```\n\nThe investigation should be evidence-based, not just \"our system says it is right.\"",
+    "commonMistakes": "A common mistake is designing the workflow around internal convenience instead of the disputed field. The reviewer needs the facts that explain that exact field.\n\nAnother mistake is failing to reconcile bureau files after a correction. A fix that does not reach the bureau is not a real fix.\n\nA third mistake is not tracking repeat disputes. Repeated complaints about the same field may indicate a systemic reporting bug."
+  },
+  {
+    "id": "tpm-credit-line-change-adverse-action",
+    "track": "TPM",
+    "category": "Credit & Lending",
+    "level": "Advanced",
+    "question": "How would you design a credit line increase or decrease workflow?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A credit line workflow decides whether a customer can borrow more, keep the same limit, or have their available credit reduced.\n\nThe beginner mistake is treating this like a normal settings change. Credit decisions can affect access to money, customer trust, risk exposure, and regulatory communication. If the product denies a requested increase or reduces a line, the team may need specific notices and reasons depending on the product and jurisdiction.\n\nThe mental model:\n\n```txt\nRequest:\nCustomer asks for more credit, or the system reviews an existing limit.\n\nDecision:\nApprove, deny, counteroffer, decrease, or ask for more information.\n\nCommunication:\nTell the customer what happened, what it means, and what rights or next steps apply.\n```\n\nThe TPM should not invent legal language. The TPM should make sure the product captures the decision reason and routes the right communication."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a customer requests an increase from $2,000 to $5,000.\n\nThe system reviews payment history, income, bureau data, utilization, fraud risk, and current affordability signals.\n\nPossible outcomes:\n\n```txt\nApproved:\nLimit increases to $5,000.\n\nCounteroffer:\nLimit increases to $3,000.\n\nDenied:\nLimit stays at $2,000 and customer receives required reason.\n\nPending:\nCustomer needs to provide updated income or identity information.\n```\n\nThose states are different. They need different messages, support views, metrics, and audit records."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a credit line workflow artifact:\n\n```txt\nWorkflow:\nCredit line increase request\n\nInputs:\n- Current line\n- Requested line\n- Payment history\n- Delinquency status\n- Income or affordability data\n- Bureau data if used\n- Fraud and identity signals\n- Existing exposure\n\nDecision outcomes:\n- Approve requested amount\n- Approve lower amount\n- Deny\n- Request more information\n- Manual review\n\nRequired product records:\n- Decision timestamp\n- Model/rule version\n- Principal reason codes\n- Data sources used\n- Customer notice sent\n- Support-visible summary\n```\n\nThe product requirement is evidence and communication, not just changing a number."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is storing only the final limit. Without reason codes and model version, the decision is hard to explain later.\n\nAnother mistake is using vague messages like \"not eligible.\" Credit products often need clearer reasons and compliant notices.\n\nA third mistake is ignoring support. Customers will ask why the decision happened, and support needs safe, approved explanations."
+      }
+    ],
+    "answer": "A credit line workflow decides whether a customer can borrow more, keep the same limit, or have their available credit reduced.",
+    "reasoning": "Here is a credit line workflow artifact:\n\n```txt\nWorkflow:\nCredit line increase request\n\nInputs:\n- Current line\n- Requested line\n- Payment history\n- Delinquency status\n- Income or affordability data\n- Bureau data if used\n- Fraud and identity signals\n- Existing exposure\n\nDecision outcomes:\n- Approve requested amount\n- Approve lower amount\n- Deny\n- Request more information\n- Manual review\n\nRequired product records:\n- Decision timestamp\n- Model/rule version\n- Principal reason codes\n- Data sources used\n- Customer notice sent\n- Support-visible summary\n```\n\nThe product requirement is evidence and communication, not just changing a number.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a credit limit change more sensitive than a normal feature setting?",
+      "What outcomes should the workflow support besides approve and deny?",
+      "Why do reason codes matter?",
+      "What should support see?",
+      "Where should legal and compliance review the product?"
+    ],
+    "interviewAnswer": "I would design the workflow with clear decision states, required inputs, reason codes, model or rule versioning, manual review paths, customer notices, support summaries, and audit records. For adverse decisions, I would partner with legal and compliance so required disclosures and timing are handled correctly.\n\nA strong answer shows that credit workflows are decision systems with customer communication and compliance requirements.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Regulation B notifications",
+        "url": "https://www.consumerfinance.gov/rules-policy/regulations/1002/9/"
+      },
+      {
+        "label": "CFPB: Credit denial guidance",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/my-credit-application-was-denied-because-of-my-credit-report-what-can-i-do-en-1253/"
+      }
+    ],
+    "beginnerExplanation": "A credit line workflow decides whether a customer can borrow more, keep the same limit, or have their available credit reduced.\n\nThe beginner mistake is treating this like a normal settings change. Credit decisions can affect access to money, customer trust, risk exposure, and regulatory communication. If the product denies a requested increase or reduces a line, the team may need specific notices and reasons depending on the product and jurisdiction.\n\nThe mental model:\n\n```txt\nRequest:\nCustomer asks for more credit, or the system reviews an existing limit.\n\nDecision:\nApprove, deny, counteroffer, decrease, or ask for more information.\n\nCommunication:\nTell the customer what happened, what it means, and what rights or next steps apply.\n```\n\nThe TPM should not invent legal language. The TPM should make sure the product captures the decision reason and routes the right communication.",
+    "example": "Imagine a customer requests an increase from $2,000 to $5,000.\n\nThe system reviews payment history, income, bureau data, utilization, fraud risk, and current affordability signals.\n\nPossible outcomes:\n\n```txt\nApproved:\nLimit increases to $5,000.\n\nCounteroffer:\nLimit increases to $3,000.\n\nDenied:\nLimit stays at $2,000 and customer receives required reason.\n\nPending:\nCustomer needs to provide updated income or identity information.\n```\n\nThose states are different. They need different messages, support views, metrics, and audit records.",
+    "commonMistakes": "A common mistake is storing only the final limit. Without reason codes and model version, the decision is hard to explain later.\n\nAnother mistake is using vague messages like \"not eligible.\" Credit products often need clearer reasons and compliant notices.\n\nA third mistake is ignoring support. Customers will ask why the decision happened, and support needs safe, approved explanations."
   },
   {
     "id": "tpm-data-product-reporting-requirements",
@@ -2456,6 +2603,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is copying database fields into a UI and calling it a tool. Internal users need workflow support, not raw data dumps.\n\nAnother mistake is skipping research because the users are coworkers. Watching five agents do the job can reveal more than a week of guessing.\n\nA third mistake is ignoring governance. Internal tools need permissions, audit logs, and clear rules about who can take risky actions."
   },
   {
+    "id": "tpm-kyb-beneficial-ownership-onboarding",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you design KYB onboarding for beneficial ownership?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "KYB means \"Know Your Business.\" It is the process of understanding a business customer before allowing them to use financial products.\n\nThe beginner mistake is asking only for company name and tax ID. For many financial products, the company also needs to understand who owns or controls the business, what the business does, and whether the relationship creates risk.\n\nThe mental model:\n\n```txt\nBusiness identity:\nWhat is this company?\n\nBeneficial ownership:\nWho ultimately owns or controls it?\n\nRisk review:\nCan we safely provide the product?\n```\n\nThe TPM should make a complex compliance requirement feel like a guided workflow instead of a wall of confusing forms."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a small business wants to open a fintech business account.\n\nThe product may need:\n\n```txt\nCompany legal name\nTax identifier\nBusiness address\nIndustry\nOwners or controlling persons\nIdentity information for owners\nDocuments if verification fails\n```\n\nIf the user does not understand why owner information is needed, they may abandon onboarding. Good product copy explains that financial services providers often need to verify the people behind a business."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a KYB artifact:\n\n```txt\nBusiness onboarding steps:\n1. Business profile\n2. Business address and tax ID\n3. Industry and expected activity\n4. Beneficial owners or control person\n5. Identity verification for required people\n6. Document upload if automated checks fail\n7. Risk review\n8. Approval, restriction, or rejection\n\nOwner fields:\n- Legal name\n- Date of birth\n- Address\n- Ownership percentage or control role\n- ID information if required\n\nStates:\n- Draft\n- Submitted\n- Needs more information\n- Manual review\n- Approved\n- Restricted\n- Rejected\n```\n\nSupport should see what is missing, not sensitive risk details that could compromise controls."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is asking for owner information without explaining why. That feels invasive and hurts completion.\n\nAnother mistake is treating all businesses the same. Industry, geography, product usage, ownership structure, and transaction volume can change risk.\n\nA third mistake is not designing resubmission. KYB often fails because data is mismatched or documents are unclear, and users need a recovery path."
+      }
+    ],
+    "answer": "KYB means \"Know Your Business.\" It is the process of understanding a business customer before allowing them to use financial products.",
+    "reasoning": "Here is a KYB artifact:\n\n```txt\nBusiness onboarding steps:\n1. Business profile\n2. Business address and tax ID\n3. Industry and expected activity\n4. Beneficial owners or control person\n5. Identity verification for required people\n6. Document upload if automated checks fail\n7. Risk review\n8. Approval, restriction, or rejection\n\nOwner fields:\n- Legal name\n- Date of birth\n- Address\n- Ownership percentage or control role\n- ID information if required\n\nStates:\n- Draft\n- Submitted\n- Needs more information\n- Manual review\n- Approved\n- Restricted\n- Rejected\n```\n\nSupport should see what is missing, not sensitive risk details that could compromise controls.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between business identity and beneficial ownership?",
+      "Why does KYB need good user education?",
+      "What onboarding states should exist?",
+      "What should support see when KYB is stuck?",
+      "Why should risk rules vary by business type?"
+    ],
+    "interviewAnswer": "I would design KYB as a staged workflow for business identity, beneficial ownership, control persons, expected activity, verification, document recovery, risk review, decision states, support visibility, and audit logs. I would partner with compliance to define required fields and risk tiers.\n\nA strong answer shows that KYB is both a compliance process and a user onboarding experience.",
+    "sourceLinks": [
+      {
+        "label": "FFIEC: Customer Due Diligence",
+        "url": "https://bsaaml.ffiec.gov/manual/AssessingComplianceWithBSARegulatoryRequirements/02"
+      },
+      {
+        "label": "FFIEC: Customer Identification Program",
+        "url": "https://bsaaml.ffiec.gov/manual/AssessingComplianceWithBSARegulatoryRequirements/01"
+      }
+    ],
+    "beginnerExplanation": "KYB means \"Know Your Business.\" It is the process of understanding a business customer before allowing them to use financial products.\n\nThe beginner mistake is asking only for company name and tax ID. For many financial products, the company also needs to understand who owns or controls the business, what the business does, and whether the relationship creates risk.\n\nThe mental model:\n\n```txt\nBusiness identity:\nWhat is this company?\n\nBeneficial ownership:\nWho ultimately owns or controls it?\n\nRisk review:\nCan we safely provide the product?\n```\n\nThe TPM should make a complex compliance requirement feel like a guided workflow instead of a wall of confusing forms.",
+    "example": "Imagine a small business wants to open a fintech business account.\n\nThe product may need:\n\n```txt\nCompany legal name\nTax identifier\nBusiness address\nIndustry\nOwners or controlling persons\nIdentity information for owners\nDocuments if verification fails\n```\n\nIf the user does not understand why owner information is needed, they may abandon onboarding. Good product copy explains that financial services providers often need to verify the people behind a business.",
+    "commonMistakes": "A common mistake is asking for owner information without explaining why. That feels invasive and hurts completion.\n\nAnother mistake is treating all businesses the same. Industry, geography, product usage, ownership structure, and transaction volume can change risk.\n\nA third mistake is not designing resubmission. KYB often fails because data is mismatched or documents are unclear, and users need a recovery path."
+  },
+  {
     "id": "tpm-ledger-balances-holds",
     "track": "TPM",
     "category": "Fintech Infrastructure",
@@ -2552,6 +2748,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "LLM features have product economics. Every request can carry cost, latency, and quality tradeoffs.\n\nThe beginner mistake is picking the strongest model for everything. That may work in a demo but fail in production if responses are too slow or too expensive.\n\nThe TPM needs to think in product tiers:\n\n```txt\nHigh-quality model:\nBetter reasoning, higher cost, often higher latency.\n\nSmaller or faster model:\nLower cost and faster, but may need narrower tasks or stricter guardrails.\n\nCached or reused output:\nFast and cheap when the answer does not need fresh reasoning.\n\nHuman review:\nSlower and more expensive, but safer for high-risk outcomes.\n```",
     "example": "Imagine an AI support assistant in a remittance app.\n\nNot every task needs the same model:\n\n```txt\nClassify ticket category:\nFast, cheap model may be enough.\n\nSummarize long case history:\nMay need a model with larger context.\n\nDraft customer response for failed transfer:\nNeeds accuracy and policy grounding.\n\nRecommend fraud action:\nMay need human review regardless of model.\n```\n\nThe TPM should map task risk and complexity before choosing model strategy.",
     "commonMistakes": "A common mistake is optimizing cost before defining acceptable quality. Cheap wrong answers are expensive.\n\nAnother mistake is optimizing quality without user patience. A perfect answer that takes too long may not work in support.\n\nA third mistake is ignoring usage growth. A feature that is affordable with 1,000 requests may become painful at 1 million."
+  },
+  {
+    "id": "tpm-merchant-underwriting-onboarding",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Advanced",
+    "question": "How would you design merchant onboarding and underwriting for payments?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Merchant underwriting is the process of deciding whether a business can safely accept payments on your platform.\n\nThe beginner mistake is approving every merchant who fills out a form. A merchant can create chargeback risk, fraud risk, illegal goods risk, brand risk, money laundering risk, and financial exposure if payouts happen before disputes or refunds are known.\n\nThe mental model:\n\n```txt\nIdentity:\nWho is the merchant?\n\nBusiness model:\nWhat are they selling and how?\n\nRisk:\nWhat can go wrong after they start processing?\n```\n\nThe TPM needs to design onboarding so good merchants can start quickly while risky merchants get reviewed before harm scales."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine two merchants apply.\n\n```txt\nMerchant A:\nLocal bakery, low ticket size, in-person pickup.\n\nMerchant B:\nHigh-ticket electronics reseller, new website, no refund policy, large expected volume.\n```\n\nBoth may be legitimate, but they should not get the same underwriting path. Merchant B needs more review because disputes, fraud, and delivery failures could create larger losses."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a merchant onboarding artifact:\n\n```txt\nApplication fields:\n- Legal business name\n- Tax ID\n- Ownership or representative information\n- Website or product description\n- Industry category\n- Expected monthly volume\n- Average transaction size\n- Refund policy\n- Fulfillment model\n- Bank account for payouts\n\nRisk tiers:\n- Low: automated approval\n- Medium: document review or payout delay\n- High: manual underwriting before processing\n\nControls:\n- Processing limits\n- Payout delays\n- Rolling reserve\n- Restricted category review\n- Chargeback monitoring\n- Early warning alerts\n```\n\nThe product should also let merchants fix missing information without starting over."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is reviewing merchants only at signup. Risk changes after launch, especially if volume spikes or disputes rise.\n\nAnother mistake is asking too much from low-risk merchants. Overly heavy onboarding kills activation.\n\nA third mistake is not connecting underwriting to payout controls. Approval should define what limits or reserves apply."
+      }
+    ],
+    "answer": "Merchant underwriting is the process of deciding whether a business can safely accept payments on your platform.",
+    "reasoning": "Here is a merchant onboarding artifact:\n\n```txt\nApplication fields:\n- Legal business name\n- Tax ID\n- Ownership or representative information\n- Website or product description\n- Industry category\n- Expected monthly volume\n- Average transaction size\n- Refund policy\n- Fulfillment model\n- Bank account for payouts\n\nRisk tiers:\n- Low: automated approval\n- Medium: document review or payout delay\n- High: manual underwriting before processing\n\nControls:\n- Processing limits\n- Payout delays\n- Rolling reserve\n- Restricted category review\n- Chargeback monitoring\n- Early warning alerts\n```\n\nThe product should also let merchants fix missing information without starting over.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is merchant underwriting needed before payment processing?",
+      "What signals make a merchant riskier?",
+      "How should low-risk and high-risk onboarding differ?",
+      "What payout controls can reduce exposure?",
+      "Why does ongoing monitoring matter?"
+    ],
+    "interviewAnswer": "I would design merchant onboarding around identity, business model, ownership, industry, expected volume, fulfillment, refund policy, bank details, risk tiering, document recovery, manual review, payout controls, and ongoing monitoring. Approval should determine limits, reserves, and review cadence.\n\nA strong answer shows that merchant onboarding is activation plus risk control.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Connect identity verification",
+        "url": "https://docs.stripe.com/connect/identity-verification"
+      },
+      {
+        "label": "Stripe Connect risk management",
+        "url": "https://docs.stripe.com/connect/risk-management"
+      }
+    ],
+    "beginnerExplanation": "Merchant underwriting is the process of deciding whether a business can safely accept payments on your platform.\n\nThe beginner mistake is approving every merchant who fills out a form. A merchant can create chargeback risk, fraud risk, illegal goods risk, brand risk, money laundering risk, and financial exposure if payouts happen before disputes or refunds are known.\n\nThe mental model:\n\n```txt\nIdentity:\nWho is the merchant?\n\nBusiness model:\nWhat are they selling and how?\n\nRisk:\nWhat can go wrong after they start processing?\n```\n\nThe TPM needs to design onboarding so good merchants can start quickly while risky merchants get reviewed before harm scales.",
+    "example": "Imagine two merchants apply.\n\n```txt\nMerchant A:\nLocal bakery, low ticket size, in-person pickup.\n\nMerchant B:\nHigh-ticket electronics reseller, new website, no refund policy, large expected volume.\n```\n\nBoth may be legitimate, but they should not get the same underwriting path. Merchant B needs more review because disputes, fraud, and delivery failures could create larger losses.",
+    "commonMistakes": "A common mistake is reviewing merchants only at signup. Risk changes after launch, especially if volume spikes or disputes rise.\n\nAnother mistake is asking too much from low-risk merchants. Overly heavy onboarding kills activation.\n\nA third mistake is not connecting underwriting to payout controls. Approval should define what limits or reserves apply."
   },
   {
     "id": "tpm-migration-communications",
@@ -2750,6 +2995,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is choosing an activation metric because it is easy to measure. The metric should represent value, not convenience.\n\nAnother mistake is ignoring time. Activation in one day and activation in sixty days mean different things.\n\nA third mistake is optimizing conversion while damaging trust or risk. In regulated products, guardrails matter."
   },
   {
+    "id": "tpm-open-banking-consent-data-access",
+    "track": "TPM",
+    "category": "Data & Schema Design",
+    "level": "Advanced",
+    "question": "How would you design an open banking consent and data access flow?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Open banking lets consumers authorize access to their financial data so another product can provide a service, such as budgeting, underwriting, payments, or account aggregation.\n\nThe beginner mistake is thinking consent is just a checkbox. Good consent explains who gets access, what data they get, why they need it, how long access lasts, and how the user can revoke it.\n\nThe mental model:\n\n```txt\nUser intent:\nI want this service to use my financial data.\n\nPermission:\nThis company may access specific data for a specific purpose.\n\nControl:\nThe user can review, renew, or revoke access.\n```\n\nThe TPM should design for trust, not just API connectivity."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a lending app asks to connect a bank account to verify cash flow.\n\nA weak flow says:\n\n```txt\nConnect your bank to continue.\n```\n\nA stronger flow says:\n\n```txt\nWe use transaction and balance data to assess affordability.\nWe do not need your bank password.\nYou can disconnect access later from settings.\n```\n\nThat framing helps the user understand what is happening and reduces fear."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a consent artifact:\n\n```txt\nUse case:\nCash-flow underwriting\n\nData requested:\n- Account identity\n- Current balance\n- Transaction history for last 12 months\n\nPurpose:\nVerify income stability and affordability\n\nConsent screen must show:\n- Data recipient\n- Data categories\n- Purpose\n- Duration\n- Revocation path\n- Support contact\n\nSystem requirements:\n- Consent record ID\n- Timestamp\n- Data scopes\n- Provider connection status\n- Revocation event\n- Access audit log\n- Data deletion or retention policy\n```\n\nThe product should make consent visible after onboarding, not bury it forever."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is asking for more data than the product needs. Extra data increases privacy risk and user discomfort.\n\nAnother mistake is making revocation hard to find. If users can grant access easily, they should be able to manage it easily.\n\nA third mistake is not separating connection failure from consent refusal. A user who wants to consent but hits a provider error needs a different path from a user who declines."
+      }
+    ],
+    "answer": "Open banking lets consumers authorize access to their financial data so another product can provide a service, such as budgeting, underwriting, payments, or account aggregation.",
+    "reasoning": "Here is a consent artifact:\n\n```txt\nUse case:\nCash-flow underwriting\n\nData requested:\n- Account identity\n- Current balance\n- Transaction history for last 12 months\n\nPurpose:\nVerify income stability and affordability\n\nConsent screen must show:\n- Data recipient\n- Data categories\n- Purpose\n- Duration\n- Revocation path\n- Support contact\n\nSystem requirements:\n- Consent record ID\n- Timestamp\n- Data scopes\n- Provider connection status\n- Revocation event\n- Access audit log\n- Data deletion or retention policy\n```\n\nThe product should make consent visible after onboarding, not bury it forever.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is consent more than a checkbox?",
+      "What should the user know before granting access?",
+      "What data should be stored about consent?",
+      "Why does revocation need product design?",
+      "How would you handle a bank connection failure?"
+    ],
+    "interviewAnswer": "I would design open banking consent around purpose, data minimization, clear scopes, duration, revocation, audit logs, connection status, and support paths. The user should understand what data is accessed, who receives it, why it is needed, and how to stop access.\n\nA strong answer treats consent as an ongoing user-control system, not just an onboarding step.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Personal financial data rights",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/other-applicable-requirements/personal-financial-data-rights/"
+      },
+      {
+        "label": "CFPB: Personal financial data rights guide",
+        "url": "https://files.consumerfinance.gov/f/documents/cfpb_personal-financial-data-rights-small-entity-compliance-guide_2024-12_pdf.pdf"
+      }
+    ],
+    "beginnerExplanation": "Open banking lets consumers authorize access to their financial data so another product can provide a service, such as budgeting, underwriting, payments, or account aggregation.\n\nThe beginner mistake is thinking consent is just a checkbox. Good consent explains who gets access, what data they get, why they need it, how long access lasts, and how the user can revoke it.\n\nThe mental model:\n\n```txt\nUser intent:\nI want this service to use my financial data.\n\nPermission:\nThis company may access specific data for a specific purpose.\n\nControl:\nThe user can review, renew, or revoke access.\n```\n\nThe TPM should design for trust, not just API connectivity.",
+    "example": "Imagine a lending app asks to connect a bank account to verify cash flow.\n\nA weak flow says:\n\n```txt\nConnect your bank to continue.\n```\n\nA stronger flow says:\n\n```txt\nWe use transaction and balance data to assess affordability.\nWe do not need your bank password.\nYou can disconnect access later from settings.\n```\n\nThat framing helps the user understand what is happening and reduces fear.",
+    "commonMistakes": "A common mistake is asking for more data than the product needs. Extra data increases privacy risk and user discomfort.\n\nAnother mistake is making revocation hard to find. If users can grant access easily, they should be able to manage it easily.\n\nA third mistake is not separating connection failure from consent refusal. A user who wants to consent but hits a provider error needs a different path from a user who declines."
+  },
+  {
     "id": "tpm-partner-outage-fallback",
     "track": "TPM",
     "category": "Operations",
@@ -2799,6 +3093,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is letting users retry when the first request may still complete. That can create duplicates.\n\nAnother mistake is hiding the problem behind generic errors. Users and support need the truth in plain language.\n\nA third mistake is ending the incident when the partner returns. Recovery also includes reconciliation, customer communication, and operational cleanup."
   },
   {
+    "id": "tpm-payment-webhooks-idempotency",
+    "track": "TPM",
+    "category": "API & Partner Integration",
+    "level": "Intermediate",
+    "question": "How would you make payment webhooks reliable and idempotent?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Payment webhooks are notifications from a payment provider that something happened, such as a payment succeeding, a dispute opening, or a bank debit failing.\n\nThe beginner mistake is treating a webhook like a normal one-time request. Webhooks can be delayed, retried, duplicated, arrive out of order, or fail while your system is down. If your app processes the same event twice, you might ship two orders, credit an account twice, or send confusing emails.\n\nThe mental model:\n\n```txt\nWebhook event:\nThe provider says something changed.\n\nIdempotency:\nProcessing the same event again should not create duplicate side effects.\n\nReconciliation:\nYour records should eventually match the provider's source of truth.\n```\n\nThe TPM needs to require reliability behavior, not only \"listen for webhook.\""
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine the app receives `payment_succeeded` and credits a wallet. The server crashes after crediting the wallet but before marking the webhook processed. The provider retries the event.\n\nWithout idempotency, the wallet gets credited twice.\n\nWith idempotency:\n\n```txt\n1. Store event ID.\n2. Check whether event already produced the business action.\n3. If already processed, return success without doing it again.\n4. If failed halfway, resume safely.\n```\n\nThat is why payment systems need replay-safe design."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a webhook reliability artifact:\n\n```txt\nWebhook flow:\n1. Verify signature\n2. Store raw event\n3. Return 200 quickly after durable receipt\n4. Process asynchronously\n5. Use event ID or object ID for idempotency\n6. Record processing status\n7. Retry failed processing\n8. Reconcile provider state daily\n\nStates:\n- Received\n- Processing\n- Processed\n- Failed retryable\n- Failed manual review\n- Ignored duplicate\n\nMetrics:\n- Delivery failure rate\n- Processing failure rate\n- Duplicate event count\n- Oldest unprocessed event\n- Reconciliation mismatches\n```\n\nThe product requirement should include replay tooling so support and engineering can recover from failures."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is doing heavy business logic before acknowledging receipt. Slow handlers create retries and confusion.\n\nAnother mistake is using only the webhook as the source of truth. Reconciliation against provider records catches missed or broken events.\n\nA third mistake is not designing idempotency by business action. Deduplicating the HTTP request is not enough if the same payment object triggers multiple paths."
+      }
+    ],
+    "answer": "Payment webhooks are notifications from a payment provider that something happened, such as a payment succeeding, a dispute opening, or a bank debit failing.",
+    "reasoning": "Here is a webhook reliability artifact:\n\n```txt\nWebhook flow:\n1. Verify signature\n2. Store raw event\n3. Return 200 quickly after durable receipt\n4. Process asynchronously\n5. Use event ID or object ID for idempotency\n6. Record processing status\n7. Retry failed processing\n8. Reconcile provider state daily\n\nStates:\n- Received\n- Processing\n- Processed\n- Failed retryable\n- Failed manual review\n- Ignored duplicate\n\nMetrics:\n- Delivery failure rate\n- Processing failure rate\n- Duplicate event count\n- Oldest unprocessed event\n- Reconciliation mismatches\n```\n\nThe product requirement should include replay tooling so support and engineering can recover from failures.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why can webhooks be delivered more than once?",
+      "What does idempotency prevent?",
+      "Why should raw events be stored?",
+      "Why is reconciliation still needed?",
+      "What dashboard would show webhook health?"
+    ],
+    "interviewAnswer": "I would make payment webhooks reliable by verifying signatures, storing raw events durably, acknowledging quickly, processing asynchronously, using idempotency keys, tracking processing states, supporting retries and replay, and reconciling against the provider's source of truth.\n\nA strong answer shows that payment events need recovery design because money side effects must not duplicate or disappear.",
+    "sourceLinks": [
+      {
+        "label": "Stripe webhooks",
+        "url": "https://docs.stripe.com/webhooks?lang=node"
+      },
+      {
+        "label": "Stripe advanced error handling",
+        "url": "https://docs.stripe.com/error-low-level?locale=en-GB"
+      }
+    ],
+    "beginnerExplanation": "Payment webhooks are notifications from a payment provider that something happened, such as a payment succeeding, a dispute opening, or a bank debit failing.\n\nThe beginner mistake is treating a webhook like a normal one-time request. Webhooks can be delayed, retried, duplicated, arrive out of order, or fail while your system is down. If your app processes the same event twice, you might ship two orders, credit an account twice, or send confusing emails.\n\nThe mental model:\n\n```txt\nWebhook event:\nThe provider says something changed.\n\nIdempotency:\nProcessing the same event again should not create duplicate side effects.\n\nReconciliation:\nYour records should eventually match the provider's source of truth.\n```\n\nThe TPM needs to require reliability behavior, not only \"listen for webhook.\"",
+    "example": "Imagine the app receives `payment_succeeded` and credits a wallet. The server crashes after crediting the wallet but before marking the webhook processed. The provider retries the event.\n\nWithout idempotency, the wallet gets credited twice.\n\nWith idempotency:\n\n```txt\n1. Store event ID.\n2. Check whether event already produced the business action.\n3. If already processed, return success without doing it again.\n4. If failed halfway, resume safely.\n```\n\nThat is why payment systems need replay-safe design.",
+    "commonMistakes": "A common mistake is doing heavy business logic before acknowledging receipt. Slow handlers create retries and confusion.\n\nAnother mistake is using only the webhook as the source of truth. Reconciliation against provider records catches missed or broken events.\n\nA third mistake is not designing idempotency by business action. Deduplicating the HTTP request is not enough if the same payment object triggers multiple paths."
+  },
+  {
     "id": "tpm-payments-remittance-requirements",
     "track": "TPM",
     "category": "Product Requirements",
@@ -2846,6 +3189,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Payments and remittance features need unusually careful requirements because mistakes can move money incorrectly, block legitimate users, create regulatory risk, or overwhelm support.\n\nThe beginner mistake is writing only the happy path: \"User sends money to a recipient.\" A real payments feature has states, limits, fees, exchange rates, funding methods, compliance checks, partner statuses, reversals, refunds, retries, reconciliation, notifications, and support visibility.\n\nThe TPM's job is to turn the money movement into a clear product and system contract.",
     "example": "Imagine a user sends $100 to a family member in another country.\n\nThe product must answer:\n\n- Who is the sender?\n- Who is the recipient?\n- Is the sender verified?\n- Is the recipient allowed?\n- What is the exchange rate?\n- What fees apply?\n- How will the sender fund the transfer?\n- Which payout partner will deliver it?\n- What happens if funding succeeds but payout fails?\n- What status does the user see?\n- What does support see?\n\nThis is why requirements should include a state model.\n\n```txt\nTransfer states\n\nDraft\nQuote shown\nUser confirmed\nFunding pending\nFunded\nCompliance review\nPayout processing\nPaid\nFailed\nReversed\nRefunded\nUnknown\n```\n\nEach state should have allowed actions, user copy, support visibility, and system owner.",
     "commonMistakes": "A common mistake is treating payment status as a single success or failure. Real money movement often has pending, uncertain, reversed, and manually reviewed states.\n\nAnother mistake is ignoring idempotency. Retrying money movement without duplicate protection is dangerous.\n\nA third mistake is forgetting support and reconciliation. If customers ask where their money is, the company needs evidence."
+  },
+  {
+    "id": "tpm-payout-reconciliation-reporting",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design payout reconciliation reporting?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Payout reconciliation is the process of proving which transactions make up a payout and whether the amounts match what finance, operations, and the ledger expect.\n\nThe beginner mistake is thinking \"money arrived in the bank\" means reconciliation is done. A payout may combine payments, fees, refunds, chargebacks, adjustments, currency conversion, reserves, and timing differences.\n\nThe mental model:\n\n```txt\nGross activity:\nThe original payments and movements.\n\nAdjustments:\nFees, refunds, disputes, corrections, reserves.\n\nNet payout:\nThe amount that lands in the bank.\n```\n\nThe TPM should make the path from transaction to payout traceable."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine finance sees a $98,420 payout in the bank.\n\nThey need to answer:\n\n```txt\nWhich customer payments are included?\nWhich refunds reduced the payout?\nWhich disputes or fees were deducted?\nWhich transactions are pending future payout?\nDoes the payout match the ledger?\n```\n\nIf the product cannot answer those questions, finance will build manual spreadsheets and operations will lose time."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a payout reconciliation artifact:\n\n```txt\nReport:\nDaily payout reconciliation\n\nColumns:\n- Payout ID\n- Bank arrival date\n- Provider payout date\n- Transaction ID\n- Transaction type\n- Gross amount\n- Fee\n- Refund amount\n- Dispute amount\n- Adjustment amount\n- Net amount\n- Currency\n- Ledger entry ID\n- Customer or merchant ID\n\nControls:\n- Payout total equals sum of included transactions\n- Ledger total equals provider total\n- Exceptions queue for mismatches\n- Export for finance\n- Drill-down from payout to transaction\n```\n\nThe report should support both human investigation and automated exception detection."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is showing only payout totals. Totals are useful, but reconciliation needs line-level traceability.\n\nAnother mistake is ignoring timing differences. A refund initiated today may affect a later payout, not the payout someone is reviewing.\n\nA third mistake is not designing exception workflows. Mismatches need owners, status, notes, and resolution."
+      }
+    ],
+    "answer": "Payout reconciliation is the process of proving which transactions make up a payout and whether the amounts match what finance, operations, and the ledger expect.",
+    "reasoning": "Here is a payout reconciliation artifact:\n\n```txt\nReport:\nDaily payout reconciliation\n\nColumns:\n- Payout ID\n- Bank arrival date\n- Provider payout date\n- Transaction ID\n- Transaction type\n- Gross amount\n- Fee\n- Refund amount\n- Dispute amount\n- Adjustment amount\n- Net amount\n- Currency\n- Ledger entry ID\n- Customer or merchant ID\n\nControls:\n- Payout total equals sum of included transactions\n- Ledger total equals provider total\n- Exceptions queue for mismatches\n- Export for finance\n- Drill-down from payout to transaction\n```\n\nThe report should support both human investigation and automated exception detection.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why does a bank deposit not prove reconciliation is complete?",
+      "What adjustments can change net payout?",
+      "Why do finance teams need line-level data?",
+      "What mismatch states should exist?",
+      "How would you make reconciliation less manual over time?"
+    ],
+    "interviewAnswer": "I would design payout reconciliation reporting with payout IDs, line-level transactions, fees, refunds, disputes, adjustments, currency, ledger entry IDs, totals, exports, drill-downs, and an exceptions queue. The key is proving how gross activity became the net payout.\n\nA strong answer shows that reconciliation is traceability plus exception management.",
+    "sourceLinks": [
+      {
+        "label": "Stripe payout reconciliation reports",
+        "url": "https://docs.stripe.com/reports/select-a-report?locale=en-GB"
+      },
+      {
+        "label": "Stripe reporting and reconciliation",
+        "url": "https://docs.stripe.com/plan-integration/get-started/reporting-reconciliation?locale=en-GB"
+      }
+    ],
+    "beginnerExplanation": "Payout reconciliation is the process of proving which transactions make up a payout and whether the amounts match what finance, operations, and the ledger expect.\n\nThe beginner mistake is thinking \"money arrived in the bank\" means reconciliation is done. A payout may combine payments, fees, refunds, chargebacks, adjustments, currency conversion, reserves, and timing differences.\n\nThe mental model:\n\n```txt\nGross activity:\nThe original payments and movements.\n\nAdjustments:\nFees, refunds, disputes, corrections, reserves.\n\nNet payout:\nThe amount that lands in the bank.\n```\n\nThe TPM should make the path from transaction to payout traceable.",
+    "example": "Imagine finance sees a $98,420 payout in the bank.\n\nThey need to answer:\n\n```txt\nWhich customer payments are included?\nWhich refunds reduced the payout?\nWhich disputes or fees were deducted?\nWhich transactions are pending future payout?\nDoes the payout match the ledger?\n```\n\nIf the product cannot answer those questions, finance will build manual spreadsheets and operations will lose time.",
+    "commonMistakes": "A common mistake is showing only payout totals. Totals are useful, but reconciliation needs line-level traceability.\n\nAnother mistake is ignoring timing differences. A refund initiated today may affect a later payout, not the payout someone is reviewing.\n\nA third mistake is not designing exception workflows. Mismatches need owners, status, notes, and resolution."
   },
   {
     "id": "tpm-platform-product-sense",
@@ -3189,6 +3581,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Launch readiness means the team has enough evidence that the feature can be released without creating unacceptable customer, business, technical, operational, or compliance risk.\n\nIt does not mean the feature is perfect. It means the team understands what is being released, who will see it, what could go wrong, how success will be measured, and how to respond if something breaks.\n\nFor a TPM, launch readiness is a cross-functional decision. Engineering may say the code is complete. Design may say the experience is approved. Compliance may require sign-off. Support may need scripts. Marketing may need timing. Data may need dashboards. Operations may need a runbook.\n\nThe job is to bring those pieces together into a clear go or no-go decision.",
     "example": "Imagine launching a new identity verification flow.\n\nCode complete is not enough. You need to know:\n\n- Does it work on supported devices and browsers?\n- Are the error states understandable?\n- Does the vendor handle expected traffic?\n- Are privacy and compliance requirements approved?\n- Can support see verification status?\n- Are analytics events firing?\n- Do we know the expected approval and failure rates?\n- Can we roll back or disable the flow?\n- What happens to users already in progress if we roll back?\n\nReadiness is about confidence across the whole system, not only the pull request.\n\nHere is what a practical readiness view can look like:\n\n```txt\nArea: Product\nOwner: PM\nEvidence: success metrics, launch scope, non-goals, customer states\nGo/no-go question: Do we know what success and harm look like?\n\nArea: Engineering\nOwner: Engineering lead\nEvidence: tests, monitoring, logs, feature flag, rollback plan\nGo/no-go question: Can we detect and recover if this behaves badly?\n\nArea: Compliance and risk\nOwner: Compliance lead\nEvidence: approval, audit fields, data retention, review workflow\nGo/no-go question: Are required controls present before risky actions?\n\nArea: Support and operations\nOwner: Ops or support lead\nEvidence: runbook, macros, admin visibility, escalation path\nGo/no-go question: Can the company operate the feature on day one?\n```\n\nThis turns \"are we ready?\" from a vague meeting into evidence the team can inspect.",
     "commonMistakes": "A common mistake is treating readiness as a meeting where everyone gives vague approval. Readiness should be evidence-based.\n\nAnother mistake is forgetting rollback. Some features are easy to turn off. Others involve migrations, customer states, partner calls, or money movement. Rollback must be designed before launch.\n\nA third mistake is not defining success until after launch. If you do not know what healthy looks like, you will not know whether launch is going well."
+  },
+  {
+    "id": "tpm-remittance-corridor-expansion",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you launch a new international remittance corridor?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A remittance corridor is a route for sending money from one country to another, such as United States to Mexico or United Kingdom to Nigeria.\n\nThe beginner mistake is thinking corridor launch is only adding a new country dropdown. A corridor touches FX, liquidity, payout partners, compliance, fraud risk, disclosures, customer support, error handling, settlement timing, and local recipient experience.\n\nThe mental model:\n\n```txt\nSender side:\nHow money is collected.\n\nMiddle:\nFX, compliance, risk, and settlement.\n\nRecipient side:\nHow money is paid out and confirmed.\n```\n\nThe TPM should prove the corridor works in normal and messy cases before launch."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine launching U.S. to Ghana bank payouts.\n\nThe happy path is simple: sender pays in dollars, recipient receives local currency. The real product questions are harder:\n\n```txt\nWhat exchange rate is shown?\nHow long does payout take?\nWhat fees are disclosed?\nWhat happens if the recipient account is invalid?\nWhat happens if the payout partner is down?\nHow does support trace a failed payout?\n```\n\nThose details determine whether the corridor is trustworthy."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a corridor launch artifact:\n\n```txt\nCorridor:\nUnited States to Ghana\n\nRequirements:\n- Sender eligibility\n- Recipient data fields\n- FX quote and expiry\n- Fee and amount-received disclosure\n- Payout partner status\n- Sanctions and compliance screening\n- Fraud controls\n- Settlement and reconciliation\n- Error and cancellation handling\n- Support investigation view\n\nLaunch gates:\n- 100 successful test payouts\n- Invalid recipient test passed\n- Partner outage fallback tested\n- Reconciliation file matched\n- Support runbook approved\n- Complaint and error process ready\n```\n\nThe corridor is not ready until operations can handle failure."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is testing only successful payouts. Bad account details, delayed settlement, partner downtime, and compliance holds are the real launch risks.\n\nAnother mistake is hiding fees or timing uncertainty. Remittance users care deeply about how much arrives and when.\n\nA third mistake is not building corridor-level monitoring. A global success rate can hide one corridor breaking."
+      }
+    ],
+    "answer": "A remittance corridor is a route for sending money from one country to another, such as United States to Mexico or United Kingdom to Nigeria.",
+    "reasoning": "Here is a corridor launch artifact:\n\n```txt\nCorridor:\nUnited States to Ghana\n\nRequirements:\n- Sender eligibility\n- Recipient data fields\n- FX quote and expiry\n- Fee and amount-received disclosure\n- Payout partner status\n- Sanctions and compliance screening\n- Fraud controls\n- Settlement and reconciliation\n- Error and cancellation handling\n- Support investigation view\n\nLaunch gates:\n- 100 successful test payouts\n- Invalid recipient test passed\n- Partner outage fallback tested\n- Reconciliation file matched\n- Support runbook approved\n- Complaint and error process ready\n```\n\nThe corridor is not ready until operations can handle failure.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a remittance corridor more than a country dropdown?",
+      "What must be disclosed to the sender?",
+      "What failure cases should be tested before launch?",
+      "Why does support need payout tracing?",
+      "What metrics would you monitor by corridor?"
+    ],
+    "interviewAnswer": "I would launch a corridor by defining sender eligibility, recipient fields, FX quote behavior, fees and disclosures, compliance screening, payout partner integration, settlement, reconciliation, support tooling, failure states, and corridor-level monitoring. I would test invalid recipient, partner outage, delayed payout, cancellation, refund, and reconciliation mismatch before launch.\n\nA strong answer shows that international money movement is a system of product, risk, operations, and customer trust.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Remittance transfers",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/deposit-accounts-resources/remittance-transfer-rule/"
+      },
+      {
+        "label": "CFPB: Remittance transfer rights",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/what-is-a-remittance-transfer-and-what-are-my-rights-en-1161/"
+      }
+    ],
+    "beginnerExplanation": "A remittance corridor is a route for sending money from one country to another, such as United States to Mexico or United Kingdom to Nigeria.\n\nThe beginner mistake is thinking corridor launch is only adding a new country dropdown. A corridor touches FX, liquidity, payout partners, compliance, fraud risk, disclosures, customer support, error handling, settlement timing, and local recipient experience.\n\nThe mental model:\n\n```txt\nSender side:\nHow money is collected.\n\nMiddle:\nFX, compliance, risk, and settlement.\n\nRecipient side:\nHow money is paid out and confirmed.\n```\n\nThe TPM should prove the corridor works in normal and messy cases before launch.",
+    "example": "Imagine launching U.S. to Ghana bank payouts.\n\nThe happy path is simple: sender pays in dollars, recipient receives local currency. The real product questions are harder:\n\n```txt\nWhat exchange rate is shown?\nHow long does payout take?\nWhat fees are disclosed?\nWhat happens if the recipient account is invalid?\nWhat happens if the payout partner is down?\nHow does support trace a failed payout?\n```\n\nThose details determine whether the corridor is trustworthy.",
+    "commonMistakes": "A common mistake is testing only successful payouts. Bad account details, delayed settlement, partner downtime, and compliance holds are the real launch risks.\n\nAnother mistake is hiding fees or timing uncertainty. Remittance users care deeply about how much arrives and when.\n\nA third mistake is not building corridor-level monitoring. A global success rate can hide one corridor breaking."
   },
   {
     "id": "tpm-risk-queue-prioritization",
@@ -3826,6 +4267,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Transaction limits and velocity controls define how much activity is allowed within a time window.\n\nThe beginner mistake is thinking limits are only about maximum dollar amounts. Limits can also control number of attempts, new recipients, risky merchants, countries, device changes, failed logins, account age, funding method, or total exposure across a customer.\n\nThe mental model:\n\n```txt\nLimit:\nHow much is allowed.\n\nVelocity:\nHow quickly activity is happening.\n\nControl:\nWhat the system does when the line is crossed.\n```\n\nControls can approve, decline, hold, request verification, or send to review.",
     "example": "Imagine a new user creates an account and tries to send five transfers in ten minutes to five new recipients.\n\nThe total amount may not look huge, but the pattern is risky. A good system looks at both amount and behavior.\n\n```txt\nSingle transfer:\n$200\n\nFive transfers in ten minutes:\n$1,000 total, five new recipients, new account\n\nPossible action:\nAllow first low-risk transfer, hold the rest, request verification, or send to review.\n```\n\nThat is why velocity matters. Fraud often appears as speed and repetition before it appears as one large transaction.",
     "commonMistakes": "A common mistake is setting hard limits without explaining the user path. A user who hits a limit needs a next step, not a confusing failure.\n\nAnother mistake is applying the same limit to every customer. Tenure, verification level, behavior, product type, and risk tier should matter.\n\nA third mistake is optimizing only for fraud loss. Overly strict limits can block good users and hurt activation."
+  },
+  {
+    "id": "tpm-treasury-liquidity-forecasting",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you design treasury liquidity forecasting for a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Liquidity forecasting means estimating how much money the company needs available to meet obligations at the right time.\n\nThe beginner mistake is thinking the ledger balance is enough. A fintech may have pending card settlements, ACH returns, remittance payouts, refunds, chargebacks, partner reserves, prefunded accounts, and timing cutoffs. The company can look solvent in one view and still fail to fund a payout on time.\n\nThe mental model:\n\n```txt\nBook balance:\nWhat records say.\n\nAvailable liquidity:\nWhat can actually be used now.\n\nForecast:\nWhat cash will be needed soon under normal and stressed conditions.\n```\n\nThe TPM's job is to turn treasury needs into product data, dashboards, alerts, and workflows."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a remittance product pays recipients before all sender funds have fully settled.\n\nOn a quiet day, this improves speed. On a risky day, more sender debits return, more refunds arrive, and a payout partner requires prefunding.\n\nThe treasury team needs to know:\n\n```txt\nExpected payout volume today\nExpected incoming settlement\nPending returns\nPartner prefunding requirement\nMinimum operating buffer\nStress scenario if volume spikes or returns rise\n```\n\nThat is a forecasting product, not just a finance spreadsheet."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a liquidity forecast artifact:\n\n```txt\nForecast horizon:\nSame day, 7 days, 30 days\n\nInputs:\n- Current bank balances\n- Pending incoming settlements\n- Pending outgoing payouts\n- Refunds and chargebacks\n- ACH return expectations\n- Partner prefunding balances\n- Reserve requirements\n- Forecasted transaction volume\n- Cutoff times and holidays\n\nOutputs:\n- Available liquidity\n- Required liquidity\n- Buffer above requirement\n- Shortfall alert\n- Partner account funding plan\n- Stress scenario view\n\nAlerts:\n- Buffer below threshold\n- Payout volume spike\n- Settlement delay\n- Return rate spike\n- Partner balance below minimum\n```\n\nThe forecast should drive action before customers are affected."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using only historical averages. Liquidity problems often happen during spikes, delays, or unusual return patterns.\n\nAnother mistake is ignoring cutoffs and holidays. Money that arrives tomorrow may not help a payout due today.\n\nA third mistake is not tying forecasts to owners. Alerts without an owner become dashboard decoration."
+      }
+    ],
+    "answer": "Liquidity forecasting means estimating how much money the company needs available to meet obligations at the right time.",
+    "reasoning": "Here is a liquidity forecast artifact:\n\n```txt\nForecast horizon:\nSame day, 7 days, 30 days\n\nInputs:\n- Current bank balances\n- Pending incoming settlements\n- Pending outgoing payouts\n- Refunds and chargebacks\n- ACH return expectations\n- Partner prefunding balances\n- Reserve requirements\n- Forecasted transaction volume\n- Cutoff times and holidays\n\nOutputs:\n- Available liquidity\n- Required liquidity\n- Buffer above requirement\n- Shortfall alert\n- Partner account funding plan\n- Stress scenario view\n\nAlerts:\n- Buffer below threshold\n- Payout volume spike\n- Settlement delay\n- Return rate spike\n- Partner balance below minimum\n```\n\nThe forecast should drive action before customers are affected.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is ledger balance different from available liquidity?",
+      "What payment flows affect liquidity?",
+      "Why do cutoff times matter?",
+      "What stress scenarios should the forecast include?",
+      "Who should own liquidity alerts?"
+    ],
+    "interviewAnswer": "I would design liquidity forecasting with current balances, pending settlements, outgoing obligations, reserves, refunds, returns, partner prefunding, volume forecasts, cutoffs, and stress scenarios. The product should show required versus available liquidity, buffer, shortfall alerts, and owner actions.\n\nA strong answer connects money movement timing to customer reliability.",
+    "sourceLinks": [
+      {
+        "label": "Federal Reserve: Liquidity risk management",
+        "url": "https://www.federalreserve.gov/supervisionreg/topics/liquidity_risk.htm"
+      },
+      {
+        "label": "U.S. Treasury: Cash forecasting",
+        "url": "https://tfx.treasury.gov/operational-accounting/cash-forecasting"
+      }
+    ],
+    "beginnerExplanation": "Liquidity forecasting means estimating how much money the company needs available to meet obligations at the right time.\n\nThe beginner mistake is thinking the ledger balance is enough. A fintech may have pending card settlements, ACH returns, remittance payouts, refunds, chargebacks, partner reserves, prefunded accounts, and timing cutoffs. The company can look solvent in one view and still fail to fund a payout on time.\n\nThe mental model:\n\n```txt\nBook balance:\nWhat records say.\n\nAvailable liquidity:\nWhat can actually be used now.\n\nForecast:\nWhat cash will be needed soon under normal and stressed conditions.\n```\n\nThe TPM's job is to turn treasury needs into product data, dashboards, alerts, and workflows.",
+    "example": "Imagine a remittance product pays recipients before all sender funds have fully settled.\n\nOn a quiet day, this improves speed. On a risky day, more sender debits return, more refunds arrive, and a payout partner requires prefunding.\n\nThe treasury team needs to know:\n\n```txt\nExpected payout volume today\nExpected incoming settlement\nPending returns\nPartner prefunding requirement\nMinimum operating buffer\nStress scenario if volume spikes or returns rise\n```\n\nThat is a forecasting product, not just a finance spreadsheet.",
+    "commonMistakes": "A common mistake is using only historical averages. Liquidity problems often happen during spikes, delays, or unusual return patterns.\n\nAnother mistake is ignoring cutoffs and holidays. Money that arrives tomorrow may not help a payout due today.\n\nA third mistake is not tying forecasts to owners. Alerts without an owner become dashboard decoration."
   },
   {
     "id": "tpm-unauthorized-transfer-reg-e-claims",

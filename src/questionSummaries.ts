@@ -398,6 +398,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-collections-hardship-repayment",
+    "track": "TPM",
+    "category": "Credit & Lending",
+    "level": "Intermediate",
+    "question": "How would you design a collections and hardship repayment experience?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-complaints-risk-feedback-loop",
     "track": "TPM",
     "category": "Product Strategy",
@@ -414,6 +425,28 @@ export const questionSummaries: Question[] = [
     "category": "Compliance & Risk",
     "level": "Intermediate",
     "question": "How would you design a compliant onboarding flow without hurting conversion too much?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-credit-bureau-dispute-workflow",
+    "track": "TPM",
+    "category": "Credit & Lending",
+    "level": "Advanced",
+    "question": "How would you design a credit bureau dispute workflow?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-credit-line-change-adverse-action",
+    "track": "TPM",
+    "category": "Credit & Lending",
+    "level": "Advanced",
+    "question": "How would you design a credit line increase or decrease workflow?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -552,6 +585,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-kyb-beneficial-ownership-onboarding",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you design KYB onboarding for beneficial ownership?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ledger-balances-holds",
     "track": "TPM",
     "category": "Fintech Infrastructure",
@@ -568,6 +612,17 @@ export const questionSummaries: Question[] = [
     "category": "AI Product",
     "level": "Intermediate",
     "question": "How would you manage cost and latency tradeoffs for an LLM-powered feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-merchant-underwriting-onboarding",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Advanced",
+    "question": "How would you design merchant onboarding and underwriting for payments?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -618,6 +673,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-open-banking-consent-data-access",
+    "track": "TPM",
+    "category": "Data & Schema Design",
+    "level": "Advanced",
+    "question": "How would you design an open banking consent and data access flow?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-partner-outage-fallback",
     "track": "TPM",
     "category": "Operations",
@@ -629,11 +695,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-payment-webhooks-idempotency",
+    "track": "TPM",
+    "category": "API & Partner Integration",
+    "level": "Intermediate",
+    "question": "How would you make payment webhooks reliable and idempotent?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-payments-remittance-requirements",
     "track": "TPM",
     "category": "Product Requirements",
     "level": "Intermediate",
     "question": "How would you define requirements for a payments or remittance feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-payout-reconciliation-reporting",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design payout reconciliation reporting?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -711,6 +799,17 @@ export const questionSummaries: Question[] = [
     "category": "Launch",
     "level": "Intermediate",
     "question": "How would you decide whether a feature is ready to launch?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-remittance-corridor-expansion",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you launch a new international remittance corridor?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -854,6 +953,17 @@ export const questionSummaries: Question[] = [
     "category": "Fraud & Risk",
     "level": "Intermediate",
     "question": "How would you design transaction limits and velocity controls?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-treasury-liquidity-forecasting",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you design treasury liquidity forecasting for a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",

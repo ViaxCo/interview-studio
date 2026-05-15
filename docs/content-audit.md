@@ -10,13 +10,13 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 82 total lessons.
+- 92 total lessons.
 - 17 Frontend lessons.
-- 65 TPM lessons.
-- 35,350 lesson words, excluding fenced code.
-- 311 fenced code blocks.
-- 165 source links.
-- 165 source links in the bank.
+- 75 TPM lessons.
+- 38,351 lesson words, excluding fenced code.
+- 342 fenced code blocks.
+- 185 source links.
+- 185 source links in the bank.
 - 0 source links failing after cleanup and the latest batch, excluding official OpenAI docs that resolve in browser/search but return Cloudflare 403 to command-line fetch.
 
 ## Scoring Rubric
@@ -283,6 +283,40 @@ Completed on 2026-05-15: ten fintech risk, payments, disputes, and compliance op
 10. `tpm-complaints-risk-feedback-loop`
     - Added complaint taxonomy, review cadence, root-cause fields, and product-risk feedback loop.
 
+### Priority 8: Banking, Lending, Treasury, And Platform TPM Batch 4
+
+Completed on 2026-05-15: ten banking, lending, treasury, open banking, and payment platform lessons were added:
+
+1. `tpm-credit-line-change-adverse-action`
+   - Added credit line decision states, reason codes, notices, support summary, and audit requirements.
+
+2. `tpm-credit-bureau-dispute-workflow`
+   - Added credit reporting dispute workflow with disputed-field mapping, evidence, bureau updates, and quality review.
+
+3. `tpm-open-banking-consent-data-access`
+   - Added consent scopes, purpose, duration, revocation, audit logs, and connection failure handling.
+
+4. `tpm-kyb-beneficial-ownership-onboarding`
+   - Added KYB stages, beneficial owner fields, verification states, recovery paths, and risk review.
+
+5. `tpm-remittance-corridor-expansion`
+   - Added corridor launch requirements, disclosure needs, payout failure cases, partner outage testing, and support tracing.
+
+6. `tpm-treasury-liquidity-forecasting`
+   - Added liquidity forecast inputs, output buffers, stress scenarios, cutoff timing, and owner alerts.
+
+7. `tpm-payment-webhooks-idempotency`
+   - Added webhook reliability flow, idempotency behavior, replay states, metrics, and reconciliation.
+
+8. `tpm-payout-reconciliation-reporting`
+   - Added payout report columns, gross-to-net traceability, controls, exports, and mismatch queue.
+
+9. `tpm-merchant-underwriting-onboarding`
+   - Added merchant onboarding fields, underwriting risk tiers, payout controls, reserves, and ongoing monitoring.
+
+10. `tpm-collections-hardship-repayment`
+    - Added collections and hardship repayment options, intake, plan terms, confirmation, and complaint-risk considerations.
+
 ## Missing Topic Map
 
 ### Frontend Topics To Add Next
@@ -299,15 +333,15 @@ High-value interview topics not yet covered or not yet deeply expanded:
 
 ### TPM Topics To Add Next
 
-Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 65, so 35 more TPM lessons are needed.
+Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 75, so 25 more TPM lessons are needed.
 
 Next batches should cover:
 
-1. Banking, cards, lending, credit, treasury, liquidity, and ledger operations.
+1. AI agents in regulated workflows, AI copilot safety, eval datasets, and red-team workflows.
 2. Compliance, privacy, data retention, audit, complaints, and regulatory reporting.
-3. AI agents in regulated workflows, AI copilot safety, eval datasets, and red-team workflows.
-4. Product operations for fintech incidents, partner risk, customer harm, and regulated communications.
-5. Fintech platform reliability: webhooks, idempotency, reconciliation, partner outages, and settlement cutoffs.
+3. Product operations for fintech incidents, partner risk, customer harm, and regulated communications.
+4. Fintech platform reliability: settlement cutoffs, async states, retries, and partner outages.
+5. Final coverage pass for gaps across fintech and AI TPM interview scenarios.
 
 ## Content Standard Going Forward
 
@@ -372,11 +406,11 @@ Completed on 2026-05-14: the second expansion batch added 10 more lessons:
 
 ## Immediate Next Step
 
-Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, AI Governance TPM Batch 2, and Fintech Risk Operations TPM Batch 3 are now complete.
+Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, AI Governance TPM Batch 2, Fintech Risk Operations TPM Batch 3, and Banking/Lending/Treasury TPM Batch 4 are now complete.
 
 Recommended order:
 
-1. Commit and push Fintech Risk Operations TPM Batch 3 after review.
-2. Add the next reviewed banking, cards, lending, and treasury TPM batch.
+1. Commit and push Banking/Lending/Treasury TPM Batch 4 after review.
+2. Add the next reviewed AI agent safety and regulated workflow TPM batch.
 3. Keep the app focused on browse, search, filters, reveal, save, and review.
 4. Keep running source validation and browser spot-checks after every batch.
