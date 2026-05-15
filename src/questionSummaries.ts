@@ -211,11 +211,44 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-agent-payment-action-approval",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Advanced",
+    "question": "How would you design approval controls for an AI agent that can take payment actions?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-agent-tool-permissions",
     "track": "TPM",
     "category": "AI Agents",
     "level": "Intermediate",
     "question": "How would you design permissions for an AI agent that can use tools?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-aml-alert-triage-copilot",
+    "track": "TPM",
+    "category": "AI & Risk",
+    "level": "Advanced",
+    "question": "How would you design an AI copilot for AML alert triage?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-audit-logs-regulated-workflows",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Advanced",
+    "question": "What should AI audit logs capture in regulated fintech workflows?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -233,11 +266,55 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-customer-communications-review",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Advanced",
+    "question": "How would you use AI to draft customer communications in a regulated fintech product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-data-privacy-retention",
     "track": "TPM",
     "category": "AI Governance",
     "level": "Intermediate",
     "question": "How would you handle data privacy and retention for an AI feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-document-verification-workflow",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you design AI-assisted document verification?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-eval-dataset-governance",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Advanced",
+    "question": "How would you govern evaluation datasets for an AI feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-explainability-risk-decisions",
+    "track": "TPM",
+    "category": "AI & Risk",
+    "level": "Advanced",
+    "question": "How would you make AI-assisted risk decisions explainable?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -266,6 +343,28 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-incident-response-model-failure",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Advanced",
+    "question": "How would you handle an incident caused by an AI model failure?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-knowledge-base-grounding",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you keep an AI assistant grounded in an approved knowledge base?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-model-evaluation",
     "track": "TPM",
     "category": "AI Product",
@@ -282,6 +381,17 @@ export const questionSummaries: Question[] = [
     "category": "AI Operations",
     "level": "Intermediate",
     "question": "What would you monitor for an AI feature in production?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-red-team-fintech-assistant",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Advanced",
+    "question": "How would you red-team an AI assistant for a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",

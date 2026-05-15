@@ -10,13 +10,13 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 92 total lessons.
+- 102 total lessons.
 - 17 Frontend lessons.
-- 75 TPM lessons.
-- 38,351 lesson words, excluding fenced code.
-- 342 fenced code blocks.
-- 185 source links.
-- 185 source links in the bank.
+- 85 TPM lessons.
+- 41,124 lesson words, excluding fenced code.
+- 377 fenced code blocks.
+- 205 source links.
+- 205 source links in the bank.
 - 0 source links failing after cleanup and the latest batch, excluding official OpenAI docs that resolve in browser/search but return Cloudflare 403 to command-line fetch.
 
 ## Scoring Rubric
@@ -317,6 +317,40 @@ Completed on 2026-05-15: ten banking, lending, treasury, open banking, and payme
 10. `tpm-collections-hardship-repayment`
     - Added collections and hardship repayment options, intake, plan terms, confirmation, and complaint-risk considerations.
 
+### Priority 9: Regulated AI Workflow TPM Batch 5
+
+Completed on 2026-05-15: ten AI safety, governance, and regulated workflow lessons were added:
+
+1. `tpm-ai-aml-alert-triage-copilot`
+   - Added AML copilot scope, allowed and prohibited actions, evidence citations, analyst approval, and eval requirements.
+
+2. `tpm-ai-customer-communications-review`
+   - Added AI drafting controls, policy grounding, review paths, safe copy constraints, and message audit logs.
+
+3. `tpm-ai-document-verification-workflow`
+   - Added AI document classification, extraction, confidence thresholds, retry paths, and false accept/reject monitoring.
+
+4. `tpm-ai-red-team-fintech-assistant`
+   - Added fintech-specific red-team categories, severe-failure criteria, tool abuse tests, and retest triggers.
+
+5. `tpm-ai-eval-dataset-governance`
+   - Added eval dataset fields, coverage model, versioning, owners, launch thresholds, and production-failure intake.
+
+6. `tpm-ai-knowledge-base-grounding`
+   - Added approved-source rules, retrieval governance, permission checks, missing-source behavior, and freshness review.
+
+7. `tpm-ai-explainability-risk-decisions`
+   - Added audience-specific explanations for analysts, support, customers, and audit.
+
+8. `tpm-ai-agent-payment-action-approval`
+   - Added tool risk tiers, payment action pre-checks, approval thresholds, and audit logs.
+
+9. `tpm-ai-audit-logs-regulated-workflows`
+   - Added AI audit fields covering models, prompts, retrieved sources, tool calls, guardrails, approvals, and business action.
+
+10. `tpm-ai-incident-response-model-failure`
+    - Added AI incident containment, affected-user analysis, evidence preservation, recovery, eval updates, and postmortem workflow.
+
 ## Missing Topic Map
 
 ### Frontend Topics To Add Next
@@ -333,15 +367,14 @@ High-value interview topics not yet covered or not yet deeply expanded:
 
 ### TPM Topics To Add Next
 
-Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 75, so 25 more TPM lessons are needed.
+Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 85, so 15 more TPM lessons are needed.
 
 Next batches should cover:
 
-1. AI agents in regulated workflows, AI copilot safety, eval datasets, and red-team workflows.
-2. Compliance, privacy, data retention, audit, complaints, and regulatory reporting.
-3. Product operations for fintech incidents, partner risk, customer harm, and regulated communications.
-4. Fintech platform reliability: settlement cutoffs, async states, retries, and partner outages.
-5. Final coverage pass for gaps across fintech and AI TPM interview scenarios.
+1. Compliance, privacy, data retention, audit, complaints, and regulatory reporting.
+2. Product operations for fintech incidents, partner risk, customer harm, and regulated communications.
+3. Fintech platform reliability: settlement cutoffs, async states, retries, and partner outages.
+4. Final coverage pass for gaps across fintech and AI TPM interview scenarios.
 
 ## Content Standard Going Forward
 
@@ -406,11 +439,11 @@ Completed on 2026-05-14: the second expansion batch added 10 more lessons:
 
 ## Immediate Next Step
 
-Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, AI Governance TPM Batch 2, Fintech Risk Operations TPM Batch 3, and Banking/Lending/Treasury TPM Batch 4 are now complete.
+Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, AI Governance TPM Batch 2, Fintech Risk Operations TPM Batch 3, Banking/Lending/Treasury TPM Batch 4, and Regulated AI Workflow TPM Batch 5 are now complete.
 
 Recommended order:
 
-1. Commit and push Banking/Lending/Treasury TPM Batch 4 after review.
-2. Add the next reviewed AI agent safety and regulated workflow TPM batch.
+1. Commit and push Regulated AI Workflow TPM Batch 5 after review.
+2. Add the final 15 TPM lessons in one 10-lesson compliance/platform batch plus one 5-lesson finishing batch.
 3. Keep the app focused on browse, search, filters, reveal, save, and review.
 4. Keep running source validation and browser spot-checks after every batch.
