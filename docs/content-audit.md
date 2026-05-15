@@ -10,13 +10,13 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 112 total lessons.
+- 117 total lessons.
 - 17 Frontend lessons.
-- 95 TPM lessons.
-- 43,756 lesson words, excluding fenced code.
-- 411 fenced code blocks.
-- 225 source links.
-- 225 source links in the bank.
+- 100 TPM lessons.
+- 45,051 lesson words, excluding fenced code.
+- 427 fenced code blocks.
+- 235 source links.
+- 235 source links in the bank.
 - 0 source links failing after cleanup and the latest batch, excluding official OpenAI docs that resolve in browser/search but return Cloudflare 403 to command-line fetch.
 
 ## Scoring Rubric
@@ -385,6 +385,25 @@ Completed on 2026-05-15: ten compliance, privacy, audit, partner, and payment op
 10. `tpm-suspicious-recipient-network-analysis`
     - Added network-analysis entities, relationship signals, reviewer view, human review guardrails, and false-positive monitoring.
 
+### Priority 11: Final Fintech And AI TPM Batch 7
+
+Completed on 2026-05-15: five final fintech and AI TPM lessons were added to reach 100 TPM lessons:
+
+1. `tpm-real-time-payment-rail-selection`
+   - Added rail selection dimensions for speed, finality, coverage, cost, fraud controls, fallback, and routing policy.
+
+2. `tpm-fintech-kill-switch-risk-controls`
+   - Added kill-switch levels, triggers, owners, customer states, support scripts, and re-enable criteria.
+
+3. `tpm-ai-feature-business-case-fintech`
+   - Added AI business-case model covering value, cost, risk, guardrails, launch evidence, and stop conditions.
+
+4. `tpm-multi-currency-wallet-pricing`
+   - Added multi-currency balance behavior, FX rate display, fees, rate expiry, refund behavior, and statements.
+
+5. `tpm-fintech-metrics-risk-guardrails`
+   - Added success, quality, and financial-risk guardrail metrics for fintech product launches.
+
 ## Missing Topic Map
 
 ### Frontend Topics To Add Next
@@ -401,11 +420,13 @@ High-value interview topics not yet covered or not yet deeply expanded:
 
 ### TPM Topics To Add Next
 
-Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 95, so 5 more TPM lessons are needed.
+Goal reached: the bank now contains 100 TPM lessons with fintech and AI focus.
 
-Next batches should cover:
+Future TPM work should be polish and practice, not raw volume:
 
-1. Final coverage pass for gaps across fintech and AI TPM interview scenarios.
+1. Sample interview drills from the strongest fintech and AI lessons.
+2. Difficulty calibration across Foundational, Intermediate, and Advanced lessons.
+3. Optional mock interview mode using the 100 TPM lessons as the source set.
 
 ## Content Standard Going Forward
 
@@ -470,11 +491,11 @@ Completed on 2026-05-14: the second expansion batch added 10 more lessons:
 
 ## Immediate Next Step
 
-Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, AI Governance TPM Batch 2, Fintech Risk Operations TPM Batch 3, Banking/Lending/Treasury TPM Batch 4, Regulated AI Workflow TPM Batch 5, and Compliance/Platform Operations TPM Batch 6 are now complete.
+Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, AI Governance TPM Batch 2, Fintech Risk Operations TPM Batch 3, Banking/Lending/Treasury TPM Batch 4, Regulated AI Workflow TPM Batch 5, Compliance/Platform Operations TPM Batch 6, and the final 5-lesson TPM Batch 7 are now complete.
 
 Recommended order:
 
-1. Commit and push Compliance/Platform Operations TPM Batch 6 after review.
-2. Add the final 5 TPM lessons, then run the full count and validation closeout.
+1. Commit and push the final TPM Batch 7 after review.
+2. Treat future work as polish, drills, UI affordances, or review-mode improvements rather than more raw question volume.
 3. Keep the app focused on browse, search, filters, reveal, save, and review.
 4. Keep running source validation and browser spot-checks after every batch.

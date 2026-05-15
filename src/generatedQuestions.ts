@@ -1427,6 +1427,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is exposing sensitive fraud signals to customers. That can teach attackers.\n\nAnother mistake is giving analysts only a score. A score without reasons makes human review weak.\n\nA third mistake is forgetting audit needs. Months later, the company may need to reconstruct why a decision happened."
   },
   {
+    "id": "tpm-ai-feature-business-case-fintech",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you build a business case for an AI feature in fintech?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An AI business case explains why an AI feature is worth building, what value it creates, what risks it introduces, and how the team will know it worked.\n\nThe beginner mistake is saying \"AI will make us faster.\" Faster at what? For whom? With what quality loss? At what model cost? With what compliance risk? A strong TPM makes the value measurable and the risk visible.\n\nThe mental model:\n\n```txt\nValue:\nWhat outcome improves?\n\nCost:\nWhat does it take to build and run?\n\nRisk:\nWhat can go wrong?\n\nEvidence:\nHow will we prove it?\n```\n\nAI should solve a specific product problem, not decorate the roadmap."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine proposing an AI support assistant for dispute questions.\n\nWeak business case:\n\n```txt\nIt will reduce support tickets.\n```\n\nStronger business case:\n\n```txt\nGoal:\nReduce repetitive dispute status contacts by 25%.\n\nGuardrails:\nNo increase in complaint rate, incorrect guidance, or escalations missed.\n\nCost:\nModel cost per resolved contact under target.\n\nEvidence:\nPilot with human review and eval set before full launch.\n```\n\nNow leadership can judge the tradeoff."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an AI business case artifact:\n\n```txt\nFeature:\nAI dispute support assistant\n\nUser problem:\nCustomers do not understand dispute status and next steps.\n\nBusiness value:\nReduce repetitive support contacts and improve response speed.\n\nSuccess metrics:\n- Contact deflection with satisfaction maintained\n- Correct answer rate\n- Escalation accuracy\n- Cost per resolved issue\n- Complaint rate\n\nRisks:\n- Wrong regulated guidance\n- Hallucinated policy\n- Privacy leakage\n- Missed escalation\n\nLaunch evidence:\n- Eval set passed\n- Human review pilot\n- Cost model approved\n- Incident plan ready\n```\n\nThe business case should include reasons not to launch."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is ignoring operational cost. AI cost includes model calls, evaluation, review, monitoring, incident response, and content maintenance.\n\nAnother mistake is counting automation as success even when quality drops.\n\nA third mistake is not naming guardrails. Without guardrails, the team may optimize the wrong metric."
+      }
+    ],
+    "answer": "An AI business case explains why an AI feature is worth building, what value it creates, what risks it introduces, and how the team will know it worked.",
+    "reasoning": "Here is an AI business case artifact:\n\n```txt\nFeature:\nAI dispute support assistant\n\nUser problem:\nCustomers do not understand dispute status and next steps.\n\nBusiness value:\nReduce repetitive support contacts and improve response speed.\n\nSuccess metrics:\n- Contact deflection with satisfaction maintained\n- Correct answer rate\n- Escalation accuracy\n- Cost per resolved issue\n- Complaint rate\n\nRisks:\n- Wrong regulated guidance\n- Hallucinated policy\n- Privacy leakage\n- Missed escalation\n\nLaunch evidence:\n- Eval set passed\n- Human review pilot\n- Cost model approved\n- Incident plan ready\n```\n\nThe business case should include reasons not to launch.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What outcome should the AI improve?",
+      "What costs exist beyond development?",
+      "What risks are specific to fintech?",
+      "What guardrail metrics would block launch?",
+      "How would you prove the feature works before scaling?"
+    ],
+    "interviewAnswer": "I would build the business case around a specific user problem, measurable value, model and operations cost, risk, guardrails, launch evidence, and stop conditions. For fintech AI, I would include quality, complaints, escalation accuracy, privacy, compliance, and incident readiness.\n\nA strong answer shows that AI must earn its place in the product.",
+    "sourceLinks": [
+      {
+        "label": "Microsoft Responsible AI principles",
+        "url": "https://www.microsoft.com/en-us/ai/principles-and-approach/"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "An AI business case explains why an AI feature is worth building, what value it creates, what risks it introduces, and how the team will know it worked.\n\nThe beginner mistake is saying \"AI will make us faster.\" Faster at what? For whom? With what quality loss? At what model cost? With what compliance risk? A strong TPM makes the value measurable and the risk visible.\n\nThe mental model:\n\n```txt\nValue:\nWhat outcome improves?\n\nCost:\nWhat does it take to build and run?\n\nRisk:\nWhat can go wrong?\n\nEvidence:\nHow will we prove it?\n```\n\nAI should solve a specific product problem, not decorate the roadmap.",
+    "example": "Imagine proposing an AI support assistant for dispute questions.\n\nWeak business case:\n\n```txt\nIt will reduce support tickets.\n```\n\nStronger business case:\n\n```txt\nGoal:\nReduce repetitive dispute status contacts by 25%.\n\nGuardrails:\nNo increase in complaint rate, incorrect guidance, or escalations missed.\n\nCost:\nModel cost per resolved contact under target.\n\nEvidence:\nPilot with human review and eval set before full launch.\n```\n\nNow leadership can judge the tradeoff.",
+    "commonMistakes": "A common mistake is ignoring operational cost. AI cost includes model calls, evaluation, review, monitoring, incident response, and content maintenance.\n\nAnother mistake is counting automation as success even when quality drops.\n\nA third mistake is not naming guardrails. Without guardrails, the team may optimize the wrong metric."
+  },
+  {
     "id": "tpm-ai-fraud-detection",
     "track": "TPM",
     "category": "AI & Risk",
@@ -2897,6 +2946,104 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is hiding fees inside totals. Users notice later and lose trust.\n\nAnother mistake is not explaining fee changes. If the fee can change because amount, method, or corridor changes, the UI should update clearly.\n\nA third mistake is having receipts that do not match checkout. That creates support pain."
   },
   {
+    "id": "tpm-fintech-kill-switch-risk-controls",
+    "track": "TPM",
+    "category": "Observability & Operations",
+    "level": "Advanced",
+    "question": "How would you design kill switches for high-risk fintech features?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A kill switch is a control that lets the company quickly pause or limit a feature when continuing would create harm.\n\nThe beginner mistake is thinking kill switches are only engineering toggles. In fintech, a kill switch is a product safety tool. It needs owners, triggers, customer states, rollback behavior, support scripts, monitoring, and audit logs.\n\nThe mental model:\n\n```txt\nDetect:\nA metric or incident shows danger.\n\nDisable or limit:\nStop the risky action without breaking everything.\n\nRecover:\nExplain state, fix root cause, and safely re-enable.\n```\n\nThe TPM should define what happens to users already inside the flow."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI fraud rule starts blocking too many legitimate transfers.\n\nA weak kill switch disables all transfers. That may create more harm.\n\nA better design offers levels:\n\n```txt\nLevel 1:\nTurn off the new AI rule only.\n\nLevel 2:\nRoute high-risk transfers to manual review.\n\nLevel 3:\nPause new transfers in one corridor.\n\nLevel 4:\nPause all transfers if financial harm is severe.\n```\n\nGranularity matters."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a kill-switch artifact:\n\n```txt\nFeature:\nAI transfer risk decisioning\n\nKill switch levels:\n- Disable AI recommendation\n- Force human review\n- Block only high-risk corridor\n- Pause all outbound transfers\n\nTriggers:\n- False-positive rate above threshold\n- Fraud loss spike\n- Model unavailable\n- Partner outage\n- Severe customer complaint pattern\n\nRequirements:\n- Owner and backup owner\n- Audit log for switch changes\n- Customer-facing state\n- Support macro\n- Re-enable checklist\n- Post-incident review\n```\n\nThe switch should be tested before it is needed."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is making the switch too broad. Pausing an entire product for a narrow issue can hurt customers.\n\nAnother mistake is having no owner. During incidents, unclear authority wastes time.\n\nA third mistake is re-enabling without evidence that the failure is fixed."
+      }
+    ],
+    "answer": "A kill switch is a control that lets the company quickly pause or limit a feature when continuing would create harm.",
+    "reasoning": "Here is a kill-switch artifact:\n\n```txt\nFeature:\nAI transfer risk decisioning\n\nKill switch levels:\n- Disable AI recommendation\n- Force human review\n- Block only high-risk corridor\n- Pause all outbound transfers\n\nTriggers:\n- False-positive rate above threshold\n- Fraud loss spike\n- Model unavailable\n- Partner outage\n- Severe customer complaint pattern\n\nRequirements:\n- Owner and backup owner\n- Audit log for switch changes\n- Customer-facing state\n- Support macro\n- Re-enable checklist\n- Post-incident review\n```\n\nThe switch should be tested before it is needed.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a kill switch more than a feature flag?",
+      "What should happen to in-progress transactions?",
+      "Why are switch levels useful?",
+      "Who should be allowed to activate it?",
+      "What should be checked before re-enable?"
+    ],
+    "interviewAnswer": "I would design kill switches with scoped levels, trigger thresholds, owners, audit logs, customer states, support scripts, monitoring, rollback behavior, and re-enable criteria. For high-risk fintech or AI features, the switch should reduce harm without unnecessarily breaking safe workflows.\n\nA strong answer shows operational maturity under pressure.",
+    "sourceLinks": [
+      {
+        "label": "Atlassian: Incident communication",
+        "url": "https://www.atlassian.com/incident-management/incident-communication"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "A kill switch is a control that lets the company quickly pause or limit a feature when continuing would create harm.\n\nThe beginner mistake is thinking kill switches are only engineering toggles. In fintech, a kill switch is a product safety tool. It needs owners, triggers, customer states, rollback behavior, support scripts, monitoring, and audit logs.\n\nThe mental model:\n\n```txt\nDetect:\nA metric or incident shows danger.\n\nDisable or limit:\nStop the risky action without breaking everything.\n\nRecover:\nExplain state, fix root cause, and safely re-enable.\n```\n\nThe TPM should define what happens to users already inside the flow.",
+    "example": "Imagine an AI fraud rule starts blocking too many legitimate transfers.\n\nA weak kill switch disables all transfers. That may create more harm.\n\nA better design offers levels:\n\n```txt\nLevel 1:\nTurn off the new AI rule only.\n\nLevel 2:\nRoute high-risk transfers to manual review.\n\nLevel 3:\nPause new transfers in one corridor.\n\nLevel 4:\nPause all transfers if financial harm is severe.\n```\n\nGranularity matters.",
+    "commonMistakes": "A common mistake is making the switch too broad. Pausing an entire product for a narrow issue can hurt customers.\n\nAnother mistake is having no owner. During incidents, unclear authority wastes time.\n\nA third mistake is re-enabling without evidence that the failure is fixed."
+  },
+  {
+    "id": "tpm-fintech-metrics-risk-guardrails",
+    "track": "TPM",
+    "category": "Product Strategy",
+    "level": "Intermediate",
+    "question": "How would you define product metrics with financial risk guardrails?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Fintech product metrics should measure growth and user value, but they also need guardrails for financial harm.\n\nThe beginner mistake is optimizing only for conversion, volume, or automation. In fintech, a feature can grow while creating fraud loss, complaints, false declines, unfair outcomes, support burden, or compliance risk.\n\nThe mental model:\n\n```txt\nSuccess metric:\nWhat we want to improve.\n\nQuality metric:\nWhether the experience is working well.\n\nRisk guardrail:\nWhat must not get worse.\n```\n\nThe TPM should define all three before launch."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a new instant payout flow increases payout volume by 30%.\n\nThat sounds good, but the full picture may be:\n\n```txt\nPayout volume: up 30%\nFraud loss: up 80%\nSupport contacts: up 25%\nFailed payout complaints: up 15%\nFalse holds: unchanged\n```\n\nThe launch is not simply successful. It created risk that needs action."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a metrics artifact:\n\n```txt\nFeature:\nInstant payouts\n\nSuccess metrics:\n- Eligible users adopting instant payout\n- Payout completion rate\n- Time to funds\n- Repeat usage\n\nQuality metrics:\n- Failed payout rate\n- User-reported confusion\n- Support contact rate\n- Status page views\n\nRisk guardrails:\n- Fraud loss\n- Unauthorized claims\n- Complaint rate\n- Manual review backlog\n- False decline or false hold rate\n- Partner incident rate\n\nDecision rule:\nScale only if adoption improves and guardrails stay within agreed thresholds.\n```\n\nMetrics should tell the team when to grow, hold, or roll back."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is celebrating volume without checking harm. More money movement is not good if bad money movement grows faster.\n\nAnother mistake is adding guardrails after launch. By then, no one agrees what \"too risky\" means.\n\nA third mistake is using averages only. A small segment may be harmed even when overall metrics look fine."
+      }
+    ],
+    "answer": "Fintech product metrics should measure growth and user value, but they also need guardrails for financial harm.",
+    "reasoning": "Here is a metrics artifact:\n\n```txt\nFeature:\nInstant payouts\n\nSuccess metrics:\n- Eligible users adopting instant payout\n- Payout completion rate\n- Time to funds\n- Repeat usage\n\nQuality metrics:\n- Failed payout rate\n- User-reported confusion\n- Support contact rate\n- Status page views\n\nRisk guardrails:\n- Fraud loss\n- Unauthorized claims\n- Complaint rate\n- Manual review backlog\n- False decline or false hold rate\n- Partner incident rate\n\nDecision rule:\nScale only if adoption improves and guardrails stay within agreed thresholds.\n```\n\nMetrics should tell the team when to grow, hold, or roll back.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between success metrics and guardrails?",
+      "Why can growth be dangerous in fintech?",
+      "What guardrails would you use for instant payouts?",
+      "Why should thresholds be agreed before launch?",
+      "How could averages hide customer harm?"
+    ],
+    "interviewAnswer": "I would define fintech metrics with success metrics, quality metrics, and risk guardrails before launch. For money movement, I would track adoption, completion, time to funds, failed payments, support contacts, fraud loss, unauthorized claims, complaints, manual review backlog, false holds, and partner incidents.\n\nA strong answer shows that fintech growth must be constrained by customer and financial harm.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Consumer Complaint Program",
+        "url": "https://www.consumerfinance.gov/compliance/consumer-complaint-program/"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "Fintech product metrics should measure growth and user value, but they also need guardrails for financial harm.\n\nThe beginner mistake is optimizing only for conversion, volume, or automation. In fintech, a feature can grow while creating fraud loss, complaints, false declines, unfair outcomes, support burden, or compliance risk.\n\nThe mental model:\n\n```txt\nSuccess metric:\nWhat we want to improve.\n\nQuality metric:\nWhether the experience is working well.\n\nRisk guardrail:\nWhat must not get worse.\n```\n\nThe TPM should define all three before launch.",
+    "example": "Imagine a new instant payout flow increases payout volume by 30%.\n\nThat sounds good, but the full picture may be:\n\n```txt\nPayout volume: up 30%\nFraud loss: up 80%\nSupport contacts: up 25%\nFailed payout complaints: up 15%\nFalse holds: unchanged\n```\n\nThe launch is not simply successful. It created risk that needs action.",
+    "commonMistakes": "A common mistake is celebrating volume without checking harm. More money movement is not good if bad money movement grows faster.\n\nAnother mistake is adding guardrails after launch. By then, no one agrees what \"too risky\" means.\n\nA third mistake is using averages only. A small segment may be harmed even when overall metrics look fine."
+  },
+  {
     "id": "tpm-fraud-case-management-tooling",
     "track": "TPM",
     "category": "Fraud & Risk",
@@ -3581,6 +3728,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Model drift happens when a model's performance changes because the world around it changes. Fraud patterns change. Customer behavior changes. New corridors launch. Economic conditions shift. Attackers adapt.\n\nThe beginner mistake is thinking a model that performed well at launch will keep performing well. Risk systems need ongoing monitoring because the data and adversaries do not stay still.\n\nThere are two useful drift ideas:\n\n```txt\nData drift:\nInputs change. Example: more transactions now come from a new country.\n\nPerformance drift:\nOutcomes get worse. Example: false positives rise or fraud misses increase.\n```",
     "example": "Imagine an AI fraud model that worked well for US card payments. The company launches a new remittance corridor. Transaction sizes, names, devices, funding sources, and fraud behavior now look different.\n\nIf the model is not monitored, it may:\n\n```txt\nBlock too many legitimate users.\nMiss new fraud patterns.\nCreate analyst backlog.\nTreat normal corridor behavior as suspicious.\nOverfit to old fraud signals.\n```\n\nThe TPM should plan monitoring before expansion.",
     "commonMistakes": "A common mistake is monitoring only aggregate performance. Drift often appears in one segment first.\n\nAnother mistake is waiting for fraud losses before acting. Leading indicators like analyst overrides and false positives can warn earlier.\n\nA third mistake is not documenting model changes. If performance changes after retraining, the team needs traceability."
+  },
+  {
+    "id": "tpm-multi-currency-wallet-pricing",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you design pricing and balance behavior for a multi-currency wallet?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A multi-currency wallet lets users hold, convert, send, or receive money in more than one currency.\n\nThe beginner mistake is treating it like a normal wallet with labels changed. Multi-currency products need exchange rates, conversion fees, balance buckets, rounding rules, settlement timing, reversals, statements, and clear user expectations.\n\nThe mental model:\n\n```txt\nCurrency balance:\nHow much the user holds in each currency.\n\nConversion:\nMoving value from one currency to another.\n\nPricing:\nExchange rate, markup, fee, and final amount.\n```\n\nThe TPM should make the money math transparent."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user holds USD and wants to send EUR.\n\nThe product can:\n\n```txt\nConvert USD to EUR first, then send.\nSend using USD and convert at payout.\nAsk the user to fund EUR directly.\n```\n\nEach choice affects rate certainty, fees, balance display, refunds, and support."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a wallet pricing artifact:\n\n```txt\nWallet:\nUSD and EUR balances\n\nUser action:\nSend 100 EUR\n\nDisplay:\n- Source currency\n- Exchange rate\n- Conversion fee\n- Total debited\n- Recipient amount\n- Rate expiry\n- Refund currency behavior\n\nBalance rules:\n- Separate balances by currency\n- No hidden auto-conversion without confirmation\n- Rounding rule documented\n- Failed transaction returns to original currency when possible\n- Statement shows conversion and fee\n```\n\nThe user should know what currency is leaving and what currency is arriving."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is hiding FX markup inside the rate without clear explanation. Users may feel tricked.\n\nAnother mistake is not defining refund currency. If the exchange rate changes, refunds can become confusing.\n\nA third mistake is mixing balances visually. Users need to know which funds are available in which currency."
+      }
+    ],
+    "answer": "A multi-currency wallet lets users hold, convert, send, or receive money in more than one currency.",
+    "reasoning": "Here is a wallet pricing artifact:\n\n```txt\nWallet:\nUSD and EUR balances\n\nUser action:\nSend 100 EUR\n\nDisplay:\n- Source currency\n- Exchange rate\n- Conversion fee\n- Total debited\n- Recipient amount\n- Rate expiry\n- Refund currency behavior\n\nBalance rules:\n- Separate balances by currency\n- No hidden auto-conversion without confirmation\n- Rounding rule documented\n- Failed transaction returns to original currency when possible\n- Statement shows conversion and fee\n```\n\nThe user should know what currency is leaving and what currency is arriving.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a multi-currency wallet more complex than a single balance?",
+      "What should the user see before conversion?",
+      "Why does rate expiry matter?",
+      "What happens when a converted transfer is refunded?",
+      "How should statements show conversion fees?"
+    ],
+    "interviewAnswer": "I would design multi-currency wallet pricing with separate currency balances, explicit exchange rates, fees, rate expiry, rounding rules, total debited, recipient amount, refund behavior, statements, and support visibility. The user should understand the conversion before committing.\n\nA strong answer makes FX and balance behavior transparent.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Remittance transfers",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/deposit-accounts-resources/remittance-transfer-rule/"
+      },
+      {
+        "label": "Stripe: Multi-currency settlement",
+        "url": "https://docs.stripe.com/currencies/conversions"
+      }
+    ],
+    "beginnerExplanation": "A multi-currency wallet lets users hold, convert, send, or receive money in more than one currency.\n\nThe beginner mistake is treating it like a normal wallet with labels changed. Multi-currency products need exchange rates, conversion fees, balance buckets, rounding rules, settlement timing, reversals, statements, and clear user expectations.\n\nThe mental model:\n\n```txt\nCurrency balance:\nHow much the user holds in each currency.\n\nConversion:\nMoving value from one currency to another.\n\nPricing:\nExchange rate, markup, fee, and final amount.\n```\n\nThe TPM should make the money math transparent.",
+    "example": "Imagine a user holds USD and wants to send EUR.\n\nThe product can:\n\n```txt\nConvert USD to EUR first, then send.\nSend using USD and convert at payout.\nAsk the user to fund EUR directly.\n```\n\nEach choice affects rate certainty, fees, balance display, refunds, and support.",
+    "commonMistakes": "A common mistake is hiding FX markup inside the rate without clear explanation. Users may feel tricked.\n\nAnother mistake is not defining refund currency. If the exchange rate changes, refunds can become confusing.\n\nA third mistake is mixing balances visually. Users need to know which funds are available in which currency."
   },
   {
     "id": "tpm-negative-balance-recovery",
@@ -4365,6 +4561,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Prompts are product behavior. Changing a prompt can change what the AI says, refuses, summarizes, omits, escalates, or recommends.\n\nThe beginner mistake is treating prompt edits like copy tweaks. In production AI systems, prompt changes need versioning, testing, review, rollout, and rollback just like code or rules.\n\nThe mental model:\n\n```txt\nPrompt version:\nWhat instructions were active?\n\nEvaluation:\nDid the new version improve behavior without breaking important cases?\n\nRollout:\nWho sees the new version first?\n\nRollback:\nHow do we return to the previous version if quality drops?\n```",
     "example": "Imagine an AI support assistant that summarizes failed transfer cases. A PM changes the prompt to make summaries shorter. Now the summary sometimes omits the transfer ID or complaint language.\n\nThat is not a small writing issue. Support agents may miss escalation requirements.\n\nA safer system asks:\n\n```txt\nWhat changed?\nWhy did it change?\nWhich evals passed?\nWhich cases got worse?\nWho approved it?\nWhich users or agents see it first?\nCan we roll back quickly?\n```",
     "commonMistakes": "A common mistake is not knowing which prompt produced a bad output. Without version logs, debugging is guesswork.\n\nAnother mistake is evaluating only the changed happy path. Prompt edits can break unrelated cases.\n\nA third mistake is rolling out to everyone at once. Production prompts deserve controlled release."
+  },
+  {
+    "id": "tpm-real-time-payment-rail-selection",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you choose between payment rails for a real-time money movement product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Payment rail selection means choosing the network or method used to move money.\n\nThe beginner mistake is choosing the fastest rail by default. A real-time payment rail may be fast, but the product also needs coverage, limits, reversibility, fraud controls, cost, bank availability, operational support, and customer expectations. \"Fast\" is only one dimension.\n\nThe mental model:\n\n```txt\nSpeed:\nHow quickly money moves.\n\nFinality:\nCan the transaction be reversed?\n\nCoverage:\nCan the sender and receiver actually use the rail?\n\nRisk:\nWhat fraud, error, or support burden does the rail create?\n```\n\nThe TPM should select the rail based on the user job and risk, not hype."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a fintech wants instant payouts to consumers.\n\nPossible options:\n\n```txt\nACH:\nBroad coverage, lower cost, slower, return risk.\n\nReal-time payment rail:\nFast, often more final, coverage depends on participating banks, fraud decisions must be strong before send.\n\nCard push payout:\nFast for eligible cards, fees and limits vary, network rules matter.\n```\n\nThe best choice may be a routing strategy, not one rail forever."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a rail-selection artifact:\n\n```txt\nUse case:\nInstant consumer payout\n\nDecision dimensions:\n- Eligible banks/cards\n- Speed promise\n- Transaction limits\n- Cost per transaction\n- Reversibility\n- Fraud screening before send\n- Error handling\n- Support tooling\n- Reconciliation\n- Partner outages\n\nRouting policy:\n- Use instant rail when recipient is eligible and risk score is low\n- Use ACH when speed is less critical or instant rail is unavailable\n- Hold for review when fraud risk is high\n- Fall back only if customer promise still holds\n```\n\nThe product should not promise instant if the routing engine cannot reliably deliver it."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is ignoring finality. Fast irreversible payments require stronger pre-send controls.\n\nAnother mistake is hiding eligibility. Users need to know whether their bank or card can receive instant payouts.\n\nA third mistake is not designing fallback behavior. If a rail is unavailable, the product needs a clear next state."
+      }
+    ],
+    "answer": "Payment rail selection means choosing the network or method used to move money.",
+    "reasoning": "Here is a rail-selection artifact:\n\n```txt\nUse case:\nInstant consumer payout\n\nDecision dimensions:\n- Eligible banks/cards\n- Speed promise\n- Transaction limits\n- Cost per transaction\n- Reversibility\n- Fraud screening before send\n- Error handling\n- Support tooling\n- Reconciliation\n- Partner outages\n\nRouting policy:\n- Use instant rail when recipient is eligible and risk score is low\n- Use ACH when speed is less critical or instant rail is unavailable\n- Hold for review when fraud risk is high\n- Fall back only if customer promise still holds\n```\n\nThe product should not promise instant if the routing engine cannot reliably deliver it.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is fastest not always best?",
+      "What does payment finality change?",
+      "What makes coverage important?",
+      "When should routing hold for risk review?",
+      "How would you explain fallback to a user?"
+    ],
+    "interviewAnswer": "I would choose payment rails by comparing speed, coverage, limits, cost, finality, fraud controls, support burden, error handling, reconciliation, and partner reliability. For real-time products, I would often use routing rules: instant when eligible and low risk, slower rail when acceptable, and review when risk is high.\n\nA strong answer shows that rail selection is product strategy plus operational risk.",
+    "sourceLinks": [
+      {
+        "label": "Federal Reserve: FedNow Service",
+        "url": "https://www.frbservices.org/financial-services/fednow"
+      },
+      {
+        "label": "The Clearing House: RTP Network",
+        "url": "https://www.theclearinghouse.org/payment-systems/rtp"
+      }
+    ],
+    "beginnerExplanation": "Payment rail selection means choosing the network or method used to move money.\n\nThe beginner mistake is choosing the fastest rail by default. A real-time payment rail may be fast, but the product also needs coverage, limits, reversibility, fraud controls, cost, bank availability, operational support, and customer expectations. \"Fast\" is only one dimension.\n\nThe mental model:\n\n```txt\nSpeed:\nHow quickly money moves.\n\nFinality:\nCan the transaction be reversed?\n\nCoverage:\nCan the sender and receiver actually use the rail?\n\nRisk:\nWhat fraud, error, or support burden does the rail create?\n```\n\nThe TPM should select the rail based on the user job and risk, not hype.",
+    "example": "Imagine a fintech wants instant payouts to consumers.\n\nPossible options:\n\n```txt\nACH:\nBroad coverage, lower cost, slower, return risk.\n\nReal-time payment rail:\nFast, often more final, coverage depends on participating banks, fraud decisions must be strong before send.\n\nCard push payout:\nFast for eligible cards, fees and limits vary, network rules matter.\n```\n\nThe best choice may be a routing strategy, not one rail forever.",
+    "commonMistakes": "A common mistake is ignoring finality. Fast irreversible payments require stronger pre-send controls.\n\nAnother mistake is hiding eligibility. Users need to know whether their bank or card can receive instant payouts.\n\nA third mistake is not designing fallback behavior. If a rail is unavailable, the product needs a clear next state."
   },
   {
     "id": "tpm-regulatory-reporting-dashboard",

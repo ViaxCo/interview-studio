@@ -321,6 +321,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-feature-business-case-fintech",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you build a business case for an AI feature in fintech?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-fraud-detection",
     "track": "TPM",
     "category": "AI & Risk",
@@ -651,6 +662,28 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-fintech-kill-switch-risk-controls",
+    "track": "TPM",
+    "category": "Observability & Operations",
+    "level": "Advanced",
+    "question": "How would you design kill switches for high-risk fintech features?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-fintech-metrics-risk-guardrails",
+    "track": "TPM",
+    "category": "Product Strategy",
+    "level": "Intermediate",
+    "question": "How would you define product metrics with financial risk guardrails?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-fraud-case-management-tooling",
     "track": "TPM",
     "category": "Fraud & Risk",
@@ -799,6 +832,17 @@ export const questionSummaries: Question[] = [
     "category": "AI & Risk",
     "level": "Intermediate",
     "question": "How would you monitor model drift in an AI risk system?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-multi-currency-wallet-pricing",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you design pricing and balance behavior for a multi-currency wallet?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -975,6 +1019,17 @@ export const questionSummaries: Question[] = [
     "category": "AI Product",
     "level": "Intermediate",
     "question": "How would you manage prompt changes and versioning in a production AI feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-real-time-payment-rail-selection",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Advanced",
+    "question": "How would you choose between payment rails for a real-time money movement product?",
     "answer": "",
     "reasoning": "",
     "tests": "",
