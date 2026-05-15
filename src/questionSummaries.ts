@@ -189,6 +189,28 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-account-freeze-appeals",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "How would you design an account freeze and appeal experience?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ach-return-risk-monitoring",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you monitor ACH return risk?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-agent-tool-permissions",
     "track": "TPM",
     "category": "AI Agents",
@@ -354,11 +376,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-card-authorization-decline-controls",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design card authorization and decline controls?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-chargebacks-disputes",
     "track": "TPM",
     "category": "Payments & Remittance",
     "level": "Intermediate",
     "question": "How would you design a product workflow for chargebacks and payment disputes?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-complaints-risk-feedback-loop",
+    "track": "TPM",
+    "category": "Product Strategy",
+    "level": "Intermediate",
+    "question": "How would you use customer complaints to improve a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -398,6 +442,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-dispute-evidence-automation",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you automate dispute evidence collection?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-enterprise-permissions-auditability",
     "track": "TPM",
     "category": "Enterprise Product",
@@ -414,6 +469,17 @@ export const questionSummaries: Question[] = [
     "category": "Metrics & Experimentation",
     "level": "Intermediate",
     "question": "How would you design an experiment when the product area has compliance or user-risk constraints?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-fraud-case-management-tooling",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "What should a fraud case management tool include?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -651,6 +717,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-risk-queue-prioritization",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "How would you design a fraud risk review queue?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-roadmap-cross-functional-pressure",
     "track": "TPM",
     "category": "Roadmap & Prioritization",
@@ -667,6 +744,17 @@ export const questionSummaries: Question[] = [
     "category": "Compliance & Risk",
     "level": "Intermediate",
     "question": "How would you design sanctions screening while managing false positives?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-sar-investigation-workflow",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you support a suspicious activity investigation workflow?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -755,6 +843,28 @@ export const questionSummaries: Question[] = [
     "category": "Technical Strategy",
     "level": "Intermediate",
     "question": "How would you explain a technical tradeoff to non-technical stakeholders?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-transaction-limits-velocity-controls",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "How would you design transaction limits and velocity controls?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-unauthorized-transfer-reg-e-claims",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you handle unauthorized transfer claims in a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",

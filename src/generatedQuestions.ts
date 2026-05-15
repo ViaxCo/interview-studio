@@ -839,6 +839,104 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
   },
   {
+    "id": "tpm-account-freeze-appeals",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "How would you design an account freeze and appeal experience?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An account freeze is a restriction that prevents some or all account activity because the company sees risk.\n\nThe beginner mistake is thinking the product requirement is just \"block the account.\" In real life, freezing an account can stop a fraudster, but it can also trap a legitimate user away from their own money. That means the product needs clear states, careful permissions, safe customer messaging, and a path to resolve the issue.\n\nThe mental model:\n\n```txt\nRestriction:\nWhat the user cannot do right now.\n\nReason:\nWhy the restriction exists internally.\n\nResolution path:\nWhat evidence or action can remove it.\n```\n\nThe user does not need every internal fraud detail, but they do need enough information to know what is happening and how to move forward."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a customer tries to send money after suspicious login behavior. The system freezes outgoing transfers.\n\nA bad experience says:\n\n```txt\nYour account is locked. Contact support.\n```\n\nA better experience says:\n\n```txt\nWe paused transfers from your account while we review unusual activity.\nYou can still sign in and view your balance.\nTo help us review this faster, confirm your identity.\n```\n\nThe second message is calmer. It says what is restricted, what still works, and what the user can do."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a freeze and appeal artifact:\n\n```txt\nFreeze type:\nOutgoing transfer restriction\n\nUser can still:\n- Sign in\n- View balance\n- Download statements\n- Contact support\n\nUser cannot:\n- Send money\n- Add new recipients\n- Change security settings\n\nInternal reason:\nPossible account takeover\n\nResolution paths:\n- Step-up identity verification\n- Analyst review\n- Customer support callback\n- Compliance escalation if required\n\nAppeal requirements:\n- Clear status page\n- Evidence upload if needed\n- SLA by risk tier\n- Human review for account closure\n- Audit log for every restriction change\n```\n\nThe product should avoid turning risk controls into a dead end."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using one generic frozen state for every risk. A sanctions hold, account takeover hold, failed KYC hold, and compliance review are not the same product state.\n\nAnother mistake is giving support no visibility. If support cannot explain allowed next steps, the user gets bounced around.\n\nA third mistake is forgetting that restrictions can create harm. A false positive can affect rent, payroll, medical bills, or family support."
+      }
+    ],
+    "answer": "An account freeze is a restriction that prevents some or all account activity because the company sees risk.",
+    "reasoning": "Here is a freeze and appeal artifact:\n\n```txt\nFreeze type:\nOutgoing transfer restriction\n\nUser can still:\n- Sign in\n- View balance\n- Download statements\n- Contact support\n\nUser cannot:\n- Send money\n- Add new recipients\n- Change security settings\n\nInternal reason:\nPossible account takeover\n\nResolution paths:\n- Step-up identity verification\n- Analyst review\n- Customer support callback\n- Compliance escalation if required\n\nAppeal requirements:\n- Clear status page\n- Evidence upload if needed\n- SLA by risk tier\n- Human review for account closure\n- Audit log for every restriction change\n```\n\nThe product should avoid turning risk controls into a dead end.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What should the user know during a freeze?",
+      "What internal details should not be exposed?",
+      "Which account actions should remain available?",
+      "When should an appeal require human review?",
+      "What metrics would show freeze false positives are too high?"
+    ],
+    "interviewAnswer": "I would design account freezes as specific restriction states with clear user messaging, safe internal reason codes, support visibility, appeal paths, SLAs, and audit logs. The user should know what is restricted, what still works, and what they can do next, while sensitive fraud logic stays protected.\n\nA strong TPM answer balances fraud prevention with legitimate-user access and resolution.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Unauthorized transaction guidance",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-get-my-money-back-after-i-discover-an-unauthorized-transaction-or-money-missing-from-my-bank-account-en-1017/"
+      },
+      {
+        "label": "CFPB: Electronic Fund Transfers FAQs",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/deposit-accounts-resources/electronic-fund-transfers/electronic-fund-transfers-faqs/"
+      }
+    ],
+    "beginnerExplanation": "An account freeze is a restriction that prevents some or all account activity because the company sees risk.\n\nThe beginner mistake is thinking the product requirement is just \"block the account.\" In real life, freezing an account can stop a fraudster, but it can also trap a legitimate user away from their own money. That means the product needs clear states, careful permissions, safe customer messaging, and a path to resolve the issue.\n\nThe mental model:\n\n```txt\nRestriction:\nWhat the user cannot do right now.\n\nReason:\nWhy the restriction exists internally.\n\nResolution path:\nWhat evidence or action can remove it.\n```\n\nThe user does not need every internal fraud detail, but they do need enough information to know what is happening and how to move forward.",
+    "example": "Imagine a customer tries to send money after suspicious login behavior. The system freezes outgoing transfers.\n\nA bad experience says:\n\n```txt\nYour account is locked. Contact support.\n```\n\nA better experience says:\n\n```txt\nWe paused transfers from your account while we review unusual activity.\nYou can still sign in and view your balance.\nTo help us review this faster, confirm your identity.\n```\n\nThe second message is calmer. It says what is restricted, what still works, and what the user can do.",
+    "commonMistakes": "A common mistake is using one generic frozen state for every risk. A sanctions hold, account takeover hold, failed KYC hold, and compliance review are not the same product state.\n\nAnother mistake is giving support no visibility. If support cannot explain allowed next steps, the user gets bounced around.\n\nA third mistake is forgetting that restrictions can create harm. A false positive can affect rent, payroll, medical bills, or family support."
+  },
+  {
+    "id": "tpm-ach-return-risk-monitoring",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you monitor ACH return risk?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "ACH return risk is the risk that bank transfers come back unpaid, unauthorized, invalid, or otherwise rejected after you thought they were moving successfully.\n\nThe beginner mistake is treating ACH like instant card authorization. ACH has delayed outcomes. A debit can appear successful and then return later because of insufficient funds, invalid account details, revoked authorization, or an unauthorized claim.\n\nThe mental model:\n\n```txt\nSubmitted:\nWe sent the ACH entry.\n\nSettled-looking:\nMoney movement appears to be progressing.\n\nReturned:\nThe network or receiving bank sends back a reason code.\n```\n\nA TPM needs to design for delayed truth."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a lending app pulls repayment by ACH. On Monday, the debit is submitted. On Tuesday, the app gives the user more credit because the repayment appears successful. On Thursday, the debit returns unauthorized.\n\nNow the company has credit exposure and a risk signal.\n\nThe product should not only show \"payment failed.\" It should connect return behavior to risk controls.\n\n```txt\nReturn reason:\nUnauthorized\n\nProduct impact:\nPause future ACH debits, restrict credit increases, request updated payment authorization, review account.\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an ACH return monitoring artifact:\n\n```txt\nMetrics:\n- Overall return rate\n- Unauthorized return rate\n- Administrative return rate\n- Insufficient funds return rate\n- Return rate by originator\n- Return rate by product\n- Return rate by onboarding cohort\n\nControls:\n- Verify bank account before first debit\n- Delay risky benefits until return window passes\n- Cap first debit amount for new users\n- Stop retrying unauthorized returns\n- Alert when return thresholds trend upward\n\nCase triggers:\n- Multiple returns from same customer\n- Spike by partner or product\n- Unauthorized return after recent account change\n- Return after benefit already granted\n```\n\nACH product design should answer, \"What can the user do before the transfer is truly final?\""
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is granting irreversible value too early. If the ACH later returns, the business may lose money.\n\nAnother mistake is treating all return codes the same. Insufficient funds, invalid account, and unauthorized debit require different product responses.\n\nA third mistake is monitoring only total returns. Unauthorized returns may matter more than overall volume because they signal permission and compliance problems."
+      }
+    ],
+    "answer": "ACH return risk is the risk that bank transfers come back unpaid, unauthorized, invalid, or otherwise rejected after you thought they were moving successfully.",
+    "reasoning": "Here is an ACH return monitoring artifact:\n\n```txt\nMetrics:\n- Overall return rate\n- Unauthorized return rate\n- Administrative return rate\n- Insufficient funds return rate\n- Return rate by originator\n- Return rate by product\n- Return rate by onboarding cohort\n\nControls:\n- Verify bank account before first debit\n- Delay risky benefits until return window passes\n- Cap first debit amount for new users\n- Stop retrying unauthorized returns\n- Alert when return thresholds trend upward\n\nCase triggers:\n- Multiple returns from same customer\n- Spike by partner or product\n- Unauthorized return after recent account change\n- Return after benefit already granted\n```\n\nACH product design should answer, \"What can the user do before the transfer is truly final?\"",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is ACH different from instant card authorization?",
+      "What can go wrong if benefits are granted before return risk is known?",
+      "Why should return reason codes drive different actions?",
+      "What return metrics should a TPM monitor?",
+      "How would you reduce unauthorized return risk during onboarding?"
+    ],
+    "interviewAnswer": "I would monitor ACH return risk by tracking return rates by reason, product, cohort, originator, and time window. I would design controls for account verification, delayed benefit release, first-transaction caps, retry rules, unauthorized return handling, and alerts when thresholds worsen.\n\nA strong answer shows that ACH has delayed failure modes and that product behavior must account for them.",
+    "sourceLinks": [
+      {
+        "label": "Nacha: ACH Network Risk and Enforcement Topics",
+        "url": "https://www.nacha.org/rules/ach-network-risk-and-enforcement-topics"
+      },
+      {
+        "label": "Nacha: Unauthorized Entry Fee",
+        "url": "https://www.nacha.org/rules/improving-ach-network-quality-unauthorized-entry-fee"
+      }
+    ],
+    "beginnerExplanation": "ACH return risk is the risk that bank transfers come back unpaid, unauthorized, invalid, or otherwise rejected after you thought they were moving successfully.\n\nThe beginner mistake is treating ACH like instant card authorization. ACH has delayed outcomes. A debit can appear successful and then return later because of insufficient funds, invalid account details, revoked authorization, or an unauthorized claim.\n\nThe mental model:\n\n```txt\nSubmitted:\nWe sent the ACH entry.\n\nSettled-looking:\nMoney movement appears to be progressing.\n\nReturned:\nThe network or receiving bank sends back a reason code.\n```\n\nA TPM needs to design for delayed truth.",
+    "example": "Imagine a lending app pulls repayment by ACH. On Monday, the debit is submitted. On Tuesday, the app gives the user more credit because the repayment appears successful. On Thursday, the debit returns unauthorized.\n\nNow the company has credit exposure and a risk signal.\n\nThe product should not only show \"payment failed.\" It should connect return behavior to risk controls.\n\n```txt\nReturn reason:\nUnauthorized\n\nProduct impact:\nPause future ACH debits, restrict credit increases, request updated payment authorization, review account.\n```",
+    "commonMistakes": "A common mistake is granting irreversible value too early. If the ACH later returns, the business may lose money.\n\nAnother mistake is treating all return codes the same. Insufficient funds, invalid account, and unauthorized debit require different product responses.\n\nA third mistake is monitoring only total returns. Unauthorized returns may matter more than overall volume because they signal permission and compliance problems."
+  },
+  {
     "id": "tpm-ai-agent-tool-permissions",
     "track": "TPM",
     "category": "AI Agents",
@@ -1574,6 +1672,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is comparing vendor price to only initial build cost. The real comparison is total cost of ownership.\n\nAnother mistake is ignoring exit risk. If leaving a vendor later would be painful, that cost belongs in the decision.\n\nA third mistake is building a commodity capability because the team enjoys technical control. Product strategy should drive ownership, not engineering pride."
   },
   {
+    "id": "tpm-card-authorization-decline-controls",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you design card authorization and decline controls?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Card authorization is the moment a card transaction is approved or declined.\n\nThe beginner mistake is thinking a decline is just \"not enough money.\" Card transactions can be declined because the card is inactive, the balance is insufficient, spending controls block the merchant, the country is restricted, the amount is too high, the transaction looks risky, or the real-time authorization system does not respond in time.\n\nThe mental model:\n\n```txt\nAuthorization request:\nA merchant asks, \"Can this card spend this amount here?\"\n\nDecision:\nApprove, decline, or apply a control.\n\nUser experience:\nThe cardholder needs a clear enough reason and a path to fix it if possible.\n```\n\nFor a TPM, the hard part is turning a technical decision into a reliable product experience."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a company card can only be used for travel. A cardholder tries to buy electronics.\n\nThe system may decline because the merchant category is blocked.\n\nA bad app experience says:\n\n```txt\nTransaction declined.\n```\n\nA better experience says:\n\n```txt\nDeclined because this card is limited to travel purchases.\nAsk your admin to update the card controls if this purchase is required.\n```\n\nThat message reduces support confusion without exposing sensitive fraud systems."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an authorization control artifact:\n\n```txt\nCard product:\nEmployee expense card\n\nControls:\n- Allowed merchant categories: travel, lodging, meals\n- Blocked countries: configured by risk policy\n- Per-transaction limit: $1,000\n- Monthly limit: $5,000\n- Real-time webhook required for high-risk authorizations\n\nDecision reasons:\n- Insufficient balance\n- Card inactive\n- Merchant category blocked\n- Amount over limit\n- Country blocked\n- Suspected fraud\n- Authorization timed out\n\nUser-facing copy:\n- Specific for policy declines\n- Generic for sensitive fraud declines\n- Admin next step when applicable\n\nMetrics:\n- Approval rate\n- False decline rate\n- Decline reason mix\n- Webhook latency\n- Timeout fallback rate\n```\n\nThe product should help legitimate cardholders understand fixable declines."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is showing the same message for every decline. That drives support tickets and user frustration.\n\nAnother mistake is exposing fraud logic too directly. \"Declined because your IP looks suspicious\" may help attackers learn the system.\n\nA third mistake is ignoring timeout behavior. Real-time authorization systems need a defined fallback because card networks expect fast decisions."
+      }
+    ],
+    "answer": "Card authorization is the moment a card transaction is approved or declined.",
+    "reasoning": "Here is an authorization control artifact:\n\n```txt\nCard product:\nEmployee expense card\n\nControls:\n- Allowed merchant categories: travel, lodging, meals\n- Blocked countries: configured by risk policy\n- Per-transaction limit: $1,000\n- Monthly limit: $5,000\n- Real-time webhook required for high-risk authorizations\n\nDecision reasons:\n- Insufficient balance\n- Card inactive\n- Merchant category blocked\n- Amount over limit\n- Country blocked\n- Suspected fraud\n- Authorization timed out\n\nUser-facing copy:\n- Specific for policy declines\n- Generic for sensitive fraud declines\n- Admin next step when applicable\n\nMetrics:\n- Approval rate\n- False decline rate\n- Decline reason mix\n- Webhook latency\n- Timeout fallback rate\n```\n\nThe product should help legitimate cardholders understand fixable declines.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What are common reasons a card authorization can decline?",
+      "Which decline reasons can be shown clearly to the user?",
+      "Which reasons should stay generic for safety?",
+      "Why does webhook latency matter?",
+      "What metric would reveal too many legitimate users are being blocked?"
+    ],
+    "interviewAnswer": "I would design card authorization controls around balance, card status, merchant category, country, transaction amount, velocity, risk, and real-time decisioning. I would define decline reason codes, safe user-facing messages, admin actions, timeout behavior, audit logs, and metrics for approval rate, false declines, reason mix, and latency.\n\nA strong answer connects payment network timing with product clarity and fraud safety.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Issuing authorizations",
+        "url": "https://docs.stripe.com/issuing/purchases/authorizations?issuing-authorization-type=incremental_authorization"
+      },
+      {
+        "label": "Stripe Issuing spending controls",
+        "url": "https://docs.stripe.com/issuing/controls/spending-controls?locale=en-GB"
+      }
+    ],
+    "beginnerExplanation": "Card authorization is the moment a card transaction is approved or declined.\n\nThe beginner mistake is thinking a decline is just \"not enough money.\" Card transactions can be declined because the card is inactive, the balance is insufficient, spending controls block the merchant, the country is restricted, the amount is too high, the transaction looks risky, or the real-time authorization system does not respond in time.\n\nThe mental model:\n\n```txt\nAuthorization request:\nA merchant asks, \"Can this card spend this amount here?\"\n\nDecision:\nApprove, decline, or apply a control.\n\nUser experience:\nThe cardholder needs a clear enough reason and a path to fix it if possible.\n```\n\nFor a TPM, the hard part is turning a technical decision into a reliable product experience.",
+    "example": "Imagine a company card can only be used for travel. A cardholder tries to buy electronics.\n\nThe system may decline because the merchant category is blocked.\n\nA bad app experience says:\n\n```txt\nTransaction declined.\n```\n\nA better experience says:\n\n```txt\nDeclined because this card is limited to travel purchases.\nAsk your admin to update the card controls if this purchase is required.\n```\n\nThat message reduces support confusion without exposing sensitive fraud systems.",
+    "commonMistakes": "A common mistake is showing the same message for every decline. That drives support tickets and user frustration.\n\nAnother mistake is exposing fraud logic too directly. \"Declined because your IP looks suspicious\" may help attackers learn the system.\n\nA third mistake is ignoring timeout behavior. Real-time authorization systems need a defined fallback because card networks expect fast decisions."
+  },
+  {
     "id": "tpm-chargebacks-disputes",
     "track": "TPM",
     "category": "Payments & Remittance",
@@ -1621,6 +1768,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A dispute happens when a cardholder challenges a payment with their issuer. A chargeback is the money reversal that can happen through the dispute process.\n\nThe beginner mistake is thinking disputes are only a finance problem. Disputes affect risk, customer experience, merchant trust, support, evidence collection, product policy, and account health.\n\nThe product must answer:\n\n```txt\nWho is notified?\nWhat evidence is needed?\nWho decides whether to fight or accept?\nWhat deadlines apply?\nHow does the disputed amount affect balances?\nWhat happens if the dispute is won or lost?\n```",
     "example": "Imagine a marketplace seller receives a $500 order. Two weeks later, the buyer disputes the payment as unauthorized.\n\nThe product cannot simply show \"payment failed.\" The seller needs to know money is being held, what the reason is, what evidence is needed, and when a response is due.\n\nA weak workflow says:\n\n```txt\nSend dispute email. Let support handle it.\n```\n\nA stronger workflow has states:\n\n```txt\nDispute opened\n-> Evidence needed\n-> Evidence submitted\n-> Under review\n-> Won\nor\n-> Lost\nor\n-> Accepted\n```\n\nEach state needs UI, notifications, support visibility, ledger impact, and audit history.",
     "commonMistakes": "A common mistake is not collecting evidence before disputes happen. If logs and receipts are missing, the team cannot reconstruct the story later.\n\nAnother mistake is treating dispute response as purely manual. The product can pre-fill evidence and guide the user.\n\nA third mistake is hiding deadlines. Missing a response deadline can turn a possibly winnable dispute into a loss."
+  },
+  {
+    "id": "tpm-complaints-risk-feedback-loop",
+    "track": "TPM",
+    "category": "Product Strategy",
+    "level": "Intermediate",
+    "question": "How would you use customer complaints to improve a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Customer complaints are not just unhappy messages. In fintech, complaints can reveal product defects, confusing policies, unfair experiences, compliance risk, fraud patterns, partner failures, and support gaps.\n\nThe beginner mistake is counting complaints only as support volume. A TPM should treat complaints as product intelligence, especially when they involve money, access, credit, identity, disputes, fees, or account restrictions.\n\nThe mental model:\n\n```txt\nIndividual complaint:\nA user had a painful experience.\n\nComplaint pattern:\nMany users are hitting the same product or policy problem.\n\nProduct action:\nFix the workflow, copy, control, policy, partner issue, or operational process.\n```\n\nThe goal is not to make the complaint dashboard pretty. The goal is to learn where the product is hurting people."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine complaints about frozen accounts increase after a new fraud rule launches.\n\nIf the team only sees total complaint count, they might miss the connection. A better loop connects complaint tags to product changes.\n\n```txt\nProduct change:\nNew rule holds transfers from new devices.\n\nComplaint pattern:\nLegitimate travelers say transfers are blocked with unclear messaging.\n\nAction:\nAdd travel/device context, improve step-up verification, rewrite status copy, monitor false positives.\n```\n\nThe complaint is a signal that the risk control may be too blunt."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a complaint feedback artifact:\n\n```txt\nComplaint taxonomy:\n- Unauthorized transaction\n- Account frozen\n- Transfer delayed\n- Fee surprise\n- Verification failed\n- Dispute denied\n- Support unresponsive\n- Partner payout issue\n\nReview cadence:\n- Daily review for severe harm\n- Weekly trend review by product area\n- Monthly executive risk review\n\nRequired fields:\n- Product area\n- Customer harm\n- Root cause hypothesis\n- Money impact\n- Regulatory risk\n- Related product change\n- Owner\n- Fix status\n\nMetrics:\n- Complaint rate per active user\n- Complaint severity mix\n- Repeat complaint rate\n- Time to response\n- Time to product fix\n```\n\nComplaints should become roadmap input when they reveal repeated harm."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is treating complaints as anecdotal and therefore useless. One complaint may be anecdotal; a pattern is evidence.\n\nAnother mistake is optimizing for fast closure instead of real resolution. Closing tickets quickly does not fix a broken product flow.\n\nA third mistake is not linking complaints to releases. If complaints spike after a launch, the product team should know quickly."
+      }
+    ],
+    "answer": "Customer complaints are not just unhappy messages. In fintech, complaints can reveal product defects, confusing policies, unfair experiences, compliance risk, fraud patterns, partner failures, and support gaps.",
+    "reasoning": "Here is a complaint feedback artifact:\n\n```txt\nComplaint taxonomy:\n- Unauthorized transaction\n- Account frozen\n- Transfer delayed\n- Fee surprise\n- Verification failed\n- Dispute denied\n- Support unresponsive\n- Partner payout issue\n\nReview cadence:\n- Daily review for severe harm\n- Weekly trend review by product area\n- Monthly executive risk review\n\nRequired fields:\n- Product area\n- Customer harm\n- Root cause hypothesis\n- Money impact\n- Regulatory risk\n- Related product change\n- Owner\n- Fix status\n\nMetrics:\n- Complaint rate per active user\n- Complaint severity mix\n- Repeat complaint rate\n- Time to response\n- Time to product fix\n```\n\nComplaints should become roadmap input when they reveal repeated harm.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why are complaints more important in fintech than in many casual apps?",
+      "What complaint categories would you track?",
+      "How would you separate one-off frustration from a product pattern?",
+      "What does \"time to product fix\" measure?",
+      "How could complaints reveal a bad fraud rule?"
+    ],
+    "interviewAnswer": "I would use complaints as a feedback system by tagging them by product area, harm, severity, root cause, money impact, regulatory risk, related release, owner, and fix status. I would review severe issues daily, trends weekly, and recurring risks monthly, then feed patterns into product fixes, policy changes, support training, and monitoring.\n\nA strong answer shows that complaints are not just support noise; they are risk and product intelligence.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Consumer Complaint Program",
+        "url": "https://www.consumerfinance.gov/compliance/consumer-complaint-program/"
+      },
+      {
+        "label": "CFPB: Consumer Complaint Database",
+        "url": "https://www.consumerfinance.gov/data-research/consumer-complaints/"
+      }
+    ],
+    "beginnerExplanation": "Customer complaints are not just unhappy messages. In fintech, complaints can reveal product defects, confusing policies, unfair experiences, compliance risk, fraud patterns, partner failures, and support gaps.\n\nThe beginner mistake is counting complaints only as support volume. A TPM should treat complaints as product intelligence, especially when they involve money, access, credit, identity, disputes, fees, or account restrictions.\n\nThe mental model:\n\n```txt\nIndividual complaint:\nA user had a painful experience.\n\nComplaint pattern:\nMany users are hitting the same product or policy problem.\n\nProduct action:\nFix the workflow, copy, control, policy, partner issue, or operational process.\n```\n\nThe goal is not to make the complaint dashboard pretty. The goal is to learn where the product is hurting people.",
+    "example": "Imagine complaints about frozen accounts increase after a new fraud rule launches.\n\nIf the team only sees total complaint count, they might miss the connection. A better loop connects complaint tags to product changes.\n\n```txt\nProduct change:\nNew rule holds transfers from new devices.\n\nComplaint pattern:\nLegitimate travelers say transfers are blocked with unclear messaging.\n\nAction:\nAdd travel/device context, improve step-up verification, rewrite status copy, monitor false positives.\n```\n\nThe complaint is a signal that the risk control may be too blunt.",
+    "commonMistakes": "A common mistake is treating complaints as anecdotal and therefore useless. One complaint may be anecdotal; a pattern is evidence.\n\nAnother mistake is optimizing for fast closure instead of real resolution. Closing tickets quickly does not fix a broken product flow.\n\nA third mistake is not linking complaints to releases. If complaints spike after a launch, the product team should know quickly."
   },
   {
     "id": "tpm-compliance-ux",
@@ -1770,6 +1966,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is tracking dependencies as vague bullets. \"Need data team\" is not a manageable dependency.\n\nAnother mistake is assuming another team's roadmap commitment exists because someone said \"sounds good\" in a meeting.\n\nA third mistake is escalating too late. Escalation is not drama. It is making a risk visible while there is still time to change the plan."
   },
   {
+    "id": "tpm-dispute-evidence-automation",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you automate dispute evidence collection?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Dispute evidence is the proof a merchant or platform submits when a cardholder challenges a transaction.\n\nThe beginner mistake is thinking more evidence is always better. In disputes, evidence needs to match the reason for the dispute. Proof of delivery may help one case, while proof of cardholder authorization or prior usage may matter more in another.\n\nThe mental model:\n\n```txt\nDispute reason:\nWhat the cardholder claims.\n\nEvidence package:\nThe specific proof that responds to that claim.\n\nSubmission:\nThe formatted response sent before the deadline.\n```\n\nAutomation is useful because dispute windows are time-bound and evidence is usually scattered across payments, support, shipping, login, contract, and product systems."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a customer disputes a subscription payment as \"product not received.\"\n\nWeak automation gathers everything:\n\n```txt\nReceipt, logs, invoice, email screenshots, product usage, billing terms, support history\n```\n\nBetter automation asks what the reason code needs:\n\n```txt\nWas the product digital?\nDid the user log in after purchase?\nWere terms shown?\nWas cancellation requested?\nDid support offer help?\n```\n\nThe goal is not a large pile of screenshots. The goal is a clear story supported by relevant proof."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an evidence automation artifact:\n\n```txt\nDispute type:\nSubscription product not received\n\nEvidence sources:\n- Payment receipt\n- Invoice\n- Account login history\n- Product usage events\n- Terms accepted at checkout\n- Cancellation policy\n- Support messages\n- Refund history\n\nAutomation behavior:\n- Detect dispute reason\n- Pull matching evidence fields\n- Highlight missing evidence\n- Generate draft response\n- Route high-value disputes for human review\n- Submit low-risk standard cases if approved\n\nQuality checks:\n- Deadline visible\n- Evidence matches reason\n- Sensitive data redacted\n- Human approval recorded\n- Outcome tracked by reason category\n```\n\nThe TPM should also define when not to automate. A high-value dispute, a vulnerable customer complaint, or a legally sensitive case may need human review."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is automating submission before evidence quality is reliable. Bad automation can lose disputes faster.\n\nAnother mistake is ignoring reason codes. Generic evidence often fails because it does not answer the actual claim.\n\nA third mistake is forgetting privacy. Evidence packages can expose unnecessary personal or sensitive data if not redacted."
+      }
+    ],
+    "answer": "Dispute evidence is the proof a merchant or platform submits when a cardholder challenges a transaction.",
+    "reasoning": "Here is an evidence automation artifact:\n\n```txt\nDispute type:\nSubscription product not received\n\nEvidence sources:\n- Payment receipt\n- Invoice\n- Account login history\n- Product usage events\n- Terms accepted at checkout\n- Cancellation policy\n- Support messages\n- Refund history\n\nAutomation behavior:\n- Detect dispute reason\n- Pull matching evidence fields\n- Highlight missing evidence\n- Generate draft response\n- Route high-value disputes for human review\n- Submit low-risk standard cases if approved\n\nQuality checks:\n- Deadline visible\n- Evidence matches reason\n- Sensitive data redacted\n- Human approval recorded\n- Outcome tracked by reason category\n```\n\nThe TPM should also define when not to automate. A high-value dispute, a vulnerable customer complaint, or a legally sensitive case may need human review.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is dispute reason more important than evidence volume?",
+      "What systems might hold useful evidence?",
+      "Which disputes should require human review?",
+      "What quality checks should run before submission?",
+      "How would you measure whether automation is helping?"
+    ],
+    "interviewAnswer": "I would automate dispute evidence by mapping dispute reasons to required evidence, pulling data from payment, product, support, contract, and fulfillment systems, generating a structured package, redacting sensitive data, showing deadlines, routing risky cases to humans, and tracking outcomes by reason category.\n\nA strong TPM answer treats automation as evidence quality and workflow design, not just document generation.",
+    "sourceLinks": [
+      {
+        "label": "Stripe disputes",
+        "url": "https://docs.stripe.com/disputes"
+      },
+      {
+        "label": "Visa dispute management guidelines",
+        "url": "https://usa.visa.com/content/dam/VCOM/global/support-legal/documents/merchants-dispute-management-guidelines.pdf"
+      }
+    ],
+    "beginnerExplanation": "Dispute evidence is the proof a merchant or platform submits when a cardholder challenges a transaction.\n\nThe beginner mistake is thinking more evidence is always better. In disputes, evidence needs to match the reason for the dispute. Proof of delivery may help one case, while proof of cardholder authorization or prior usage may matter more in another.\n\nThe mental model:\n\n```txt\nDispute reason:\nWhat the cardholder claims.\n\nEvidence package:\nThe specific proof that responds to that claim.\n\nSubmission:\nThe formatted response sent before the deadline.\n```\n\nAutomation is useful because dispute windows are time-bound and evidence is usually scattered across payments, support, shipping, login, contract, and product systems.",
+    "example": "Imagine a customer disputes a subscription payment as \"product not received.\"\n\nWeak automation gathers everything:\n\n```txt\nReceipt, logs, invoice, email screenshots, product usage, billing terms, support history\n```\n\nBetter automation asks what the reason code needs:\n\n```txt\nWas the product digital?\nDid the user log in after purchase?\nWere terms shown?\nWas cancellation requested?\nDid support offer help?\n```\n\nThe goal is not a large pile of screenshots. The goal is a clear story supported by relevant proof.",
+    "commonMistakes": "A common mistake is automating submission before evidence quality is reliable. Bad automation can lose disputes faster.\n\nAnother mistake is ignoring reason codes. Generic evidence often fails because it does not answer the actual claim.\n\nA third mistake is forgetting privacy. Evidence packages can expose unnecessary personal or sensitive data if not redacted."
+  },
+  {
     "id": "tpm-enterprise-permissions-auditability",
     "track": "TPM",
     "category": "Enterprise Product",
@@ -1866,6 +2111,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "An experiment is a way to learn whether a change improves an outcome. In many product areas, you can run an A/B test. But not every product decision should be tested by casually exposing users to risk.\n\nThe beginner mistake is thinking \"experiment\" always means \"ship two versions and see which wins.\" In regulated, financial, health, safety, privacy, or trust-sensitive products, some experiments can harm users, create unfair treatment, or violate policy.\n\nThe TPM still needs learning, but the learning method must match the risk.\n\nThe mental model is:\n\n```txt\nLow-risk change:\nUse normal A/B test if measurement is clean.\n\nMedium-risk change:\nUse limited rollout, guardrails, and monitoring.\n\nHigh-risk change:\nUse research, simulation, backtesting, expert review, or staged release before live exposure.\n```",
     "example": "Imagine a remittance app wants to reduce identity-verification drop-off.\n\nThe growth idea is: \"Ask fewer questions upfront.\"\n\nThat might improve conversion. But it may also allow risky users to move further into the product before required checks happen.\n\nA weak experiment plan says:\n\n```txt\nVariant A: current onboarding\nVariant B: shorter onboarding\nPrimary metric: signup completion\nShip to 50 percent of users\n```\n\nThat ignores compliance and risk.\n\nA stronger experiment plan says:\n\n```txt\nHypothesis:\nMoving low-risk profile questions later will improve signup completion without increasing risky account progression.\n\nEligible users:\nOnly users in low-risk corridors and low transaction limits.\n\nPrimary metric:\nVerified signup completion.\n\nGuardrail metrics:\n- Manual review rate\n- Suspicious activity flags\n- Failed verification rate\n- Support contacts about missing information\n- Time to compliance decision\n\nRollout:\n5 percent for 48 hours, then 20 percent if guardrails stay healthy.\n\nStop condition:\nPause if manual review rate or suspicious flags exceed threshold.\n```\n\nNow the experiment has a learning goal and a safety model.",
     "commonMistakes": "A common mistake is optimizing the primary metric while ignoring harm. More signups are not useful if the product creates more fraud, support burden, or compliance exposure.\n\nAnother mistake is using an experiment where research would answer the question faster and more safely.\n\nA third mistake is failing to define stop conditions. If the team has no pause rule, it may argue while users are already being affected."
+  },
+  {
+    "id": "tpm-fraud-case-management-tooling",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "What should a fraud case management tool include?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Fraud case management is the system analysts use after something looks suspicious enough to investigate.\n\nThe beginner mistake is treating it like a notes app. A real case tool needs evidence, timelines, decisions, permissions, audit logs, and handoffs. In fintech, a fraud case may affect money movement, account access, regulatory reporting, customer support, and legal exposure.\n\nThe mental model:\n\n```txt\nAlert:\nSomething may be wrong.\n\nCase:\nAn investigation with evidence, owner, decision, and record.\n```\n\nA TPM should design the case tool so an analyst can understand what happened, decide what to do, and prove later why the decision was reasonable."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine three alerts point to the same customer:\n\n```txt\n1. New device login\n2. Failed password reset attempts\n3. Transfer to a newly added recipient\n```\n\nIf each alert lives separately, the analyst may miss the pattern. A good case tool groups them into one investigation.\n\nThe case should show a timeline:\n\n```txt\n09:02 New device login\n09:05 Password changed\n09:08 Phone number changed\n09:12 New recipient added\n09:14 Transfer attempted\n09:15 Transfer held\n```\n\nNow the analyst sees behavior, not just isolated signals."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a case management artifact:\n\n```txt\nCase type:\nPossible account takeover\n\nCase fields:\n- Case ID\n- Customer ID\n- Current account restrictions\n- Triggering alerts\n- Timeline of events\n- Linked transactions\n- Device and IP summary\n- Customer contact history\n- Analyst notes\n- Decision reason\n- Required next action\n\nDecision options:\n- No fraud found\n- Request customer verification\n- Keep account restricted\n- Reverse or cancel transaction\n- Escalate to compliance\n- Recommend suspicious activity review\n\nAudit requirements:\n- Who viewed the case\n- Who changed status\n- What evidence was used\n- What decision was made\n- When customer-facing action happened\n```\n\nThe tool should reduce context switching. Analysts should not need five dashboards to understand one case."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is letting analysts write free-form notes without structured decision reasons. That makes reporting and quality review painful.\n\nAnother mistake is allowing sensitive actions without audit logs. If someone freezes an account, releases funds, or closes a case, the company needs a durable record.\n\nA third mistake is ignoring duplicate cases. If the same customer appears in multiple queues, teams may make conflicting decisions."
+      }
+    ],
+    "answer": "Fraud case management is the system analysts use after something looks suspicious enough to investigate.",
+    "reasoning": "Here is a case management artifact:\n\n```txt\nCase type:\nPossible account takeover\n\nCase fields:\n- Case ID\n- Customer ID\n- Current account restrictions\n- Triggering alerts\n- Timeline of events\n- Linked transactions\n- Device and IP summary\n- Customer contact history\n- Analyst notes\n- Decision reason\n- Required next action\n\nDecision options:\n- No fraud found\n- Request customer verification\n- Keep account restricted\n- Reverse or cancel transaction\n- Escalate to compliance\n- Recommend suspicious activity review\n\nAudit requirements:\n- Who viewed the case\n- Who changed status\n- What evidence was used\n- What decision was made\n- When customer-facing action happened\n```\n\nThe tool should reduce context switching. Analysts should not need five dashboards to understand one case.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a case different from an alert?",
+      "What events belong in a fraud timeline?",
+      "Which actions should be audited?",
+      "How would you prevent duplicate investigations?",
+      "What should support be allowed to see without exposing sensitive investigation details?"
+    ],
+    "interviewAnswer": "A fraud case management tool should include linked alerts, customer and transaction context, event timeline, evidence, ownership, status, decision reasons, allowed actions, audit logs, escalation paths, and metrics for quality and throughput. It should help analysts make consistent decisions and preserve the record needed for review.\n\nA strong answer shows that fraud operations require workflow design, data design, permissions, and governance.",
+    "sourceLinks": [
+      {
+        "label": "FFIEC: Suspicious Activity Reporting",
+        "url": "https://bsaaml.ffiec.gov/manual/AssessingComplianceWithBSARegulatoryRequirements/04"
+      },
+      {
+        "label": "FDIC: Suspicious activity FAQ",
+        "url": "https://www.fdic.gov/news/financial-institution-letters/2025/frequently-asked-questions-regarding-suspicious-activity"
+      }
+    ],
+    "beginnerExplanation": "Fraud case management is the system analysts use after something looks suspicious enough to investigate.\n\nThe beginner mistake is treating it like a notes app. A real case tool needs evidence, timelines, decisions, permissions, audit logs, and handoffs. In fintech, a fraud case may affect money movement, account access, regulatory reporting, customer support, and legal exposure.\n\nThe mental model:\n\n```txt\nAlert:\nSomething may be wrong.\n\nCase:\nAn investigation with evidence, owner, decision, and record.\n```\n\nA TPM should design the case tool so an analyst can understand what happened, decide what to do, and prove later why the decision was reasonable.",
+    "example": "Imagine three alerts point to the same customer:\n\n```txt\n1. New device login\n2. Failed password reset attempts\n3. Transfer to a newly added recipient\n```\n\nIf each alert lives separately, the analyst may miss the pattern. A good case tool groups them into one investigation.\n\nThe case should show a timeline:\n\n```txt\n09:02 New device login\n09:05 Password changed\n09:08 Phone number changed\n09:12 New recipient added\n09:14 Transfer attempted\n09:15 Transfer held\n```\n\nNow the analyst sees behavior, not just isolated signals.",
+    "commonMistakes": "A common mistake is letting analysts write free-form notes without structured decision reasons. That makes reporting and quality review painful.\n\nAnother mistake is allowing sensitive actions without audit logs. If someone freezes an account, releases funds, or closes a case, the company needs a durable record.\n\nA third mistake is ignoring duplicate cases. If the same customer appears in multiple queues, teams may make conflicting decisions."
   },
   {
     "id": "tpm-fraud-compliance-tradeoffs",
@@ -2897,6 +3191,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is treating readiness as a meeting where everyone gives vague approval. Readiness should be evidence-based.\n\nAnother mistake is forgetting rollback. Some features are easy to turn off. Others involve migrations, customer states, partner calls, or money movement. Rollback must be designed before launch.\n\nA third mistake is not defining success until after launch. If you do not know what healthy looks like, you will not know whether launch is going well."
   },
   {
+    "id": "tpm-risk-queue-prioritization",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "How would you design a fraud risk review queue?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A fraud risk queue is the workbench where risky transactions, accounts, or customers go when automation should not make the final decision alone.\n\nThe beginner mistake is thinking the queue is just a list of alerts. A useful queue is not only a list. It decides what gets reviewed first, what information reviewers need, what actions they can take, and how the team learns from mistakes.\n\nThink about it like triage in a busy operations team:\n\n```txt\nLow risk:\nLet it pass or monitor.\n\nMedium risk:\nSend to review if the signal is unusual.\n\nHigh risk:\nHold, restrict, or escalate before money moves.\n```\n\nThe TPM's job is to protect users and the business without creating a queue so noisy that reviewers drown in low-quality alerts."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a fintech app that sees possible account takeover. A user logs in from a new device, changes their phone number, adds a new recipient, and tries to send $2,500 within ten minutes.\n\nThe product should not simply say \"fraud score is high.\" It needs a queue item that explains why the case matters.\n\n```txt\nRisk reason:\nNew device + profile change + new recipient + high-value transfer\n\nCustomer impact:\nTransfer held for review\n\nReviewer goal:\nDecide whether to release, request step-up verification, keep hold, or escalate\n```\n\nThat is much more actionable than an anonymous alert with a score."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a queue design artifact:\n\n```txt\nQueue item:\nSuspicious transfer review\n\nPriority:\nP0 if money leaves in under 15 minutes\nP1 if transfer is held before settlement\nP2 if only monitoring is needed\n\nReviewer sees:\n- Customer identity and tenure\n- Recent login/device changes\n- Transaction amount and destination\n- Past failed attempts\n- Model score and rule triggers\n- Similar previous cases\n- Allowed actions\n\nAllowed actions:\n- Release\n- Request verification\n- Hold temporarily\n- Freeze account\n- Escalate to compliance\n\nQuality metrics:\n- False-positive rate\n- Fraud loss avoided\n- Average review time\n- Oldest unreviewed P0 case\n- Appeal/reversal rate\n```\n\nThe queue should help reviewers make consistent decisions, not force them to improvise under pressure."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is prioritizing by alert time only. A low-risk alert from five hours ago may matter less than a high-risk transfer that settles in fifteen minutes.\n\nAnother mistake is hiding the reason for the alert. If reviewers cannot see why something was flagged, they cannot build trust or correct bad rules.\n\nA third mistake is measuring only queue volume. A smaller queue with better precision may be healthier than a big queue that looks productive but wastes reviewer time."
+      }
+    ],
+    "answer": "A fraud risk queue is the workbench where risky transactions, accounts, or customers go when automation should not make the final decision alone.",
+    "reasoning": "Here is a queue design artifact:\n\n```txt\nQueue item:\nSuspicious transfer review\n\nPriority:\nP0 if money leaves in under 15 minutes\nP1 if transfer is held before settlement\nP2 if only monitoring is needed\n\nReviewer sees:\n- Customer identity and tenure\n- Recent login/device changes\n- Transaction amount and destination\n- Past failed attempts\n- Model score and rule triggers\n- Similar previous cases\n- Allowed actions\n\nAllowed actions:\n- Release\n- Request verification\n- Hold temporarily\n- Freeze account\n- Escalate to compliance\n\nQuality metrics:\n- False-positive rate\n- Fraud loss avoided\n- Average review time\n- Oldest unreviewed P0 case\n- Appeal/reversal rate\n```\n\nThe queue should help reviewers make consistent decisions, not force them to improvise under pressure.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What makes a risk queue different from a normal task list?",
+      "Why does settlement timing affect queue priority?",
+      "What information should a reviewer see before making a decision?",
+      "What actions should require a second approval?",
+      "How would you know the queue is creating too many false positives?"
+    ],
+    "interviewAnswer": "I would design a fraud risk queue around priority, evidence, actionability, and feedback. The queue should rank cases by customer harm, money movement timing, risk severity, and operational SLA. Reviewers need clear risk reasons, relevant context, allowed actions, audit logs, and metrics for false positives, review time, fraud prevented, and escalations.\n\nA strong TPM answer shows that a queue is an operating system for decisions, not just a backlog of alerts.",
+    "sourceLinks": [
+      {
+        "label": "FFIEC: Suspicious Activity Reporting",
+        "url": "https://bsaaml.ffiec.gov/manual/AssessingComplianceWithBSARegulatoryRequirements/04"
+      },
+      {
+        "label": "Stripe Radar rules",
+        "url": "https://docs.stripe.com/radar/rules?locale=en-GB"
+      }
+    ],
+    "beginnerExplanation": "A fraud risk queue is the workbench where risky transactions, accounts, or customers go when automation should not make the final decision alone.\n\nThe beginner mistake is thinking the queue is just a list of alerts. A useful queue is not only a list. It decides what gets reviewed first, what information reviewers need, what actions they can take, and how the team learns from mistakes.\n\nThink about it like triage in a busy operations team:\n\n```txt\nLow risk:\nLet it pass or monitor.\n\nMedium risk:\nSend to review if the signal is unusual.\n\nHigh risk:\nHold, restrict, or escalate before money moves.\n```\n\nThe TPM's job is to protect users and the business without creating a queue so noisy that reviewers drown in low-quality alerts.",
+    "example": "Imagine a fintech app that sees possible account takeover. A user logs in from a new device, changes their phone number, adds a new recipient, and tries to send $2,500 within ten minutes.\n\nThe product should not simply say \"fraud score is high.\" It needs a queue item that explains why the case matters.\n\n```txt\nRisk reason:\nNew device + profile change + new recipient + high-value transfer\n\nCustomer impact:\nTransfer held for review\n\nReviewer goal:\nDecide whether to release, request step-up verification, keep hold, or escalate\n```\n\nThat is much more actionable than an anonymous alert with a score.",
+    "commonMistakes": "A common mistake is prioritizing by alert time only. A low-risk alert from five hours ago may matter less than a high-risk transfer that settles in fifteen minutes.\n\nAnother mistake is hiding the reason for the alert. If reviewers cannot see why something was flagged, they cannot build trust or correct bad rules.\n\nA third mistake is measuring only queue volume. A smaller queue with better precision may be healthier than a big queue that looks productive but wastes reviewer time."
+  },
+  {
     "id": "tpm-roadmap-cross-functional-pressure",
     "track": "TPM",
     "category": "Roadmap & Prioritization",
@@ -2993,6 +3336,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Sanctions screening checks whether a person, business, country, wallet, vessel, or other party may match a sanctions list.\n\nThe beginner mistake is thinking screening is a simple yes/no name match. Names are messy. People share names. Names can be transliterated. Addresses may be incomplete. Businesses may have beneficial owners. A match may be a true hit or a false positive.\n\nThe product challenge is serious:\n\n```txt\nIf the system misses a true hit:\nThe company may violate sanctions obligations.\n\nIf the system blocks too many false positives:\nLegitimate users are harmed, support gets flooded, and conversion suffers.\n```",
     "example": "Imagine a user named \"Mohammed Ali\" signs up. The name may produce a potential match against a sanctions list, but that does not mean the user is sanctioned.\n\nA weak product blocks the user with vague copy:\n\n```txt\nYour account is banned.\n```\n\nA stronger product creates a review workflow:\n\n```txt\nPotential match found\n-> Account action limited\n-> Compliance review opened\n-> Additional identifiers compared\n-> Cleared, blocked, or escalated\n```\n\nThe system should compare more than name: date of birth, address, nationality, document ID, business ownership, and other identifiers where available and allowed.",
     "commonMistakes": "A common mistake is auto-blocking every name match. That creates unnecessary user harm and operational noise.\n\nAnother mistake is permanently clearing a false positive without rescreening when lists or user details change.\n\nA third mistake is exposing sensitive screening logic in customer copy or support macros."
+  },
+  {
+    "id": "tpm-sar-investigation-workflow",
+    "track": "TPM",
+    "category": "Security & Compliance",
+    "level": "Advanced",
+    "question": "How would you support a suspicious activity investigation workflow?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A suspicious activity investigation workflow helps compliance teams investigate activity that may need regulatory reporting.\n\nThe beginner mistake is thinking the TPM should decide whether to file a suspicious activity report. That decision belongs to trained compliance teams. The TPM's job is to build the product and operations support: alerts, cases, evidence, controls, audit logs, confidentiality, and filing readiness.\n\nThe mental model:\n\n```txt\nDetection:\nSomething looks suspicious.\n\nInvestigation:\nCompliance reviews facts and context.\n\nDecision:\nFile, do not file, continue monitoring, or escalate.\n```\n\nThe workflow must be careful because suspicious activity reporting has confidentiality expectations. Customer-facing teams may need limited information."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a money transmitter sees repeated transfers just below a review threshold, sent to many recipients, then followed by fast withdrawals.\n\nThe system should not simply create a generic alert. It should create an investigation package:\n\n```txt\nPattern:\nPossible structuring or suspicious transfer pattern\n\nEvidence:\nTransaction timeline, counterparties, amounts, geographies, customer profile, prior alerts, notes\n\nControls:\nCompliance-only access, audit log, escalation owner\n```\n\nThe product should make facts easy to review without letting sensitive investigation details leak."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a suspicious activity workflow artifact:\n\n```txt\nWorkflow stages:\n1. Alert generated\n2. Case opened\n3. Analyst reviews evidence\n4. More information requested internally\n5. Compliance decision recorded\n6. Filing workflow triggered if needed\n7. Supporting documentation retained\n8. Monitoring plan updated\n\nCase data:\n- Customer identity profile\n- Transaction history\n- Counterparty network\n- Risk rules triggered\n- Analyst notes\n- Decision rationale\n- Filing deadline if applicable\n- Supporting documentation links\n\nPermissions:\n- Compliance can view full case\n- Support sees only safe customer-service status\n- Product sees aggregated trends\n- Every access is logged\n```\n\nThe product requirement is not \"add a SAR button.\" It is a controlled investigation workflow."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is exposing investigation notes to support or broad internal audiences. Sensitive compliance work needs strict permissions.\n\nAnother mistake is losing supporting documentation. If a case is reviewed later, the evidence and decision rationale need to be available.\n\nA third mistake is making alerts without feedback. If analysts cannot mark false positives or explain decisions, the monitoring system cannot improve."
+      }
+    ],
+    "answer": "A suspicious activity investigation workflow helps compliance teams investigate activity that may need regulatory reporting.",
+    "reasoning": "Here is a suspicious activity workflow artifact:\n\n```txt\nWorkflow stages:\n1. Alert generated\n2. Case opened\n3. Analyst reviews evidence\n4. More information requested internally\n5. Compliance decision recorded\n6. Filing workflow triggered if needed\n7. Supporting documentation retained\n8. Monitoring plan updated\n\nCase data:\n- Customer identity profile\n- Transaction history\n- Counterparty network\n- Risk rules triggered\n- Analyst notes\n- Decision rationale\n- Filing deadline if applicable\n- Supporting documentation links\n\nPermissions:\n- Compliance can view full case\n- Support sees only safe customer-service status\n- Product sees aggregated trends\n- Every access is logged\n```\n\nThe product requirement is not \"add a SAR button.\" It is a controlled investigation workflow.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the TPM's role versus compliance's role?",
+      "Why do permissions matter in suspicious activity workflows?",
+      "What evidence should an investigation case include?",
+      "Why should supporting documentation be retained?",
+      "How can analyst decisions improve future monitoring?"
+    ],
+    "interviewAnswer": "I would support suspicious activity investigations with alert intake, case management, evidence timelines, analyst notes, compliance decision states, filing readiness, retention, strict permissions, audit logs, and feedback loops into monitoring. I would not make filing decisions myself; I would design the workflow that lets compliance make and document them.\n\nA strong answer shows respect for regulated ownership and confidentiality.",
+    "sourceLinks": [
+      {
+        "label": "FDIC: Suspicious activity FAQ",
+        "url": "https://www.fdic.gov/news/financial-institution-letters/2025/frequently-asked-questions-regarding-suspicious-activity"
+      },
+      {
+        "label": "FFIEC: Suspicious Activity Reporting",
+        "url": "https://bsaaml.ffiec.gov/manual/AssessingComplianceWithBSARegulatoryRequirements/04"
+      }
+    ],
+    "beginnerExplanation": "A suspicious activity investigation workflow helps compliance teams investigate activity that may need regulatory reporting.\n\nThe beginner mistake is thinking the TPM should decide whether to file a suspicious activity report. That decision belongs to trained compliance teams. The TPM's job is to build the product and operations support: alerts, cases, evidence, controls, audit logs, confidentiality, and filing readiness.\n\nThe mental model:\n\n```txt\nDetection:\nSomething looks suspicious.\n\nInvestigation:\nCompliance reviews facts and context.\n\nDecision:\nFile, do not file, continue monitoring, or escalate.\n```\n\nThe workflow must be careful because suspicious activity reporting has confidentiality expectations. Customer-facing teams may need limited information.",
+    "example": "Imagine a money transmitter sees repeated transfers just below a review threshold, sent to many recipients, then followed by fast withdrawals.\n\nThe system should not simply create a generic alert. It should create an investigation package:\n\n```txt\nPattern:\nPossible structuring or suspicious transfer pattern\n\nEvidence:\nTransaction timeline, counterparties, amounts, geographies, customer profile, prior alerts, notes\n\nControls:\nCompliance-only access, audit log, escalation owner\n```\n\nThe product should make facts easy to review without letting sensitive investigation details leak.",
+    "commonMistakes": "A common mistake is exposing investigation notes to support or broad internal audiences. Sensitive compliance work needs strict permissions.\n\nAnother mistake is losing supporting documentation. If a case is reviewed later, the evidence and decision rationale need to be available.\n\nA third mistake is making alerts without feedback. If analysts cannot mark false positives or explain decisions, the monitoring system cannot improve."
   },
   {
     "id": "tpm-security-review-product-manager",
@@ -3385,6 +3777,104 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A technical tradeoff is a choice where improving one thing usually costs something else. Speed may cost reliability. Customization may cost simplicity. A cheaper vendor may cost flexibility. A faster launch may cost maintainability. Strong security may add friction.\n\nNon-technical stakeholders do not need every implementation detail, but they do need to understand the consequences of the decision.\n\nThe TPM's job is to translate technical options into user impact, business impact, risk, cost, timing, and reversibility.\n\nDo not say, \"Engineering wants to use Kafka instead of webhooks.\" That may be meaningful to engineers but not to everyone else.\n\nSay, \"Option A is faster to launch but may struggle when volume grows. Option B takes three extra weeks but gives us better reliability and easier partner onboarding later.\"",
     "example": "Imagine a team deciding whether to build a custom fraud rules engine or use a vendor.\n\nThe technical details may involve APIs, data models, latency, alerting, explainability, integrations, and long-term platform architecture. But the stakeholder decision might be:\n\n- Do we need to launch in six weeks?\n- How much fraud risk can we tolerate?\n- Do we need custom rules for our market?\n- What will compliance need to audit?\n- What happens if the vendor is wrong?\n- What is the cost now versus later?\n\nA clear tradeoff explanation compares options in plain language.\n\nOption 1: Use vendor rules first. Faster launch, lower engineering effort, proven baseline, but less customization and vendor dependency.\n\nOption 2: Build in-house. More control and flexibility, but slower launch, more engineering cost, and more operational responsibility.\n\nOption 3: Hybrid. Start with vendor baseline and build internal rule overrides for our highest-risk cases.\n\nNow stakeholders can decide based on strategy, not hidden technical preference.\n\nHere is a simple tradeoff memo:\n\n```txt\nDecision: Use vendor fraud rules for launch, then add internal rule overrides.\n\nContext:\nWe need fraud screening before launch. Building the full rules engine in-house would delay launch by six to eight weeks.\n\nOptions:\n1. Vendor only.\n2. Build fully in-house.\n3. Vendor baseline plus internal overrides for high-risk cases.\n\nRecommendation:\nChoose option 3.\n\nWhy:\nIt gets us to launch with a proven baseline while preserving control over our highest-risk cases.\n\nWhat we give up:\nWe accept vendor dependency and some limits in rule customization during the first launch.\n\nRisk:\nVendor decisions may be hard to explain to compliance or support.\n\nMitigation:\nLog vendor reason codes, build an admin review view, and create manual override rules for priority cases.\n\nRevisit trigger:\nIf manual overrides exceed 15% of flagged cases for two consecutive weeks, revisit the build-versus-buy decision.\n```\n\nThat memo is not just communication. It becomes a record of why the team chose one path and what would make them change their mind.",
     "commonMistakes": "A common mistake is overexplaining technical internals before explaining why the decision matters.\n\nAnother mistake is hiding the recommendation. TPMs should not only be note takers. They should synthesize and recommend, while being honest about tradeoffs.\n\nA third mistake is making the decision sound binary when there are staged options. Sometimes the best answer is a phased plan that learns quickly while limiting risk."
+  },
+  {
+    "id": "tpm-transaction-limits-velocity-controls",
+    "track": "TPM",
+    "category": "Fraud & Risk",
+    "level": "Intermediate",
+    "question": "How would you design transaction limits and velocity controls?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Transaction limits and velocity controls define how much activity is allowed within a time window.\n\nThe beginner mistake is thinking limits are only about maximum dollar amounts. Limits can also control number of attempts, new recipients, risky merchants, countries, device changes, failed logins, account age, funding method, or total exposure across a customer.\n\nThe mental model:\n\n```txt\nLimit:\nHow much is allowed.\n\nVelocity:\nHow quickly activity is happening.\n\nControl:\nWhat the system does when the line is crossed.\n```\n\nControls can approve, decline, hold, request verification, or send to review."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a new user creates an account and tries to send five transfers in ten minutes to five new recipients.\n\nThe total amount may not look huge, but the pattern is risky. A good system looks at both amount and behavior.\n\n```txt\nSingle transfer:\n$200\n\nFive transfers in ten minutes:\n$1,000 total, five new recipients, new account\n\nPossible action:\nAllow first low-risk transfer, hold the rest, request verification, or send to review.\n```\n\nThat is why velocity matters. Fraud often appears as speed and repetition before it appears as one large transaction."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a limits artifact:\n\n```txt\nControl:\nNew-account transfer velocity\n\nApplies to:\nAccounts less than 7 days old\n\nLimits:\n- Max $500 per transfer\n- Max $1,000 per 24 hours\n- Max 2 new recipients per 24 hours\n- Max 3 failed funding attempts per hour\n\nStep-up triggers:\n- New device plus new recipient\n- High-risk destination\n- Multiple failed attempts\n- Recipient previously associated with fraud\n\nActions:\n- Allow\n- Require verification\n- Hold for review\n- Decline\n\nMetrics:\n- Fraud loss\n- False declines\n- Manual review rate\n- Completion rate for legitimate users\n- Limit override requests\n```\n\nThe important product decision is not only where the limit sits. It is what happens when the user reaches it."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is setting hard limits without explaining the user path. A user who hits a limit needs a next step, not a confusing failure.\n\nAnother mistake is applying the same limit to every customer. Tenure, verification level, behavior, product type, and risk tier should matter.\n\nA third mistake is optimizing only for fraud loss. Overly strict limits can block good users and hurt activation."
+      }
+    ],
+    "answer": "Transaction limits and velocity controls define how much activity is allowed within a time window.",
+    "reasoning": "Here is a limits artifact:\n\n```txt\nControl:\nNew-account transfer velocity\n\nApplies to:\nAccounts less than 7 days old\n\nLimits:\n- Max $500 per transfer\n- Max $1,000 per 24 hours\n- Max 2 new recipients per 24 hours\n- Max 3 failed funding attempts per hour\n\nStep-up triggers:\n- New device plus new recipient\n- High-risk destination\n- Multiple failed attempts\n- Recipient previously associated with fraud\n\nActions:\n- Allow\n- Require verification\n- Hold for review\n- Decline\n\nMetrics:\n- Fraud loss\n- False declines\n- Manual review rate\n- Completion rate for legitimate users\n- Limit override requests\n```\n\nThe important product decision is not only where the limit sits. It is what happens when the user reaches it.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is the difference between amount limits and velocity controls?",
+      "Why are new recipients risky in money movement?",
+      "When should a limit trigger verification instead of decline?",
+      "What metrics reveal false positives?",
+      "How would limits change for a verified long-tenured customer?"
+    ],
+    "interviewAnswer": "I would design limits around amount, frequency, account age, recipient risk, device risk, funding method, and verification level. When a limit is reached, the product should choose the right action: allow, step up, hold, review, or decline. I would monitor fraud loss, false declines, review load, and legitimate completion rate.\n\nA strong answer shows that limits are product controls, not just backend constants.",
+    "sourceLinks": [
+      {
+        "label": "Stripe Radar rules",
+        "url": "https://docs.stripe.com/radar/rules?locale=en-GB"
+      },
+      {
+        "label": "Marqeta: Velocity controls",
+        "url": "https://www.marqeta.com/docs/core-api/velocity-controls"
+      }
+    ],
+    "beginnerExplanation": "Transaction limits and velocity controls define how much activity is allowed within a time window.\n\nThe beginner mistake is thinking limits are only about maximum dollar amounts. Limits can also control number of attempts, new recipients, risky merchants, countries, device changes, failed logins, account age, funding method, or total exposure across a customer.\n\nThe mental model:\n\n```txt\nLimit:\nHow much is allowed.\n\nVelocity:\nHow quickly activity is happening.\n\nControl:\nWhat the system does when the line is crossed.\n```\n\nControls can approve, decline, hold, request verification, or send to review.",
+    "example": "Imagine a new user creates an account and tries to send five transfers in ten minutes to five new recipients.\n\nThe total amount may not look huge, but the pattern is risky. A good system looks at both amount and behavior.\n\n```txt\nSingle transfer:\n$200\n\nFive transfers in ten minutes:\n$1,000 total, five new recipients, new account\n\nPossible action:\nAllow first low-risk transfer, hold the rest, request verification, or send to review.\n```\n\nThat is why velocity matters. Fraud often appears as speed and repetition before it appears as one large transaction.",
+    "commonMistakes": "A common mistake is setting hard limits without explaining the user path. A user who hits a limit needs a next step, not a confusing failure.\n\nAnother mistake is applying the same limit to every customer. Tenure, verification level, behavior, product type, and risk tier should matter.\n\nA third mistake is optimizing only for fraud loss. Overly strict limits can block good users and hurt activation."
+  },
+  {
+    "id": "tpm-unauthorized-transfer-reg-e-claims",
+    "track": "TPM",
+    "category": "Payments & Remittance",
+    "level": "Intermediate",
+    "question": "How would you handle unauthorized transfer claims in a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An unauthorized transfer claim happens when a customer says money moved without their permission.\n\nThe beginner mistake is treating it like an ordinary support ticket. In consumer fintech, unauthorized electronic fund transfers can trigger specific investigation, timing, communication, provisional credit, and recordkeeping obligations. The exact obligations depend on product, jurisdiction, partner bank, account type, and facts, so the TPM must work with legal and compliance.\n\nThe mental model:\n\n```txt\nCustomer report:\nThe user says the transfer was not authorized.\n\nInvestigation:\nThe company reviews evidence and timelines.\n\nOutcome:\nThe company corrects the error, denies with explanation, or continues under required rules.\n```\n\nThis is both a customer-trust workflow and a regulated operations workflow."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user says a $900 debit card transaction was not theirs.\n\nA weak product flow says:\n\n```txt\nSubmit a ticket. We will get back to you.\n```\n\nA stronger flow collects structured information:\n\n```txt\nWhich transaction are you reporting?\nDid you lose your card or phone?\nDo you recognize the merchant?\nDid anyone else have access?\nWhen did you notice it?\nCan we contact you for more information?\n```\n\nThe product should also show status so the user is not left guessing."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an unauthorized-transfer workflow artifact:\n\n```txt\nClaim intake:\n- Customer selects transaction\n- Customer states why it is unauthorized\n- Product captures report time\n- Product shows next steps and expected timing\n\nInvestigation view:\n- Transaction details\n- Device and login history\n- Card-present or card-not-present details\n- Prior customer activity with merchant\n- Support contact history\n- Linked fraud alerts\n\nCustomer states:\n- Received\n- Under review\n- Temporary credit issued if applicable\n- More information needed\n- Resolved in customer's favor\n- Denied with explanation\n\nControls:\n- Freeze card or account if needed\n- Block merchant or recipient if needed\n- Escalate suspected fraud pattern\n- Preserve evidence\n```\n\nThe user experience should be humane, but the workflow must be precise."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is asking the customer to explain everything in free text. Structured intake makes investigation faster and more consistent.\n\nAnother mistake is giving a denial without useful reasoning or access to next steps.\n\nA third mistake is failing to separate customer-facing status from internal investigation details. Users need clarity, but not sensitive fraud logic."
+      }
+    ],
+    "answer": "An unauthorized transfer claim happens when a customer says money moved without their permission.",
+    "reasoning": "Here is an unauthorized-transfer workflow artifact:\n\n```txt\nClaim intake:\n- Customer selects transaction\n- Customer states why it is unauthorized\n- Product captures report time\n- Product shows next steps and expected timing\n\nInvestigation view:\n- Transaction details\n- Device and login history\n- Card-present or card-not-present details\n- Prior customer activity with merchant\n- Support contact history\n- Linked fraud alerts\n\nCustomer states:\n- Received\n- Under review\n- Temporary credit issued if applicable\n- More information needed\n- Resolved in customer's favor\n- Denied with explanation\n\nControls:\n- Freeze card or account if needed\n- Block merchant or recipient if needed\n- Escalate suspected fraud pattern\n- Preserve evidence\n```\n\nThe user experience should be humane, but the workflow must be precise.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is an unauthorized transfer claim more than a normal support ticket?",
+      "What information should claim intake collect?",
+      "What should the user see while the investigation is active?",
+      "What internal evidence might an investigator review?",
+      "Why should legal and compliance be involved in requirements?"
+    ],
+    "interviewAnswer": "I would handle unauthorized transfer claims with structured intake, transaction selection, report timestamping, investigation workflow, customer status states, evidence review, required communications, provisional credit handling where applicable, and audit records. I would partner with legal, compliance, operations, support, and the sponsor bank because the workflow may be regulated.\n\nA strong answer shows that consumer harm, regulatory timing, and operational evidence all matter.",
+    "sourceLinks": [
+      {
+        "label": "CFPB: Unauthorized transaction guidance",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-get-my-money-back-after-i-discover-an-unauthorized-transaction-or-money-missing-from-my-bank-account-en-1017/"
+      },
+      {
+        "label": "CFPB: Electronic Fund Transfers FAQs",
+        "url": "https://www.consumerfinance.gov/compliance/compliance-resources/deposit-accounts-resources/electronic-fund-transfers/electronic-fund-transfers-faqs/"
+      }
+    ],
+    "beginnerExplanation": "An unauthorized transfer claim happens when a customer says money moved without their permission.\n\nThe beginner mistake is treating it like an ordinary support ticket. In consumer fintech, unauthorized electronic fund transfers can trigger specific investigation, timing, communication, provisional credit, and recordkeeping obligations. The exact obligations depend on product, jurisdiction, partner bank, account type, and facts, so the TPM must work with legal and compliance.\n\nThe mental model:\n\n```txt\nCustomer report:\nThe user says the transfer was not authorized.\n\nInvestigation:\nThe company reviews evidence and timelines.\n\nOutcome:\nThe company corrects the error, denies with explanation, or continues under required rules.\n```\n\nThis is both a customer-trust workflow and a regulated operations workflow.",
+    "example": "Imagine a user says a $900 debit card transaction was not theirs.\n\nA weak product flow says:\n\n```txt\nSubmit a ticket. We will get back to you.\n```\n\nA stronger flow collects structured information:\n\n```txt\nWhich transaction are you reporting?\nDid you lose your card or phone?\nDo you recognize the merchant?\nDid anyone else have access?\nWhen did you notice it?\nCan we contact you for more information?\n```\n\nThe product should also show status so the user is not left guessing.",
+    "commonMistakes": "A common mistake is asking the customer to explain everything in free text. Structured intake makes investigation faster and more consistent.\n\nAnother mistake is giving a denial without useful reasoning or access to next steps.\n\nA third mistake is failing to separate customer-facing status from internal investigation details. Users need clarity, but not sensitive fraud logic."
   },
   {
     "id": "tpm-usage-based-pricing-packaging",
