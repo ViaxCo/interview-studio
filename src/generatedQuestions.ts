@@ -839,6 +839,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is thinking XSS is only a backend problem. Frontend code decides how data is rendered, which URLs are trusted, and whether raw HTML is inserted.\n\nAnother mistake is trusting data because it came from your own API. If the API stored user input, partner data, CMS content, or imported data, it can still be untrusted.\n\nA third mistake is assuming React makes XSS impossible. React helps by escaping text by default, but unsafe HTML insertion, unsafe URLs, third-party scripts, and bad token handling can still create risk."
   },
   {
+    "id": "tpm-ai-agent-tool-permissions",
+    "track": "TPM",
+    "category": "AI Agents",
+    "level": "Intermediate",
+    "question": "How would you design permissions for an AI agent that can use tools?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "An AI agent with tools can do more than answer. It may search records, create tickets, send messages, issue refunds, change account settings, or trigger workflows.\n\nThe beginner mistake is giving the agent broad access because it makes the demo impressive. In production, tool access is power. The TPM must decide what the agent can do, when it needs approval, and how actions are logged.\n\nThe mental model:\n\n```txt\nRead:\nAgent can view information.\n\nSuggest:\nAgent can recommend an action.\n\nDraft:\nAgent can prepare an action for human approval.\n\nExecute:\nAgent can perform the action.\n```\n\nEach step carries more risk."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a support agent that helps with failed transfers.\n\nSafe tool use:\n\n```txt\nRead transfer status.\nSummarize case.\nDraft support reply.\nCreate internal ticket.\n```\n\nRisky tool use:\n\n```txt\nIssue refund.\nChange KYC status.\nOverride fraud hold.\nClose complaint.\nEdit recipient details.\n```\n\nThe product should not treat these equally."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a tool permission artifact:\n\n```txt\nAI agent:\nTransfer support assistant\n\nAllowed without approval:\n- Read transfer status\n- Read public help article\n- Draft response\n- Summarize case\n\nRequires human approval:\n- Send customer message\n- Create refund request\n- Escalate to compliance\n\nNever allowed:\n- Approve KYC\n- Remove fraud hold\n- Change payout recipient\n- Delete audit logs\n- File regulatory report\n\nControls:\n- Tool scopes\n- Confirmation screen\n- Reason required for high-impact actions\n- Audit log of tool call and user approval\n- Rate limits\n- Emergency disable switch\n```\n\nThe TPM should also design failure behavior:\n\n```txt\nIf tool call fails:\nTell the user the action was not completed.\n\nIf confidence is low:\nRoute to human.\n\nIf untrusted text instructs the agent to ignore policy:\nTreat it as user data, not an instruction.\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is relying on the prompt alone to control tool use. Permissions should be enforced by the system.\n\nAnother mistake is not separating draft from execute. Drafting is often useful and much safer.\n\nA third mistake is missing audit logs. If an agent changes state, the company needs to know exactly what happened."
+      }
+    ],
+    "answer": "An AI agent with tools can do more than answer. It may search records, create tickets, send messages, issue refunds, change account settings, or trigger workflows.",
+    "reasoning": "Here is a tool permission artifact:\n\n```txt\nAI agent:\nTransfer support assistant\n\nAllowed without approval:\n- Read transfer status\n- Read public help article\n- Draft response\n- Summarize case\n\nRequires human approval:\n- Send customer message\n- Create refund request\n- Escalate to compliance\n\nNever allowed:\n- Approve KYC\n- Remove fraud hold\n- Change payout recipient\n- Delete audit logs\n- File regulatory report\n\nControls:\n- Tool scopes\n- Confirmation screen\n- Reason required for high-impact actions\n- Audit log of tool call and user approval\n- Rate limits\n- Emergency disable switch\n```\n\nThe TPM should also design failure behavior:\n\n```txt\nIf tool call fails:\nTell the user the action was not completed.\n\nIf confidence is low:\nRoute to human.\n\nIf untrusted text instructs the agent to ignore policy:\nTreat it as user data, not an instruction.\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why are tool permissions important for AI agents?",
+      "What is the difference between read, suggest, draft, and execute?",
+      "Which fintech actions should require human approval?",
+      "Why should permissions be enforced outside the prompt?",
+      "What should an audit log capture?"
+    ],
+    "interviewAnswer": "I would design AI agent permissions by classifying tools by risk, limiting scopes, requiring human approval for consequential actions, forbidding sensitive actions, logging all tool calls, and adding failure handling and emergency disable controls.\n\nA strong TPM answer treats the agent like a powerful user with least-privilege access.",
+    "sourceLinks": [
+      {
+        "label": "OpenAI Docs: Safety in building agents",
+        "url": "https://platform.openai.com/docs/guides/agent-builder-safety"
+      },
+      {
+        "label": "OWASP: Top 10 for Large Language Model Applications",
+        "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+      }
+    ],
+    "beginnerExplanation": "An AI agent with tools can do more than answer. It may search records, create tickets, send messages, issue refunds, change account settings, or trigger workflows.\n\nThe beginner mistake is giving the agent broad access because it makes the demo impressive. In production, tool access is power. The TPM must decide what the agent can do, when it needs approval, and how actions are logged.\n\nThe mental model:\n\n```txt\nRead:\nAgent can view information.\n\nSuggest:\nAgent can recommend an action.\n\nDraft:\nAgent can prepare an action for human approval.\n\nExecute:\nAgent can perform the action.\n```\n\nEach step carries more risk.",
+    "example": "Imagine a support agent that helps with failed transfers.\n\nSafe tool use:\n\n```txt\nRead transfer status.\nSummarize case.\nDraft support reply.\nCreate internal ticket.\n```\n\nRisky tool use:\n\n```txt\nIssue refund.\nChange KYC status.\nOverride fraud hold.\nClose complaint.\nEdit recipient details.\n```\n\nThe product should not treat these equally.",
+    "commonMistakes": "A common mistake is relying on the prompt alone to control tool use. Permissions should be enforced by the system.\n\nAnother mistake is not separating draft from execute. Drafting is often useful and much safer.\n\nA third mistake is missing audit logs. If an agent changes state, the company needs to know exactly what happened."
+  },
+  {
     "id": "tpm-ai-credit-underwriting",
     "track": "TPM",
     "category": "AI & Fintech",
@@ -886,6 +935,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Credit underwriting decides whether a customer qualifies for credit, how much, and on what terms. AI-assisted underwriting uses models to support that decision.\n\nThe beginner mistake is treating underwriting AI like a normal recommendation model. Credit decisions are high-stakes. They affect people's access to money, business growth, housing, and financial opportunity. They also come with regulatory, fairness, explainability, and model-risk obligations.\n\nThe TPM must ask:\n\n```txt\nWhat decision does the model support?\nWhat data is used?\nCan we explain adverse outcomes?\nHow do we test fairness and performance?\nWho can override the model?\nHow do we monitor drift?\n```",
     "example": "Imagine a lender wants to use cash-flow data and machine learning to approve small-business loans.\n\nA weak product requirement says:\n\n```txt\nUse AI to approve loans faster.\n```\n\nA stronger requirement separates the system:\n\n```txt\nInputs:\nBank transactions, revenue trends, repayment history, business age, existing debt, fraud signals.\n\nModel output:\nRisk score and recommended limit.\n\nDecision:\nApprove, decline, request more info, or route to manual review.\n\nExplanation:\nSpecific principal reasons for adverse action.\n\nControls:\nFair lending review, model validation, override workflow, audit trail.\n```\n\nThe TPM should not let the product become a black box.",
     "commonMistakes": "A common mistake is optimizing approval speed without protecting decision quality.\n\nAnother mistake is ignoring explainability until legal review. If the team cannot explain declines, the product is not ready.\n\nA third mistake is not defining human oversight. Manual review and overrides need policy, permissions, and audit logs."
+  },
+  {
+    "id": "tpm-ai-data-privacy-retention",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Intermediate",
+    "question": "How would you handle data privacy and retention for an AI feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AI features often need data: prompts, documents, customer records, chat history, transaction details, support tickets, and model outputs. Privacy and retention decide what data is used, stored, shared, deleted, and audited.\n\nThe beginner mistake is thinking \"we do not train the model\" solves privacy. Even if training is disabled, the feature may still log prompts, store outputs, send data to vendors, or expose sensitive context to users or staff.\n\nThe TPM should ask:\n\n```txt\nWhat data goes into the AI system?\nWhy is each field needed?\nWhere is it stored?\nHow long is it kept?\nWho can see it?\nCan users request deletion?\nDoes a vendor process it?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI assistant summarizes support cases. The case may contain names, phone numbers, transfer IDs, document-review notes, fraud flags, and complaint language.\n\nThe product should not blindly send every field into the model. It should minimize.\n\n```txt\nNeed:\nTransfer status, public reason, customer question, safe support notes.\n\nDo not need:\nFull ID document number, internal fraud rule, analyst private note, unrelated account history.\n```\n\nPrivacy design shapes the data pipeline."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a privacy and retention artifact:\n\n```txt\nFeature:\nAI support case summarizer\n\nData used:\n- Customer message\n- Transfer status\n- Support-safe case notes\n- Public reason codes\n\nData excluded:\n- Full identity document number\n- Internal fraud rules\n- Sanctions match details\n- Raw payment credentials\n\nRetention:\n- Prompt and output logs kept for 30 days for quality review.\n- Audit metadata kept according to compliance policy.\n- Sensitive fields redacted before logging.\n\nAccess:\n- Support lead can review samples.\n- Product can review anonymized quality data.\n- Engineering can debug traces with masked data.\n\nVendor controls:\n- Confirm data processing terms.\n- Confirm training settings.\n- Confirm deletion/export process.\n```\n\nThe TPM should also define user-facing and internal policy language. People should know what the AI feature uses and what it does not do."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is sending all available context because it improves quality. More context can create more privacy risk.\n\nAnother mistake is logging raw prompts forever. AI logs can contain sensitive information.\n\nA third mistake is forgetting vendor data flow. If data leaves your system, contracts and controls matter."
+      }
+    ],
+    "answer": "AI features often need data: prompts, documents, customer records, chat history, transaction details, support tickets, and model outputs. Privacy and retention decide what data is used, stored, shared, deleted, and audited.",
+    "reasoning": "Here is a privacy and retention artifact:\n\n```txt\nFeature:\nAI support case summarizer\n\nData used:\n- Customer message\n- Transfer status\n- Support-safe case notes\n- Public reason codes\n\nData excluded:\n- Full identity document number\n- Internal fraud rules\n- Sanctions match details\n- Raw payment credentials\n\nRetention:\n- Prompt and output logs kept for 30 days for quality review.\n- Audit metadata kept according to compliance policy.\n- Sensitive fields redacted before logging.\n\nAccess:\n- Support lead can review samples.\n- Product can review anonymized quality data.\n- Engineering can debug traces with masked data.\n\nVendor controls:\n- Confirm data processing terms.\n- Confirm training settings.\n- Confirm deletion/export process.\n```\n\nThe TPM should also define user-facing and internal policy language. People should know what the AI feature uses and what it does not do.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is \"not used for training\" not the whole privacy story?",
+      "What does data minimization mean for AI?",
+      "Why do AI logs need retention rules?",
+      "Who should access AI traces?",
+      "What vendor controls matter?"
+    ],
+    "interviewAnswer": "I would handle AI privacy by mapping data inputs, minimizing sensitive fields, defining retention, redaction, access controls, vendor terms, deletion process, audit logs, and user-facing transparency.\n\nA strong TPM answer shows that AI privacy covers prompts, context, outputs, logs, vendors, and lifecycle.",
+    "sourceLinks": [
+      {
+        "label": "NIST: Privacy Framework",
+        "url": "https://www.nist.gov/privacy-framework"
+      },
+      {
+        "label": "ICO: Data protection by design and by default",
+        "url": "https://ico.org.uk/for-organisations/guide-to-data-protection/guide-to-the-general-data-protection-regulation-gdpr/accountability-and-governance/data-protection-by-design-and-default/"
+      }
+    ],
+    "beginnerExplanation": "AI features often need data: prompts, documents, customer records, chat history, transaction details, support tickets, and model outputs. Privacy and retention decide what data is used, stored, shared, deleted, and audited.\n\nThe beginner mistake is thinking \"we do not train the model\" solves privacy. Even if training is disabled, the feature may still log prompts, store outputs, send data to vendors, or expose sensitive context to users or staff.\n\nThe TPM should ask:\n\n```txt\nWhat data goes into the AI system?\nWhy is each field needed?\nWhere is it stored?\nHow long is it kept?\nWho can see it?\nCan users request deletion?\nDoes a vendor process it?\n```",
+    "example": "Imagine an AI assistant summarizes support cases. The case may contain names, phone numbers, transfer IDs, document-review notes, fraud flags, and complaint language.\n\nThe product should not blindly send every field into the model. It should minimize.\n\n```txt\nNeed:\nTransfer status, public reason, customer question, safe support notes.\n\nDo not need:\nFull ID document number, internal fraud rule, analyst private note, unrelated account history.\n```\n\nPrivacy design shapes the data pipeline.",
+    "commonMistakes": "A common mistake is sending all available context because it improves quality. More context can create more privacy risk.\n\nAnother mistake is logging raw prompts forever. AI logs can contain sensitive information.\n\nA third mistake is forgetting vendor data flow. If data leaves your system, contracts and controls matter."
   },
   {
     "id": "tpm-ai-fraud-detection",
@@ -937,6 +1035,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is optimizing only fraud loss. If false positives explode, the product harms good users.\n\nAnother mistake is launching without human review tooling. Fraud teams need explanations, queues, and decision recording.\n\nA third mistake is not monitoring model drift. Fraud patterns change as attackers adapt."
   },
   {
+    "id": "tpm-ai-governance-risk-tiering",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Intermediate",
+    "question": "How would you create a risk-tiering model for AI features?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AI risk tiering is a way to decide how much review, testing, monitoring, and control an AI feature needs before launch.\n\nThe beginner mistake is treating all AI features the same. An AI that rewrites marketing copy is not the same as an AI that recommends whether a customer gets credit, flags fraud, blocks an account, or drafts regulated support responses.\n\nThe mental model:\n\n```txt\nLow-risk AI:\nHelps with low-stakes productivity. Human can easily verify output.\n\nMedium-risk AI:\nInfluences user experience or business decisions, but humans can review before harm.\n\nHigh-risk AI:\nAffects money, access, eligibility, identity, compliance, safety, or legal outcomes.\n```\n\nThe TPM's job is to make the risk visible early so the team does not discover governance requirements after building the wrong product."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine three AI ideas:\n\n```txt\nIdea 1:\nSummarize internal meeting notes.\n\nIdea 2:\nDraft support replies about failed transfers.\n\nIdea 3:\nRecommend whether to block a suspicious account.\n```\n\nAll use AI, but they should not share the same launch process. The account-blocking system needs stricter review, human oversight, audit logs, false-positive monitoring, and appeal paths."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a risk-tiering artifact:\n\n```txt\nAI feature:\nFraud risk recommendation\n\nDecision influence:\nModel recommends allow, review, hold, or block.\n\nPotential harms:\n- Legitimate user blocked\n- Fraud allowed\n- Compliance issue missed\n- Analyst overtrusts model\n\nRisk tier:\nHigh\n\nRequired controls:\n- Human review before block\n- Model score explanation for analyst\n- Audit trail for recommendation and decision\n- False-positive monitoring\n- Drift monitoring\n- Weekly risk review during beta\n- Clear appeal or support path\n```\n\nFor lower-risk features, controls can be lighter. But every tier should have a clear reason."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is tiering based on model sophistication instead of user harm. A simple model can be high risk if it affects money or access.\n\nAnother mistake is using governance as a blocker only at the end. Tiering should happen during discovery.\n\nA third mistake is not revisiting risk after launch. A feature can become higher risk as usage grows."
+      }
+    ],
+    "answer": "AI risk tiering is a way to decide how much review, testing, monitoring, and control an AI feature needs before launch.",
+    "reasoning": "Here is a risk-tiering artifact:\n\n```txt\nAI feature:\nFraud risk recommendation\n\nDecision influence:\nModel recommends allow, review, hold, or block.\n\nPotential harms:\n- Legitimate user blocked\n- Fraud allowed\n- Compliance issue missed\n- Analyst overtrusts model\n\nRisk tier:\nHigh\n\nRequired controls:\n- Human review before block\n- Model score explanation for analyst\n- Audit trail for recommendation and decision\n- False-positive monitoring\n- Drift monitoring\n- Weekly risk review during beta\n- Clear appeal or support path\n```\n\nFor lower-risk features, controls can be lighter. But every tier should have a clear reason.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why should AI features be risk-tiered?",
+      "What makes an AI feature high risk?",
+      "Why is user harm more important than model complexity?",
+      "What controls might a high-risk AI feature need?",
+      "When should the risk tier be revisited?"
+    ],
+    "interviewAnswer": "I would create AI risk tiers by looking at the decision the AI influences, potential user harm, data sensitivity, reversibility, human oversight, regulatory exposure, and operational impact.\n\nA strong TPM answer shows that AI governance is proportional: light enough for low-risk features, strict enough for money, identity, compliance, and access decisions.",
+    "sourceLinks": [
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      },
+      {
+        "label": "Microsoft: Responsible AI principles",
+        "url": "https://www.microsoft.com/en-us/ai/principles-and-approach/"
+      }
+    ],
+    "beginnerExplanation": "AI risk tiering is a way to decide how much review, testing, monitoring, and control an AI feature needs before launch.\n\nThe beginner mistake is treating all AI features the same. An AI that rewrites marketing copy is not the same as an AI that recommends whether a customer gets credit, flags fraud, blocks an account, or drafts regulated support responses.\n\nThe mental model:\n\n```txt\nLow-risk AI:\nHelps with low-stakes productivity. Human can easily verify output.\n\nMedium-risk AI:\nInfluences user experience or business decisions, but humans can review before harm.\n\nHigh-risk AI:\nAffects money, access, eligibility, identity, compliance, safety, or legal outcomes.\n```\n\nThe TPM's job is to make the risk visible early so the team does not discover governance requirements after building the wrong product.",
+    "example": "Imagine three AI ideas:\n\n```txt\nIdea 1:\nSummarize internal meeting notes.\n\nIdea 2:\nDraft support replies about failed transfers.\n\nIdea 3:\nRecommend whether to block a suspicious account.\n```\n\nAll use AI, but they should not share the same launch process. The account-blocking system needs stricter review, human oversight, audit logs, false-positive monitoring, and appeal paths.",
+    "commonMistakes": "A common mistake is tiering based on model sophistication instead of user harm. A simple model can be high risk if it affects money or access.\n\nAnother mistake is using governance as a blocker only at the end. Tiering should happen during discovery.\n\nA third mistake is not revisiting risk after launch. A feature can become higher risk as usage grows."
+  },
+  {
     "id": "tpm-ai-model-evaluation",
     "track": "TPM",
     "category": "AI Product",
@@ -986,6 +1133,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is evaluating only average quality. A small number of severe failures can make the product unsafe.\n\nAnother mistake is using synthetic examples only. Real messy cases reveal issues polished examples miss.\n\nA third mistake is not refreshing evals after prompts, models, tools, or policies change."
   },
   {
+    "id": "tpm-ai-observability-monitoring",
+    "track": "TPM",
+    "category": "AI Operations",
+    "level": "Intermediate",
+    "question": "What would you monitor for an AI feature in production?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AI observability means understanding how an AI feature behaves in production: what users ask, what the system retrieves, what the model outputs, what tools it calls, how long it takes, how much it costs, and where it fails.\n\nThe beginner mistake is monitoring only uptime. An AI feature can be \"up\" while giving wrong, unsafe, expensive, slow, or unhelpful answers.\n\nThe mental model:\n\n```txt\nTraditional monitoring:\nIs the system available and fast?\n\nAI monitoring:\nIs the system available, fast, useful, safe, grounded, and cost-controlled?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a fintech AI assistant that answers support questions.\n\nYou need to know:\n\n```txt\nQuality:\nAre answers accurate?\n\nGrounding:\nDid the answer use the right source?\n\nSafety:\nDid it reveal sensitive info or give prohibited advice?\n\nOperations:\nDid it escalate when needed?\n\nCost:\nAre token costs growing unexpectedly?\n\nLatency:\nAre users waiting too long?\n```\n\nWithout these, the team will not know whether the feature is helping or quietly creating risk."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a production monitoring plan:\n\n```txt\nFeature:\nAI transfer-status assistant\n\nOperational metrics:\n- Request volume\n- Error rate\n- Latency p50/p95\n- Tool-call failure rate\n- Retrieval failure rate\n- Cost per conversation\n\nQuality metrics:\n- Thumbs-up/down\n- Human escalation rate\n- Agent correction rate\n- Factual error reports\n- Unsupported answer rate\n\nSafety metrics:\n- Sensitive data leakage reports\n- Policy violation rate\n- Fraud/compliance escalation misses\n- Prompt injection attempts\n\nTrace data:\n- User intent\n- Retrieved documents or records\n- Model version\n- Prompt version\n- Tool calls\n- Final answer\n- Refusal or escalation reason\n```\n\nThe TPM should define alert thresholds before launch. For example, if support corrections spike after a prompt change, pause the rollout."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is not logging enough context to debug failures. If you only store the final answer, you may not know whether retrieval, prompt, model, or tool call failed.\n\nAnother mistake is monitoring user satisfaction without safety. Users may like fast answers that are wrong.\n\nA third mistake is ignoring cost. AI features can become financially unhealthy before they become technically broken."
+      }
+    ],
+    "answer": "AI observability means understanding how an AI feature behaves in production: what users ask, what the system retrieves, what the model outputs, what tools it calls, how long it takes, how much it costs, and where it fails.",
+    "reasoning": "Here is a production monitoring plan:\n\n```txt\nFeature:\nAI transfer-status assistant\n\nOperational metrics:\n- Request volume\n- Error rate\n- Latency p50/p95\n- Tool-call failure rate\n- Retrieval failure rate\n- Cost per conversation\n\nQuality metrics:\n- Thumbs-up/down\n- Human escalation rate\n- Agent correction rate\n- Factual error reports\n- Unsupported answer rate\n\nSafety metrics:\n- Sensitive data leakage reports\n- Policy violation rate\n- Fraud/compliance escalation misses\n- Prompt injection attempts\n\nTrace data:\n- User intent\n- Retrieved documents or records\n- Model version\n- Prompt version\n- Tool calls\n- Final answer\n- Refusal or escalation reason\n```\n\nThe TPM should define alert thresholds before launch. For example, if support corrections spike after a prompt change, pause the rollout.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is uptime not enough for AI monitoring?",
+      "What trace data helps debug an AI failure?",
+      "Why should cost be monitored?",
+      "What safety metrics matter in fintech support?",
+      "What should trigger a rollout pause?"
+    ],
+    "interviewAnswer": "I would monitor AI features across availability, latency, cost, quality, grounding, safety, escalation, tool use, and user feedback. I would log prompts, model versions, retrieved context, tool calls, outputs, and decisions so failures are debuggable.\n\nA strong answer shows that AI production health includes behavior, not just infrastructure.",
+    "sourceLinks": [
+      {
+        "label": "Microsoft Learn: Agent monitoring dashboard",
+        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/how-to-monitor-agents-dashboard"
+      },
+      {
+        "label": "OpenAI Agents SDK: Tracing",
+        "url": "https://openai.github.io/openai-agents-js/guides/tracing/"
+      }
+    ],
+    "beginnerExplanation": "AI observability means understanding how an AI feature behaves in production: what users ask, what the system retrieves, what the model outputs, what tools it calls, how long it takes, how much it costs, and where it fails.\n\nThe beginner mistake is monitoring only uptime. An AI feature can be \"up\" while giving wrong, unsafe, expensive, slow, or unhelpful answers.\n\nThe mental model:\n\n```txt\nTraditional monitoring:\nIs the system available and fast?\n\nAI monitoring:\nIs the system available, fast, useful, safe, grounded, and cost-controlled?\n```",
+    "example": "Imagine a fintech AI assistant that answers support questions.\n\nYou need to know:\n\n```txt\nQuality:\nAre answers accurate?\n\nGrounding:\nDid the answer use the right source?\n\nSafety:\nDid it reveal sensitive info or give prohibited advice?\n\nOperations:\nDid it escalate when needed?\n\nCost:\nAre token costs growing unexpectedly?\n\nLatency:\nAre users waiting too long?\n```\n\nWithout these, the team will not know whether the feature is helping or quietly creating risk.",
+    "commonMistakes": "A common mistake is not logging enough context to debug failures. If you only store the final answer, you may not know whether retrieval, prompt, model, or tool call failed.\n\nAnother mistake is monitoring user satisfaction without safety. Users may like fast answers that are wrong.\n\nA third mistake is ignoring cost. AI features can become financially unhealthy before they become technically broken."
+  },
+  {
     "id": "tpm-ai-support-agent-regulated-fintech",
     "track": "TPM",
     "category": "AI & Customer Operations",
@@ -1033,6 +1229,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "An AI support agent can answer customer questions, summarize cases, draft replies, or help support agents work faster.\n\nIn regulated fintech, support answers can affect money, identity, fraud, compliance, account access, and customer trust. The beginner mistake is launching a chatbot as if wrong answers are just a UX issue. In fintech, a wrong answer can tell a user the wrong payment status, expose sensitive data, promise a refund, or mishandle a complaint.\n\nThe TPM should decide where AI is allowed to act:\n\n```txt\nAnswer only:\nAI gives general information.\n\nDraft only:\nAI drafts for a human agent.\n\nAssist:\nAI summarizes and suggests next steps.\n\nAct:\nAI changes account state or triggers workflows.\n```\n\nThe risk increases sharply as the AI moves from answering to acting.",
     "example": "Imagine a customer asks: \"Where is my transfer?\"\n\nA weak AI agent might respond from generic policy:\n\n```txt\nMost transfers arrive in 1-3 days.\n```\n\nBut this customer's transfer may be failed, pending compliance review, delayed by a partner, or already paid. The AI must use trusted system data and know what it is allowed to say.\n\nA safer version:\n\n```txt\nI found your transfer. It is still pending with our payout partner.\nYou do not need to send it again. We will update the status here when the partner confirms the final result.\n```\n\nThat answer needs retrieval, permissions, state awareness, and safety rules.",
     "commonMistakes": "A common mistake is measuring only deflection. If the bot reduces tickets by giving wrong answers, that is not success.\n\nAnother mistake is letting AI answer from stale or generic knowledge when account state matters.\n\nA third mistake is skipping escalation design. Regulated support needs clear human handoff paths."
+  },
+  {
+    "id": "tpm-ai-vendor-evaluation",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you evaluate an AI vendor for a fintech product?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "AI vendor evaluation is deciding whether an external AI provider is reliable, safe, compliant, and useful enough for your product.\n\nThe beginner mistake is evaluating only demo quality. A demo can look impressive while the vendor fails on latency, cost, privacy, auditability, uptime, eval tooling, data controls, or security.\n\nFor fintech, vendor questions are sharper because the product may touch money, identity, support, fraud, or compliance."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a vendor offers an AI support agent for financial services.\n\nA weak evaluation asks:\n\n```txt\nCan it answer our help center questions?\n```\n\nA stronger evaluation asks:\n\n```txt\nCan it answer accurately from approved sources?\nCan it refuse prohibited topics?\nCan it avoid exposing sensitive account data?\nCan it escalate complaints and fraud cases?\nCan we audit what it said and why?\nCan we control data retention?\nCan it meet latency and uptime needs?\nCan we leave the vendor later?\n```\n\nThe TPM should test the riskiest assumptions, not the prettiest demo path."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is an AI vendor scorecard:\n\n```txt\nProduct fit:\n- Supported use cases\n- Quality on our real cases\n- Multilingual support\n- Human handoff\n\nRisk and safety:\n- Refusal behavior\n- Prompt injection handling\n- Sensitive data handling\n- Audit logs\n- Red-team results\n\nData and compliance:\n- Data retention\n- Training-on-customer-data controls\n- Subprocessors\n- Region controls\n- Deletion and export\n\nOperations:\n- SLA\n- Latency\n- Incident communication\n- Monitoring dashboard\n- Support escalation\n\nCommercials:\n- Pricing model\n- Cost at projected volume\n- Overages\n- Contract lock-in\n\nExit:\n- Data export\n- Prompt/config export\n- Fallback provider\n- Migration effort\n```\n\nThe proof of concept should use real scenarios:\n\n```txt\nPOC cases:\n- Failed transfer\n- KYC pending\n- Refund request\n- Sanctions review\n- Angry complaint\n- Prompt injection attempt\n- Unauthenticated account question\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is evaluating vendors with sanitized test cases. Real support and risk cases are messy.\n\nAnother mistake is ignoring data terms. AI vendors may have different retention, training, and logging policies.\n\nA third mistake is not planning exit. AI vendor lock-in can be hidden in prompts, tools, eval datasets, and workflows."
+      }
+    ],
+    "answer": "AI vendor evaluation is deciding whether an external AI provider is reliable, safe, compliant, and useful enough for your product.",
+    "reasoning": "Here is an AI vendor scorecard:\n\n```txt\nProduct fit:\n- Supported use cases\n- Quality on our real cases\n- Multilingual support\n- Human handoff\n\nRisk and safety:\n- Refusal behavior\n- Prompt injection handling\n- Sensitive data handling\n- Audit logs\n- Red-team results\n\nData and compliance:\n- Data retention\n- Training-on-customer-data controls\n- Subprocessors\n- Region controls\n- Deletion and export\n\nOperations:\n- SLA\n- Latency\n- Incident communication\n- Monitoring dashboard\n- Support escalation\n\nCommercials:\n- Pricing model\n- Cost at projected volume\n- Overages\n- Contract lock-in\n\nExit:\n- Data export\n- Prompt/config export\n- Fallback provider\n- Migration effort\n```\n\nThe proof of concept should use real scenarios:\n\n```txt\nPOC cases:\n- Failed transfer\n- KYC pending\n- Refund request\n- Sanctions review\n- Angry complaint\n- Prompt injection attempt\n- Unauthenticated account question\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is demo quality not enough?",
+      "What should an AI vendor POC test?",
+      "What data terms matter?",
+      "Why is auditability important in fintech AI?",
+      "What makes AI vendor lock-in painful?"
+    ],
+    "interviewAnswer": "I would evaluate an AI vendor across product quality, safety, privacy, compliance, auditability, latency, uptime, cost, data controls, operational support, and exit path. I would run a POC on real high-risk scenarios before recommending adoption.\n\nA strong answer treats AI vendor choice as a product, risk, and operating decision.",
+    "sourceLinks": [
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      },
+      {
+        "label": "OWASP: Top 10 for Large Language Model Applications",
+        "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+      }
+    ],
+    "beginnerExplanation": "AI vendor evaluation is deciding whether an external AI provider is reliable, safe, compliant, and useful enough for your product.\n\nThe beginner mistake is evaluating only demo quality. A demo can look impressive while the vendor fails on latency, cost, privacy, auditability, uptime, eval tooling, data controls, or security.\n\nFor fintech, vendor questions are sharper because the product may touch money, identity, support, fraud, or compliance.",
+    "example": "Imagine a vendor offers an AI support agent for financial services.\n\nA weak evaluation asks:\n\n```txt\nCan it answer our help center questions?\n```\n\nA stronger evaluation asks:\n\n```txt\nCan it answer accurately from approved sources?\nCan it refuse prohibited topics?\nCan it avoid exposing sensitive account data?\nCan it escalate complaints and fraud cases?\nCan we audit what it said and why?\nCan we control data retention?\nCan it meet latency and uptime needs?\nCan we leave the vendor later?\n```\n\nThe TPM should test the riskiest assumptions, not the prettiest demo path.",
+    "commonMistakes": "A common mistake is evaluating vendors with sanitized test cases. Real support and risk cases are messy.\n\nAnother mistake is ignoring data terms. AI vendors may have different retention, training, and logging policies.\n\nA third mistake is not planning exit. AI vendor lock-in can be hidden in prompts, tools, eval datasets, and workflows."
   },
   {
     "id": "tpm-ambiguous-executive-ask",
@@ -1721,6 +1966,104 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is promising delivery speed without confirming payout capacity.\n\nAnother mistake is hiding rate expiry. Users get angry if the recipient amount changes after they thought the quote was locked.\n\nA third mistake is not monitoring corridor-level health. Global averages can hide one broken country corridor."
   },
   {
+    "id": "tpm-hallucination-mitigation-fintech",
+    "track": "TPM",
+    "category": "AI & Customer Operations",
+    "level": "Intermediate",
+    "question": "How would you reduce hallucination risk in a fintech AI feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "A hallucination is when an AI system produces information that sounds plausible but is not grounded in truth. In fintech, hallucinations can be dangerous because they may misstate payment status, fees, refund eligibility, compliance requirements, or account restrictions.\n\nThe beginner mistake is saying \"make the model more accurate.\" That is not a product plan. The TPM needs to design the workflow so the AI has trusted sources, knows when to refuse, and cannot take risky actions based on invented information."
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine a user asks, \"Will my transfer arrive today?\"\n\nA risky AI answer:\n\n```txt\nYes, your transfer will arrive by 5 PM.\n```\n\nIf the system does not have confirmed payout status, that answer may be invented.\n\nA safer answer:\n\n```txt\nYour transfer is currently pending with our payout partner. We do not have a final arrival time yet. You do not need to send it again.\n```\n\nThe difference is grounding. The safe answer uses known status and avoids unsupported promises."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a hallucination mitigation artifact:\n\n```txt\nFeature:\nAI transfer status assistant\n\nAllowed sources:\n- Transfer status API\n- Approved status explanations\n- Help center articles\n- Support-safe reason codes\n\nNot allowed:\n- Guessing delivery time\n- Inventing fees\n- Promising refunds\n- Explaining fraud or sanctions logic\n- Giving legal or compliance advice\n\nRequired behavior:\n- Cite or attach source internally\n- Say when information is unavailable\n- Escalate uncertain cases\n- Use structured status templates\n- Refuse unsupported actions\n\nEvaluation cases:\n- Missing status\n- Conflicting partner status\n- Delayed payout\n- Failed transfer\n- Refund request\n- Compliance review\n- User asks for guarantee\n```\n\nThe TPM should monitor severe hallucinations separately from minor wording issues. One invented refund promise can be worse than many awkward sentences."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is relying only on prompt wording. Grounding, retrieval, templates, evals, and permissions matter more.\n\nAnother mistake is optimizing for confident tone. In regulated products, appropriate uncertainty is safer.\n\nA third mistake is not defining prohibited claims. The AI needs clear boundaries."
+      }
+    ],
+    "answer": "A hallucination is when an AI system produces information that sounds plausible but is not grounded in truth. In fintech, hallucinations can be dangerous because they may misstate payment status, fees, refund eligibility, compliance requirements, or account restrictions.",
+    "reasoning": "Here is a hallucination mitigation artifact:\n\n```txt\nFeature:\nAI transfer status assistant\n\nAllowed sources:\n- Transfer status API\n- Approved status explanations\n- Help center articles\n- Support-safe reason codes\n\nNot allowed:\n- Guessing delivery time\n- Inventing fees\n- Promising refunds\n- Explaining fraud or sanctions logic\n- Giving legal or compliance advice\n\nRequired behavior:\n- Cite or attach source internally\n- Say when information is unavailable\n- Escalate uncertain cases\n- Use structured status templates\n- Refuse unsupported actions\n\nEvaluation cases:\n- Missing status\n- Conflicting partner status\n- Delayed payout\n- Failed transfer\n- Refund request\n- Compliance review\n- User asks for guarantee\n```\n\nThe TPM should monitor severe hallucinations separately from minor wording issues. One invented refund promise can be worse than many awkward sentences.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why are hallucinations more dangerous in fintech?",
+      "What does grounding mean?",
+      "Why should the AI say when information is unavailable?",
+      "What claims should be prohibited?",
+      "How would you evaluate hallucination risk?"
+    ],
+    "interviewAnswer": "I would reduce hallucination risk by grounding the AI in trusted sources, limiting allowed claims, using templates for high-risk answers, requiring refusal or escalation when data is missing, evaluating edge cases, and monitoring severe factual errors.\n\nA strong TPM answer designs the product so the AI cannot safely rely on guessing.",
+    "sourceLinks": [
+      {
+        "label": "OpenAI Docs: Evaluation best practices",
+        "url": "https://platform.openai.com/docs/guides/evaluation-best-practices"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "A hallucination is when an AI system produces information that sounds plausible but is not grounded in truth. In fintech, hallucinations can be dangerous because they may misstate payment status, fees, refund eligibility, compliance requirements, or account restrictions.\n\nThe beginner mistake is saying \"make the model more accurate.\" That is not a product plan. The TPM needs to design the workflow so the AI has trusted sources, knows when to refuse, and cannot take risky actions based on invented information.",
+    "example": "Imagine a user asks, \"Will my transfer arrive today?\"\n\nA risky AI answer:\n\n```txt\nYes, your transfer will arrive by 5 PM.\n```\n\nIf the system does not have confirmed payout status, that answer may be invented.\n\nA safer answer:\n\n```txt\nYour transfer is currently pending with our payout partner. We do not have a final arrival time yet. You do not need to send it again.\n```\n\nThe difference is grounding. The safe answer uses known status and avoids unsupported promises.",
+    "commonMistakes": "A common mistake is relying only on prompt wording. Grounding, retrieval, templates, evals, and permissions matter more.\n\nAnother mistake is optimizing for confident tone. In regulated products, appropriate uncertainty is safer.\n\nA third mistake is not defining prohibited claims. The AI needs clear boundaries."
+  },
+  {
+    "id": "tpm-human-in-the-loop-ai-review",
+    "track": "TPM",
+    "category": "AI Operations",
+    "level": "Intermediate",
+    "question": "How would you design a human-in-the-loop review workflow for AI decisions?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Human-in-the-loop means a person reviews, approves, corrects, or overrides an AI recommendation before or after it affects users.\n\nThe beginner mistake is saying \"a human will review it\" without designing the actual workflow. Humans need queues, context, decision options, policies, training, audit logs, and capacity.\n\nThe TPM should ask:\n\n```txt\nWhat does the AI recommend?\nWhen must a human review?\nWhat evidence does the reviewer see?\nWhat decisions can the reviewer make?\nWhat happens after the decision?\nHow do we learn from reviewer corrections?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI model flags transfers for fraud review.\n\nA bad workflow dumps alerts into a queue with a risk score and no context. Analysts either overtrust the score or waste time digging.\n\nA good workflow gives reviewable evidence:\n\n```txt\nAI recommendation:\nManual review\n\nTop signals:\n- New device\n- New recipient\n- High-risk corridor\n- Transfer amount 4x user average\n- Similar pattern seen in confirmed fraud cases\n\nReviewer actions:\n- Approve\n- Request verification\n- Hold\n- Block\n- Escalate\n```\n\nNow the human can make a responsible decision."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a review workflow artifact:\n\n```txt\nReview trigger:\nAI risk score between 70 and 90, or any score with high-risk corridor.\n\nQueue priority:\n1. Money already captured\n2. High-value transfer\n3. Time-sensitive payout\n4. Repeat customer\n\nReviewer view:\n- Customer profile\n- KYC status\n- Transfer history\n- Recipient history\n- Model score\n- Top risk signals\n- Policy guidance\n- Similar prior cases\n\nDecision requirements:\n- Decision reason required\n- Notes required for block\n- Escalation required for sanctions or legal concern\n- All decisions audited\n```\n\nThe TPM should also monitor reviewer quality:\n\n```txt\nMetrics:\n- Review backlog\n- Time to decision\n- Override rate\n- Reviewer disagreement rate\n- Confirmed fraud after approval\n- False-positive appeals\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is using humans as decoration. If reviewers cannot override or understand the AI, oversight is weak.\n\nAnother mistake is creating more alerts than humans can handle. A huge backlog can be worse than no review.\n\nA third mistake is not feeding review outcomes back into evaluation."
+      }
+    ],
+    "answer": "Human-in-the-loop means a person reviews, approves, corrects, or overrides an AI recommendation before or after it affects users.",
+    "reasoning": "Here is a review workflow artifact:\n\n```txt\nReview trigger:\nAI risk score between 70 and 90, or any score with high-risk corridor.\n\nQueue priority:\n1. Money already captured\n2. High-value transfer\n3. Time-sensitive payout\n4. Repeat customer\n\nReviewer view:\n- Customer profile\n- KYC status\n- Transfer history\n- Recipient history\n- Model score\n- Top risk signals\n- Policy guidance\n- Similar prior cases\n\nDecision requirements:\n- Decision reason required\n- Notes required for block\n- Escalation required for sanctions or legal concern\n- All decisions audited\n```\n\nThe TPM should also monitor reviewer quality:\n\n```txt\nMetrics:\n- Review backlog\n- Time to decision\n- Override rate\n- Reviewer disagreement rate\n- Confirmed fraud after approval\n- False-positive appeals\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What does human-in-the-loop mean?",
+      "Why is a review queue not enough?",
+      "What context should reviewers see?",
+      "How can review capacity become a product risk?",
+      "What metrics show review workflow health?"
+    ],
+    "interviewAnswer": "I would design human review by defining triggers, queue priority, reviewer context, allowed decisions, policy guidance, audit logs, escalation paths, capacity metrics, and feedback loops.\n\nA strong answer shows that human oversight is an operating workflow, not a sentence in a PRD.",
+    "sourceLinks": [
+      {
+        "label": "Microsoft: Responsible AI principles",
+        "url": "https://www.microsoft.com/en-us/ai/principles-and-approach/"
+      },
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      }
+    ],
+    "beginnerExplanation": "Human-in-the-loop means a person reviews, approves, corrects, or overrides an AI recommendation before or after it affects users.\n\nThe beginner mistake is saying \"a human will review it\" without designing the actual workflow. Humans need queues, context, decision options, policies, training, audit logs, and capacity.\n\nThe TPM should ask:\n\n```txt\nWhat does the AI recommend?\nWhen must a human review?\nWhat evidence does the reviewer see?\nWhat decisions can the reviewer make?\nWhat happens after the decision?\nHow do we learn from reviewer corrections?\n```",
+    "example": "Imagine an AI model flags transfers for fraud review.\n\nA bad workflow dumps alerts into a queue with a risk score and no context. Analysts either overtrust the score or waste time digging.\n\nA good workflow gives reviewable evidence:\n\n```txt\nAI recommendation:\nManual review\n\nTop signals:\n- New device\n- New recipient\n- High-risk corridor\n- Transfer amount 4x user average\n- Similar pattern seen in confirmed fraud cases\n\nReviewer actions:\n- Approve\n- Request verification\n- Hold\n- Block\n- Escalate\n```\n\nNow the human can make a responsible decision.",
+    "commonMistakes": "A common mistake is using humans as decoration. If reviewers cannot override or understand the AI, oversight is weak.\n\nAnother mistake is creating more alerts than humans can handle. A huge backlog can be worse than no review.\n\nA third mistake is not feeding review outcomes back into evaluation."
+  },
+  {
     "id": "tpm-incident-management",
     "track": "TPM",
     "category": "Operations",
@@ -1868,6 +2211,55 @@ export const generatedQuestions: Question[] = [
     "commonMistakes": "A common mistake is letting engineers build ledger states without product definitions. That leads to support and UI confusion later.\n\nAnother mistake is hiding holds from users. If money is unavailable, the product should explain why and what happens next where legally and operationally safe.\n\nA third mistake is allowing manual adjustments without auditability. In money systems, manual fixes need controls."
   },
   {
+    "id": "tpm-llm-cost-latency-tradeoffs",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you manage cost and latency tradeoffs for an LLM-powered feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "LLM features have product economics. Every request can carry cost, latency, and quality tradeoffs.\n\nThe beginner mistake is picking the strongest model for everything. That may work in a demo but fail in production if responses are too slow or too expensive.\n\nThe TPM needs to think in product tiers:\n\n```txt\nHigh-quality model:\nBetter reasoning, higher cost, often higher latency.\n\nSmaller or faster model:\nLower cost and faster, but may need narrower tasks or stricter guardrails.\n\nCached or reused output:\nFast and cheap when the answer does not need fresh reasoning.\n\nHuman review:\nSlower and more expensive, but safer for high-risk outcomes.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI support assistant in a remittance app.\n\nNot every task needs the same model:\n\n```txt\nClassify ticket category:\nFast, cheap model may be enough.\n\nSummarize long case history:\nMay need a model with larger context.\n\nDraft customer response for failed transfer:\nNeeds accuracy and policy grounding.\n\nRecommend fraud action:\nMay need human review regardless of model.\n```\n\nThe TPM should map task risk and complexity before choosing model strategy."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a cost-latency artifact:\n\n```txt\nFeature:\nAI support assistant\n\nTask 1:\nIntent classification\nTarget latency: under 500 ms\nQuality requirement: medium\nModel strategy: small model\n\nTask 2:\nCase summary\nTarget latency: under 3 seconds\nQuality requirement: high factual accuracy\nModel strategy: stronger model, structured output\n\nTask 3:\nCustomer reply draft\nTarget latency: under 5 seconds\nQuality requirement: high, policy grounded\nModel strategy: stronger model plus retrieval\n\nTask 4:\nCompliance-sensitive answer\nTarget latency: human workflow acceptable\nQuality requirement: very high\nModel strategy: draft-only with human approval\n```\n\nThen define controls:\n\n```txt\nOptimization levers:\n- Shorter prompts\n- Retrieval only when needed\n- Prompt caching\n- Smaller model for classification\n- Batch processing for non-urgent work\n- Output length limits\n- Reuse prior summaries\n- Escalate high-risk tasks instead of over-automating\n```"
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is optimizing cost before defining acceptable quality. Cheap wrong answers are expensive.\n\nAnother mistake is optimizing quality without user patience. A perfect answer that takes too long may not work in support.\n\nA third mistake is ignoring usage growth. A feature that is affordable with 1,000 requests may become painful at 1 million."
+      }
+    ],
+    "answer": "LLM features have product economics. Every request can carry cost, latency, and quality tradeoffs.",
+    "reasoning": "Here is a cost-latency artifact:\n\n```txt\nFeature:\nAI support assistant\n\nTask 1:\nIntent classification\nTarget latency: under 500 ms\nQuality requirement: medium\nModel strategy: small model\n\nTask 2:\nCase summary\nTarget latency: under 3 seconds\nQuality requirement: high factual accuracy\nModel strategy: stronger model, structured output\n\nTask 3:\nCustomer reply draft\nTarget latency: under 5 seconds\nQuality requirement: high, policy grounded\nModel strategy: stronger model plus retrieval\n\nTask 4:\nCompliance-sensitive answer\nTarget latency: human workflow acceptable\nQuality requirement: very high\nModel strategy: draft-only with human approval\n```\n\nThen define controls:\n\n```txt\nOptimization levers:\n- Shorter prompts\n- Retrieval only when needed\n- Prompt caching\n- Smaller model for classification\n- Batch processing for non-urgent work\n- Output length limits\n- Reuse prior summaries\n- Escalate high-risk tasks instead of over-automating\n```",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why should not every task use the strongest model?",
+      "What is a latency target?",
+      "Why can output length affect cost and speed?",
+      "When is human review better than a bigger model?",
+      "What metrics show AI unit economics?"
+    ],
+    "interviewAnswer": "I would manage LLM cost and latency by splitting the workflow into tasks, setting quality and latency targets, choosing model strategy per task, using caching or smaller models where safe, limiting output, and monitoring cost per successful outcome.\n\nA strong TPM answer connects AI model choices to user experience and unit economics.",
+    "sourceLinks": [
+      {
+        "label": "OpenAI Docs: Latency optimization",
+        "url": "https://platform.openai.com/docs/guides/latency-optimization"
+      },
+      {
+        "label": "OpenAI Docs: Cost optimization",
+        "url": "https://platform.openai.com/docs/guides/cost-optimization"
+      }
+    ],
+    "beginnerExplanation": "LLM features have product economics. Every request can carry cost, latency, and quality tradeoffs.\n\nThe beginner mistake is picking the strongest model for everything. That may work in a demo but fail in production if responses are too slow or too expensive.\n\nThe TPM needs to think in product tiers:\n\n```txt\nHigh-quality model:\nBetter reasoning, higher cost, often higher latency.\n\nSmaller or faster model:\nLower cost and faster, but may need narrower tasks or stricter guardrails.\n\nCached or reused output:\nFast and cheap when the answer does not need fresh reasoning.\n\nHuman review:\nSlower and more expensive, but safer for high-risk outcomes.\n```",
+    "example": "Imagine an AI support assistant in a remittance app.\n\nNot every task needs the same model:\n\n```txt\nClassify ticket category:\nFast, cheap model may be enough.\n\nSummarize long case history:\nMay need a model with larger context.\n\nDraft customer response for failed transfer:\nNeeds accuracy and policy grounding.\n\nRecommend fraud action:\nMay need human review regardless of model.\n```\n\nThe TPM should map task risk and complexity before choosing model strategy.",
+    "commonMistakes": "A common mistake is optimizing cost before defining acceptable quality. Cheap wrong answers are expensive.\n\nAnother mistake is optimizing quality without user patience. A perfect answer that takes too long may not work in support.\n\nA third mistake is ignoring usage growth. A feature that is affordable with 1,000 requests may become painful at 1 million."
+  },
+  {
     "id": "tpm-migration-communications",
     "track": "TPM",
     "category": "Migration & Change Management",
@@ -1964,6 +2356,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "A migration moves users, data, traffic, or workflows from an old system to a new one. Migrations are risky because the user may not care that a new platform is cleaner. They care whether their data is correct, the product still works, and nothing disappears.\n\nFor a TPM, the migration is a product and operations problem, not just an engineering project. You need to know what changes for users, what changes for internal teams, what data must be preserved, how the team validates correctness, and how to recover if the migration goes wrong.",
     "example": "Imagine moving scheduled transfers from an old payments service to a new orchestration platform.\n\nThe risky questions are:\n\n- Which scheduled transfers already exist?\n- Which service owns them during migration?\n- Can both systems execute the same transfer by accident?\n- What happens to transfers scheduled during the migration window?\n- How do we verify every schedule moved correctly?\n- Can we roll back?\n- What does support see if a user asks about a migrated transfer?\n\nThis is why a migration plan needs phases.\n\n```txt\nPhase 1: Inventory\n- List data, users, workflows, dependencies, and owners.\n\nPhase 2: Dual read or shadow mode\n- New system observes or mirrors behavior without owning the user outcome.\n\nPhase 3: Limited migration\n- Move a low-risk cohort or one corridor.\n\nPhase 4: Expand\n- Increase traffic or data volume after validation.\n\nPhase 5: Decommission\n- Remove old paths only after no active dependency remains.\n```",
     "commonMistakes": "A common mistake is treating migration as complete when data is copied. It is not complete until the product works, the data reconciles, and old dependencies are safely retired.\n\nAnother mistake is forgetting in-flight activity. Users may create, edit, or cancel things while migration is happening.\n\nA third mistake is assuming rollback is always easy. If the new system mutates data, the team may need a forward-fix plan instead."
+  },
+  {
+    "id": "tpm-model-drift-risk-systems",
+    "track": "TPM",
+    "category": "AI & Risk",
+    "level": "Intermediate",
+    "question": "How would you monitor model drift in an AI risk system?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Model drift happens when a model's performance changes because the world around it changes. Fraud patterns change. Customer behavior changes. New corridors launch. Economic conditions shift. Attackers adapt.\n\nThe beginner mistake is thinking a model that performed well at launch will keep performing well. Risk systems need ongoing monitoring because the data and adversaries do not stay still.\n\nThere are two useful drift ideas:\n\n```txt\nData drift:\nInputs change. Example: more transactions now come from a new country.\n\nPerformance drift:\nOutcomes get worse. Example: false positives rise or fraud misses increase.\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI fraud model that worked well for US card payments. The company launches a new remittance corridor. Transaction sizes, names, devices, funding sources, and fraud behavior now look different.\n\nIf the model is not monitored, it may:\n\n```txt\nBlock too many legitimate users.\nMiss new fraud patterns.\nCreate analyst backlog.\nTreat normal corridor behavior as suspicious.\nOverfit to old fraud signals.\n```\n\nThe TPM should plan monitoring before expansion."
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a drift monitoring artifact:\n\n```txt\nSystem:\nAI fraud risk model\n\nInput drift metrics:\n- Transaction amount distribution\n- Corridor mix\n- Device mix\n- New recipient rate\n- User tenure distribution\n\nOutcome metrics:\n- Confirmed fraud rate\n- False-positive rate\n- Manual review rate\n- Analyst override rate\n- Appeal success rate\n- Fraud loss after approval\n\nSegments:\n- Corridor\n- Funding method\n- New versus returning users\n- Business versus consumer\n- High-value transfers\n\nReview cadence:\n- Daily during new corridor launch\n- Weekly for normal operations\n- Immediate review after fraud spike or policy change\n\nActions:\n- Adjust thresholds\n- Add rules\n- Retrain model\n- Narrow rollout\n- Increase manual review\n- Pause automated decisions\n```\n\nThe TPM should also define ownership. Data science may monitor model metrics, but product owns whether the current behavior is acceptable for users and the business."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is monitoring only aggregate performance. Drift often appears in one segment first.\n\nAnother mistake is waiting for fraud losses before acting. Leading indicators like analyst overrides and false positives can warn earlier.\n\nA third mistake is not documenting model changes. If performance changes after retraining, the team needs traceability."
+      }
+    ],
+    "answer": "Model drift happens when a model's performance changes because the world around it changes. Fraud patterns change. Customer behavior changes. New corridors launch. Economic conditions shift. Attackers adapt.",
+    "reasoning": "Here is a drift monitoring artifact:\n\n```txt\nSystem:\nAI fraud risk model\n\nInput drift metrics:\n- Transaction amount distribution\n- Corridor mix\n- Device mix\n- New recipient rate\n- User tenure distribution\n\nOutcome metrics:\n- Confirmed fraud rate\n- False-positive rate\n- Manual review rate\n- Analyst override rate\n- Appeal success rate\n- Fraud loss after approval\n\nSegments:\n- Corridor\n- Funding method\n- New versus returning users\n- Business versus consumer\n- High-value transfers\n\nReview cadence:\n- Daily during new corridor launch\n- Weekly for normal operations\n- Immediate review after fraud spike or policy change\n\nActions:\n- Adjust thresholds\n- Add rules\n- Retrain model\n- Narrow rollout\n- Increase manual review\n- Pause automated decisions\n```\n\nThe TPM should also define ownership. Data science may monitor model metrics, but product owns whether the current behavior is acceptable for users and the business.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "What is model drift?",
+      "What is the difference between data drift and performance drift?",
+      "Why should drift be monitored by segment?",
+      "What early warning metrics matter?",
+      "What actions can the team take when drift appears?"
+    ],
+    "interviewAnswer": "I would monitor model drift by tracking input distributions, outcome metrics, false positives, fraud misses, overrides, appeals, and segment-level performance. I would define review cadence, alert thresholds, ownership, and actions like threshold changes, retraining, added rules, or pausing automation.\n\nA strong TPM answer treats AI risk systems as living products that need continuous governance.",
+    "sourceLinks": [
+      {
+        "label": "NIST: AI Risk Management Framework",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+      },
+      {
+        "label": "Federal Reserve: SR 11-7 model risk management",
+        "url": "https://www.federalreserve.gov/boarddocs/srletters/2011/sr1107a1.pdf"
+      }
+    ],
+    "beginnerExplanation": "Model drift happens when a model's performance changes because the world around it changes. Fraud patterns change. Customer behavior changes. New corridors launch. Economic conditions shift. Attackers adapt.\n\nThe beginner mistake is thinking a model that performed well at launch will keep performing well. Risk systems need ongoing monitoring because the data and adversaries do not stay still.\n\nThere are two useful drift ideas:\n\n```txt\nData drift:\nInputs change. Example: more transactions now come from a new country.\n\nPerformance drift:\nOutcomes get worse. Example: false positives rise or fraud misses increase.\n```",
+    "example": "Imagine an AI fraud model that worked well for US card payments. The company launches a new remittance corridor. Transaction sizes, names, devices, funding sources, and fraud behavior now look different.\n\nIf the model is not monitored, it may:\n\n```txt\nBlock too many legitimate users.\nMiss new fraud patterns.\nCreate analyst backlog.\nTreat normal corridor behavior as suspicious.\nOverfit to old fraud signals.\n```\n\nThe TPM should plan monitoring before expansion.",
+    "commonMistakes": "A common mistake is monitoring only aggregate performance. Drift often appears in one segment first.\n\nAnother mistake is waiting for fraud losses before acting. Leading indicators like analyst overrides and false positives can warn earlier.\n\nA third mistake is not documenting model changes. If performance changes after retraining, the team needs traceability."
   },
   {
     "id": "tpm-onboarding-activation-metrics",
@@ -2356,6 +2797,55 @@ export const generatedQuestions: Question[] = [
     "beginnerExplanation": "Privacy by design means privacy is considered while the product is being shaped, not after the feature is already built.\n\nThe beginner mistake is thinking privacy is only a legal review at the end. By then, the team may have already collected too much data, exposed it to too many people, stored it too long, or made deletion hard.\n\nFor a TPM, privacy by design is a product-thinking discipline:\n\n```txt\nWhat data do we need?\nWhy do we need it?\nWho can see it?\nHow long do we keep it?\nHow does the user understand and control it?\nWhat could go wrong for the person if this data is misused?\n```\n\nPrivacy is not only about avoiding fines. It is about user trust and reducing harm.",
     "example": "Imagine a remittance product wants to add \"recipient suggestions.\" When a user sends money, the app suggests previous recipients and maybe contacts from the user's phone.\n\nA weak approach says:\n\n```txt\nAsk for contact access and upload contacts so suggestions work.\n```\n\nA privacy-by-design approach asks:\n\n```txt\nIs contact access actually required?\nCan suggestions work from recipients the user already paid?\nCan contact matching happen on device?\nCan the user choose not to enable contacts?\nWhat exactly is uploaded?\nAre contacts stored?\nCan the user delete imported data?\nDo recipients know their data is being used?\n```\n\nThe product may decide that saved recipients are enough for the first version. That is a privacy-friendly product decision, not a legal afterthought.",
     "commonMistakes": "A common mistake is collecting data because it might be useful later. That creates privacy and security burden without clear user value.\n\nAnother mistake is hiding privacy choices in vague copy. Users should understand what is happening in plain language.\n\nA third mistake is forgetting lifecycle. Privacy includes collection, use, access, sharing, retention, deletion, and auditability."
+  },
+  {
+    "id": "tpm-prompt-versioning-change-management",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you manage prompt changes and versioning in a production AI feature?",
+    "lessonSections": [
+      {
+        "title": "Learn it",
+        "body": "Prompts are product behavior. Changing a prompt can change what the AI says, refuses, summarizes, omits, escalates, or recommends.\n\nThe beginner mistake is treating prompt edits like copy tweaks. In production AI systems, prompt changes need versioning, testing, review, rollout, and rollback just like code or rules.\n\nThe mental model:\n\n```txt\nPrompt version:\nWhat instructions were active?\n\nEvaluation:\nDid the new version improve behavior without breaking important cases?\n\nRollout:\nWho sees the new version first?\n\nRollback:\nHow do we return to the previous version if quality drops?\n```"
+      },
+      {
+        "title": "Walkthrough",
+        "body": "Imagine an AI support assistant that summarizes failed transfer cases. A PM changes the prompt to make summaries shorter. Now the summary sometimes omits the transfer ID or complaint language.\n\nThat is not a small writing issue. Support agents may miss escalation requirements.\n\nA safer system asks:\n\n```txt\nWhat changed?\nWhy did it change?\nWhich evals passed?\nWhich cases got worse?\nWho approved it?\nWhich users or agents see it first?\nCan we roll back quickly?\n```"
+      },
+      {
+        "title": "Make it practical",
+        "body": "Here is a prompt-change artifact:\n\n```txt\nPrompt:\nSupport case summarizer\n\nChange:\nReduce summary length and force structured fields.\n\nReason:\nAgents said long summaries slow triage.\n\nRequired evals:\n- Payment delay cases\n- Refund requests\n- Complaint language\n- KYC review cases\n- Sensitive internal notes\n\nMust not regress:\n- Transfer ID accuracy\n- Amount accuracy\n- Complaint detection\n- Sensitive note exclusion\n\nRollout:\n10 percent of agents for 48 hours.\n\nMonitoring:\n- Agent edit rate\n- Thumbs-down rate\n- Escalation miss rate\n- Average handle time\n\nRollback:\nRevert to v12 if severe factual error or complaint miss exceeds threshold.\n```\n\nThat makes prompt management operational instead of vibes-based."
+      },
+      {
+        "title": "Common mistakes",
+        "body": "A common mistake is not knowing which prompt produced a bad output. Without version logs, debugging is guesswork.\n\nAnother mistake is evaluating only the changed happy path. Prompt edits can break unrelated cases.\n\nA third mistake is rolling out to everyone at once. Production prompts deserve controlled release."
+      }
+    ],
+    "answer": "Prompts are product behavior. Changing a prompt can change what the AI says, refuses, summarizes, omits, escalates, or recommends.",
+    "reasoning": "Here is a prompt-change artifact:\n\n```txt\nPrompt:\nSupport case summarizer\n\nChange:\nReduce summary length and force structured fields.\n\nReason:\nAgents said long summaries slow triage.\n\nRequired evals:\n- Payment delay cases\n- Refund requests\n- Complaint language\n- KYC review cases\n- Sensitive internal notes\n\nMust not regress:\n- Transfer ID accuracy\n- Amount accuracy\n- Complaint detection\n- Sensitive note exclusion\n\nRollout:\n10 percent of agents for 48 hours.\n\nMonitoring:\n- Agent edit rate\n- Thumbs-down rate\n- Escalation miss rate\n- Average handle time\n\nRollback:\nRevert to v12 if severe factual error or complaint miss exceeds threshold.\n```\n\nThat makes prompt management operational instead of vibes-based.",
+    "tests": "Use the prompts to check whether the idea is clear enough to explain without memorizing.",
+    "followUps": [
+      "Why is a prompt change a product change?",
+      "What should be logged with each prompt version?",
+      "Why do evals need regression cases?",
+      "What metrics reveal prompt quality after launch?",
+      "Why is rollback important?"
+    ],
+    "interviewAnswer": "I would manage production prompts with version history, change reason, evals, regression tests, approval, staged rollout, monitoring, and rollback.\n\nA strong TPM answer treats prompts as part of the product contract, not informal text hidden inside the system.",
+    "sourceLinks": [
+      {
+        "label": "OpenAI Docs: Prompting",
+        "url": "https://platform.openai.com/docs/guides/prompting"
+      },
+      {
+        "label": "OpenAI Docs: Evaluation best practices",
+        "url": "https://platform.openai.com/docs/guides/evaluation-best-practices"
+      }
+    ],
+    "beginnerExplanation": "Prompts are product behavior. Changing a prompt can change what the AI says, refuses, summarizes, omits, escalates, or recommends.\n\nThe beginner mistake is treating prompt edits like copy tweaks. In production AI systems, prompt changes need versioning, testing, review, rollout, and rollback just like code or rules.\n\nThe mental model:\n\n```txt\nPrompt version:\nWhat instructions were active?\n\nEvaluation:\nDid the new version improve behavior without breaking important cases?\n\nRollout:\nWho sees the new version first?\n\nRollback:\nHow do we return to the previous version if quality drops?\n```",
+    "example": "Imagine an AI support assistant that summarizes failed transfer cases. A PM changes the prompt to make summaries shorter. Now the summary sometimes omits the transfer ID or complaint language.\n\nThat is not a small writing issue. Support agents may miss escalation requirements.\n\nA safer system asks:\n\n```txt\nWhat changed?\nWhy did it change?\nWhich evals passed?\nWhich cases got worse?\nWho approved it?\nWhich users or agents see it first?\nCan we roll back quickly?\n```",
+    "commonMistakes": "A common mistake is not knowing which prompt produced a bad output. Without version logs, debugging is guesswork.\n\nAnother mistake is evaluating only the changed happy path. Prompt edits can break unrelated cases.\n\nA third mistake is rolling out to everyone at once. Production prompts deserve controlled release."
   },
   {
     "id": "tpm-release-readiness",

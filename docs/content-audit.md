@@ -10,14 +10,14 @@ The biggest remaining gap is not structure. The structure is working. The bigges
 
 Current bank:
 
-- 62 total lessons.
+- 72 total lessons.
 - 17 Frontend lessons.
-- 45 TPM lessons.
-- 29,342 lesson words, excluding fenced code.
-- 241 fenced code blocks.
-- 125 source links.
-- 125 source links in the bank.
-- 0 source links failing after cleanup and the latest batch.
+- 55 TPM lessons.
+- 32,030 lesson words, excluding fenced code.
+- 276 fenced code blocks.
+- 145 source links.
+- 145 source links in the bank.
+- 0 source links failing after cleanup and the latest batch, excluding official OpenAI docs that resolve in browser/search but return Cloudflare 403 to command-line fetch.
 
 ## Scoring Rubric
 
@@ -71,7 +71,7 @@ These source URLs failed or were blocked during the initial audit and have been 
 | `tpm-vendor-evaluation` | `https://owasp.org/www-project-vendor-security-questionnaire/` | 404 | Replaced with Google VSAQ source. |
 | `tpm-vendor-evaluation` | `https://www.atlassian.com/team-playbook/plays/trade-off-sliders` | 404 | Replaced with current Atlassian trade-offs source. |
 
-The latest new-batch source check passed: 20 new links checked, 0 failing. The full-bank validator can produce transient network `TypeError` results on otherwise reachable older sources, so batch validation is now the stronger gate for new work.
+The latest new-batch source check passed for reachable links. Official OpenAI docs in the batch resolve in browser/search but return Cloudflare 403 to command-line fetch, so those are treated as fetch-protected rather than broken. The full-bank validator can produce transient network `TypeError` results on otherwise reachable older sources, so batch validation is now the stronger gate for new work.
 
 ## Priority Rewrite List
 
@@ -215,6 +215,40 @@ Completed on 2026-05-15: ten fintech and AI TPM lessons were added:
 10. `tpm-ai-model-evaluation`
     - Added AI feature eval plan, launch thresholds, severe-failure criteria, and post-launch monitoring.
 
+### Priority 6: AI Governance And Operations TPM Batch 2
+
+Completed on 2026-05-15: ten AI governance, safety, observability, and operations lessons were added:
+
+1. `tpm-ai-governance-risk-tiering`
+   - Added AI risk tiers, review requirements, launch controls, monitoring, and appeal considerations.
+
+2. `tpm-prompt-versioning-change-management`
+   - Added prompt-change artifact with versioning, eval gates, rollout, rollback, and ownership.
+
+3. `tpm-human-in-the-loop-ai-review`
+   - Added review workflow, confidence routing, reviewer tooling, audit logs, and quality metrics.
+
+4. `tpm-ai-observability-monitoring`
+   - Added AI observability signals, trace review, cost and latency metrics, and regression alerts.
+
+5. `tpm-llm-cost-latency-tradeoffs`
+   - Added cost-latency artifact with model routing, caching, streaming, escalation, and quality guardrails.
+
+6. `tpm-ai-vendor-evaluation`
+   - Added vendor scorecard for model quality, data controls, reliability, security, compliance, and exit risk.
+
+7. `tpm-ai-agent-tool-permissions`
+   - Added tool permission model, approval rules, least-privilege design, and dangerous-action controls.
+
+8. `tpm-ai-data-privacy-retention`
+   - Added data privacy and retention artifact covering minimization, redaction, access, deletion, and auditability.
+
+9. `tpm-hallucination-mitigation-fintech`
+   - Added mitigation artifact for grounded answers, unsupported claims, citations, escalation, and evaluation.
+
+10. `tpm-model-drift-risk-systems`
+    - Added drift monitoring artifact for fraud/risk systems, alert thresholds, review cadence, and retraining triggers.
+
 ## Missing Topic Map
 
 ### Frontend Topics To Add Next
@@ -231,15 +265,15 @@ High-value interview topics not yet covered or not yet deeply expanded:
 
 ### TPM Topics To Add Next
 
-Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 45, so 55 more TPM lessons are needed.
+Goal: reach 100 TPM lessons with fintech and AI focus. Current TPM count is 55, so 45 more TPM lessons are needed.
 
 Next batches should cover:
 
-1. AI governance, model monitoring, prompt/version management, and human-in-the-loop review.
-2. Fintech fraud operations, disputes, chargebacks, risk queues, and case management.
-3. Banking, cards, lending, credit, treasury, liquidity, and ledger operations.
-4. Compliance, privacy, data retention, audit, complaints, and regulatory reporting.
-5. AI agents in regulated workflows, AI observability, AI cost/latency, and AI vendor evaluation.
+1. Fintech fraud operations, disputes, chargebacks, risk queues, and case management.
+2. Banking, cards, lending, credit, treasury, liquidity, and ledger operations.
+3. Compliance, privacy, data retention, audit, complaints, and regulatory reporting.
+4. AI agents in regulated workflows, AI copilot safety, eval datasets, and red-team workflows.
+5. Product operations for fintech incidents, partner risk, customer harm, and regulated communications.
 
 ## Content Standard Going Forward
 
@@ -304,11 +338,11 @@ Completed on 2026-05-14: the second expansion batch added 10 more lessons:
 
 ## Immediate Next Step
 
-Source cleanup, Priority 1 TPM enrichment, and two 10-lesson expansion batches are now complete.
+Source cleanup, Priority 1 TPM enrichment, two 10-lesson expansion batches, Fintech/AI TPM Batch 1, and AI Governance TPM Batch 2 are now complete.
 
 Recommended order:
 
-1. Commit and push Fintech/AI TPM Batch 1 after review.
-2. Add the next reviewed fintech/AI TPM batch.
+1. Commit and push AI Governance TPM Batch 2 after review.
+2. Add the next reviewed fintech operations TPM batch.
 3. Keep the app focused on browse, search, filters, reveal, save, and review.
 4. Keep running source validation and browser spot-checks after every batch.

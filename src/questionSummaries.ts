@@ -189,11 +189,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-agent-tool-permissions",
+    "track": "TPM",
+    "category": "AI Agents",
+    "level": "Intermediate",
+    "question": "How would you design permissions for an AI agent that can use tools?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-credit-underwriting",
     "track": "TPM",
     "category": "AI & Fintech",
     "level": "Intermediate",
     "question": "How would you approach AI-assisted credit underwriting as a TPM?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-data-privacy-retention",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Intermediate",
+    "question": "How would you handle data privacy and retention for an AI feature?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -211,6 +233,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-governance-risk-tiering",
+    "track": "TPM",
+    "category": "AI Governance",
+    "level": "Intermediate",
+    "question": "How would you create a risk-tiering model for AI features?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-model-evaluation",
     "track": "TPM",
     "category": "AI Product",
@@ -222,11 +255,33 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-ai-observability-monitoring",
+    "track": "TPM",
+    "category": "AI Operations",
+    "level": "Intermediate",
+    "question": "What would you monitor for an AI feature in production?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-ai-support-agent-regulated-fintech",
     "track": "TPM",
     "category": "AI & Customer Operations",
     "level": "Intermediate",
     "question": "How would you launch an AI support agent in a regulated fintech product?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-ai-vendor-evaluation",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you evaluate an AI vendor for a fintech product?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -387,6 +442,28 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-hallucination-mitigation-fintech",
+    "track": "TPM",
+    "category": "AI & Customer Operations",
+    "level": "Intermediate",
+    "question": "How would you reduce hallucination risk in a fintech AI feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-human-in-the-loop-ai-review",
+    "track": "TPM",
+    "category": "AI Operations",
+    "level": "Intermediate",
+    "question": "How would you design a human-in-the-loop review workflow for AI decisions?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-incident-management",
     "track": "TPM",
     "category": "Operations",
@@ -420,6 +497,17 @@ export const questionSummaries: Question[] = [
     "followUps": []
   },
   {
+    "id": "tpm-llm-cost-latency-tradeoffs",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you manage cost and latency tradeoffs for an LLM-powered feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
     "id": "tpm-migration-communications",
     "track": "TPM",
     "category": "Migration & Change Management",
@@ -436,6 +524,17 @@ export const questionSummaries: Question[] = [
     "category": "Technical Strategy",
     "level": "Intermediate",
     "question": "How would you plan a platform or data migration?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-model-drift-risk-systems",
+    "track": "TPM",
+    "category": "AI & Risk",
+    "level": "Intermediate",
+    "question": "How would you monitor model drift in an AI risk system?",
     "answer": "",
     "reasoning": "",
     "tests": "",
@@ -524,6 +623,17 @@ export const questionSummaries: Question[] = [
     "category": "Security & Compliance",
     "level": "Intermediate",
     "question": "How would you apply privacy by design to a new product feature?",
+    "answer": "",
+    "reasoning": "",
+    "tests": "",
+    "followUps": []
+  },
+  {
+    "id": "tpm-prompt-versioning-change-management",
+    "track": "TPM",
+    "category": "AI Product",
+    "level": "Intermediate",
+    "question": "How would you manage prompt changes and versioning in a production AI feature?",
     "answer": "",
     "reasoning": "",
     "tests": "",
